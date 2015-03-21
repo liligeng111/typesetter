@@ -53,7 +53,16 @@
     <ClCompile Include="typesetter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="font.cpp">
+    <ClCompile Include="viewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="path.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="box.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="algebra.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -75,7 +84,16 @@
     <ClInclude Include="typesetter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="font.h">
+    <ClInclude Include="viewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="path.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="box.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="algebra.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

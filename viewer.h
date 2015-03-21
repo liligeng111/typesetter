@@ -4,6 +4,8 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_viewer.h"
 
+using namespace std;
+
 class Viewer : public QMainWindow
 {
 	Q_OBJECT
@@ -11,6 +13,9 @@ class Viewer : public QMainWindow
 public:
 	Viewer(QWidget *parent = 0);
 	~Viewer();
+
+
+	static void Message(const string& msg);
 
 private:
 	Ui::viewerClass ui;

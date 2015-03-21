@@ -101,7 +101,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;.\lib\freetype\freetype255d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,7 +137,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="font.cpp" />
+    <ClCompile Include="algebra.cpp" />
+    <ClCompile Include="box.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_viewer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -157,8 +158,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="path.cpp" />
     <ClCompile Include="typesetter.cpp" />
     <ClCompile Include="viewer.cpp" />
+    <ClCompile Include="viewport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="viewer.h">
@@ -201,9 +204,12 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="font.h" />
+    <ClInclude Include="algebra.h" />
+    <ClInclude Include="box.h" />
     <ClInclude Include="GeneratedFiles\ui_viewer.h" />
+    <ClInclude Include="path.h" />
     <ClInclude Include="typesetter.h" />
+    <ClInclude Include="viewport.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="viewer.qrc">

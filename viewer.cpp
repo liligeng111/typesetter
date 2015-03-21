@@ -1,4 +1,6 @@
 #include "viewer.h"
+#include <qmessagebox.h>
+
 
 Viewer::Viewer(QWidget *parent)
 	: QMainWindow(parent)
@@ -9,4 +11,9 @@ Viewer::Viewer(QWidget *parent)
 Viewer::~Viewer()
 {
 
+}
+
+void Viewer::Message(const string& msg)
+{
+	QMessageBox::critical(NULL, "Error", QString::fromStdString(msg));
 }

@@ -16,6 +16,8 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
@@ -26,6 +28,8 @@ class Ui_viewerClass
 {
 public:
     QWidget *centralWidget;
+    QPushButton *renderButton;
+    QPlainTextEdit *plainTextEdit;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -37,6 +41,12 @@ public:
         viewerClass->resize(600, 400);
         centralWidget = new QWidget(viewerClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
+        renderButton = new QPushButton(centralWidget);
+        renderButton->setObjectName(QStringLiteral("renderButton"));
+        renderButton->setGeometry(QRect(30, 260, 75, 23));
+        plainTextEdit = new QPlainTextEdit(centralWidget);
+        plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
+        plainTextEdit->setGeometry(QRect(20, 30, 281, 181));
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -57,6 +67,8 @@ public:
     void retranslateUi(QMainWindow *viewerClass)
     {
         viewerClass->setWindowTitle(QApplication::translate("viewerClass", "Typesetter", 0));
+        renderButton->setText(QApplication::translate("viewerClass", "Render", 0));
+        plainTextEdit->setPlainText(QApplication::translate("viewerClass", "The quick brown fox jumps over the lazy dog.", 0));
     } // retranslateUi
 
 };

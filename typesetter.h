@@ -4,7 +4,6 @@
 #include <ft2build.h>
 #include <vector>
 #include FT_FREETYPE_H
-#include "viewer.h"
 #include "box.h"
 
 using namespace std;
@@ -12,6 +11,7 @@ using namespace std;
 class Box;
 class Glyph;
 
+class Viewer;
 class Typesetter
 {
 
@@ -23,16 +23,21 @@ public:
 
 	Typesetter();
 	~Typesetter();
+
+	void set_content(string& content) { content_ = content; }
+
 	void Render(RenderTarget target);
-	static void Message(const string& msg) { Viewer::Message(msg); }
+	static void Message(const string& msg);
+	void Typeset();
 
 
 private:
-	void Typeset();
 
 	string content_;
 	FT_Library  library_;
 	FT_Face face_;
 	vector<Box> boxes_;
+
+	void clean() { boxes_ = vector<Box>(); };
 
 };

@@ -14,37 +14,10 @@ Box::~Box()
 
 string Box::SVG(int n) const
 {
-	Path* path = glyph_->path();
-	if (!(path->points_))
-	{
-		Typesetter::Message("Uninitialized glyph");
-	}
-
-	string str = "<path id=\"p" + to_string(n) + "\" fill=\"rgb(0, 0, 0)\" d=\"";
-
-	int j = 0;
-	for (int i = 0; i < path->n_contours_; i++)
-	{
-		bool first = true;
-		str += " M ";
-		for (; j <= path->contours_[i]; j++)
-		{
-			if (first)
-			{
-				first = false;
-			}
-			else
-			{
-				if (path->tags_[i] & (1 << 0))
-					str += " L ";
-				else
-					str += " Q ";
-			}
-			str += to_string(path->points_[j].x() + x_) + " " + to_string(path->points_[j].y() + y_);
-		}
-		str += " Z";
-	}
-
-	str += "\"/>";
+	string str = "";
+	str += "<g transform = \"translate(" + to_string(x_) + ", " + to_string(y_) + ")\">";
+	str += "<path id=\"p" + to_string(n) + "\" fill=\"rgb(0, 0, 0)\" d=\"";
+	str += glyph_->path()->SVG();
+	str += "\"/></g>";
 	return str;
 }

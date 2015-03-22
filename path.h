@@ -9,9 +9,10 @@ using namespace std;
 class Path
 {
 public:
-	friend class Box;
 	Path(FT_Outline outline);
 	~Path();
+
+	string SVG() const { return svg_; }
 
 private:
 	int n_contours_;
@@ -20,5 +21,6 @@ private:
 	char* tags_;
 	int* contours_;
 	int flags_;
+	string svg_;
 };
 

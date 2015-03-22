@@ -1,4 +1,30 @@
 #include "path.h"
+#include "typesetter.h"
+
+int MoveTo(const FT_Vector* to, void* user)
+{
+	((string*)user)->append(" M " + to_string(to->x) + " " + to_string(to->y));
+	return 0;
+}
+
+int LineTo(const FT_Vector* to, void* user)
+{
+	((string*)user)->append(" L " + to_string(to->x) + " " + to_string(to->y));
+	return 0;
+}
+
+int ConicTo(const FT_Vector* control, const FT_Vector* to, void* user)
+{
+	((string*)user)->append(" Q " + to_string(control->x) + " " + to_string(control->y) + " " + to_string(to->x) + " " + to_string(to->y));
+	return 0;
+}
+
+int CubicTo(const FT_Vector* control1, const FT_Vector* control2, const FT_Vector* to, void* user)
+{
+	Typesetter::Message("Cannot handle cubic curve");
+	return 1;
+}
+
 
 Path::Path(FT_Outline outline)
 {
@@ -19,6 +45,22 @@ Path::Path(FT_Outline outline)
 	{
 		contours_[i] = outline.contours[i];
 	}
+
+	FT_Outline_Funcs funcs;
+	funcs.move_to = &MoveTo;
+	funcs.line_to = &LineTo;
+	funcs.conic_to = &ConicTo;
+	funcs.cubic_to = &CubicTo;
+	funcs.delta = 0;
+	funcs.shift = 0;
+
+	// Write the outline to SVG;
+	svg_ = "";
+	FT_Error error = FT_Outline_Decompose(&outline, &funcs, &svg_);
+	if (error)
+	{
+		Typesetter::Message("Error decomposing outline");
+	}
 }
 
 
@@ -28,3 +70,4 @@ Path::~Path()
 	delete tags_;
 	delete contours_;
 }
+

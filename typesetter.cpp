@@ -1,11 +1,11 @@
 #include "typesetter.h"
 #include <iostream>
 #include <fstream>
+#include "viewer.h"
 
 Typesetter::Typesetter()
 {
-	content_ = "ABC DE";
-	//content_ = "\"The quick brown fox jumps over the lazy dog\" is an English-language pangram¡ªa phrase that contains all of the letters of the alphabet. It is commonly used for touch-typing practice. It is also used to test typewriters and computer keyboards, show fonts, and other applications involving all of the letters in the English alphabet. Owing to its brevity and coherence, it has become widely known.";
+	content_ = "";
 	
 	FT_Error error = FT_Init_FreeType(&library_);
 	if (error)
@@ -23,19 +23,35 @@ Typesetter::Typesetter()
 		Message("Unable to read the font file or it is broken.");
 	}
 
-	FT_Set_Char_Size(face_, 0, 2 * 64, 72, 72);
+	error = FT_Set_Char_Size(face_, 0, 12 * 64, 72, 72);
+	if (error)
+	{
+		Message("Cannot set char size");
+	}
+	error = FT_Set_Pixel_Sizes(face_, 0, 64);
+	if (error)
+	{
+		Message("Cannot set pixel size");
+	}
 
-	Typeset();
-	Render(RenderTarget::SVG);
 }
 
 Typesetter::~Typesetter()
 {
 }
 
+void Typesetter::Message(const string& msg)
+{ 
+	Viewer::Message(msg); 
+}
+
 void Typesetter::Typeset()
 {
+	//clear previous boxes
+	clean();
+
 	long x_cursor = 0;
+	long y_cursor = 0;
 	FT_UInt last_char = 0;
 
 	for (int i = 0; i < content_.length(); i++)
@@ -47,20 +63,19 @@ void Typesetter::Typeset()
 		}
 		
 		//kern
-		if (last_char)
-		{
-			FT_Vector* kern = new FT_Vector();
-			//? what are the modes?
-			FT_Get_Kerning(face_, last_char, content_[i], FT_KERNING_DEFAULT, kern);
-			x_cursor += kern->x;
-		}
+		FT_Vector* kern = new FT_Vector();
+		//? what are the modes?
+		FT_Get_Kerning(face_, last_char, content_[i], FT_KERNING_DEFAULT, kern);
+		x_cursor += kern->x;
 		last_char = content_[i];
-
+		
 		Glyph* glyph = new Glyph(face_->glyph);
 		Box* box = new Box(glyph);
+
 		box->set_x(x_cursor);
 		boxes_.push_back(*box);
 		x_cursor += box->glyph()->advance().x();
+		//x_cursor += face_->glyph->metrics.width;
 	}
 }
 
@@ -79,10 +94,10 @@ void Typesetter::Render(RenderTarget target)
 		file << "	xmlns:svg=\"http://www.w3.org/2000/svg\"\n";
 		file << "	xmlns=\"http://www.w3.org/2000/svg\"\n";
 		file << "	version=\"1.1\"\n";
-		file << "	viewBox=\"0 0 2000 3000\">\n";
+		file << "	viewBox=\"0 0 20000 30000\">\n";
 		file << "<defs>\n";
 		file << "</defs>\n";
-		file << "<g transform = \"translate(-73, 1500) scale(1, -1)\">\n";
+		file << "<g transform = \"translate(-15000, 5000) scale(1, -1)\">\n";
 
 
 		//print all the boxes

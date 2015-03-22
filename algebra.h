@@ -1,18 +1,19 @@
 #pragma once
 
-class Vector
+class Vector3l
 {
 public:
-	Vector(float x, float y) : x_(x), y_(y), z_(1) {}
-	Vector(float x, float y, float z) : x_(x), y_(y), z_(z) {}
-	~Vector();
+	Vector3l() : x_(1), y_(1), z_(1) {}
+	Vector3l(long x, long y) : x_(x), y_(y), z_(1) {}
+	Vector3l(long x, long y, long z) : x_(x), y_(y), z_(z) {}
+	~Vector3l();
 
-	float x() const { return x_; }
-	float y() const { return y_; }
-	float z() const { return z_; }
+	int x() const { return x_; }
+	int y() const { return y_; }
+	int z() const { return z_; }
 
 private:
-	float x_, y_, z_;
+	long x_, y_, z_;
 };
 
 
@@ -21,7 +22,9 @@ class Matrix
 public:
 	Matrix();
 	~Matrix();
+
+	void Translate(float x, float y);
 	
 private:
-	float m_[][];
+	//float m_[][];
 };

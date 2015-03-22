@@ -1,7 +1,7 @@
 #pragma once
 
 #include "path.h"
-#include "algebra.h"
+#include "glyph.h"
 
 class Box
 {
@@ -13,13 +13,26 @@ public:
 		LINE = 2
 	};
 
-	Box();
+	Box(Glyph* glyph);
 	~Box();
 
+	Glyph* glyph() { return glyph_; }
+	void set_glyph(Glyph* glyph) { glyph_ = glyph; }
+
+	long x() const { return x_; }
+	long y() const { return y_; }
+	void set_x(long x) { x_ = x; }
+	void set_y(long y) { y_ = y; }
+
+	string SVG(int n) const;
+	
 private:
 	Box* parent_;
 	Box** children_;
 	Path* path_;
-	Matrix matrix_;
+	long x_;
+	long y_;
+	Glyph* glyph_;
+	//Matrix matrix_;
 };
 

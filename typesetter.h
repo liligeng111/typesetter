@@ -2,10 +2,15 @@
 
 #include <string>
 #include <ft2build.h>
+#include <vector>
 #include FT_FREETYPE_H
 #include "viewer.h"
+#include "box.h"
 
 using namespace std;
+
+class Box;
+class Glyph;
 
 class Typesetter
 {
@@ -19,12 +24,15 @@ public:
 	Typesetter();
 	~Typesetter();
 	void Render(RenderTarget target);
+	static void Message(const string& msg) { Viewer::Message(msg); }
 
 
 private:
-	static void Message(const string& msg) { Viewer::Message(msg); }
+	void Typeset();
 
 	string content_;
 	FT_Library  library_;
 	FT_Face face_;
+	vector<Box> boxes_;
+
 };

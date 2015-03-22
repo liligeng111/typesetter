@@ -1,7 +1,7 @@
 #include "algebra.h"
 
 
-Vector::~Vector()
+Vector3l::~Vector3l()
 {
 }
 

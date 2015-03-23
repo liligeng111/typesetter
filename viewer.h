@@ -24,6 +24,8 @@ private slots:
 private:
 	Ui::viewerClass ui;
 	Typesetter typesetter;
+
+	void Resize();
 };
 
 #endif // VIEWER_H

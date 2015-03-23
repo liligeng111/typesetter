@@ -14,6 +14,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPlainTextEdit>
@@ -30,6 +31,7 @@ public:
     QWidget *centralWidget;
     QPushButton *renderButton;
     QPlainTextEdit *plainTextEdit;
+    QLabel *label;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -38,19 +40,22 @@ public:
     {
         if (viewerClass->objectName().isEmpty())
             viewerClass->setObjectName(QStringLiteral("viewerClass"));
-        viewerClass->resize(600, 400);
+        viewerClass->resize(897, 642);
         centralWidget = new QWidget(viewerClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         renderButton = new QPushButton(centralWidget);
         renderButton->setObjectName(QStringLiteral("renderButton"));
-        renderButton->setGeometry(QRect(30, 260, 75, 23));
+        renderButton->setGeometry(QRect(70, 560, 75, 23));
         plainTextEdit = new QPlainTextEdit(centralWidget);
         plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
-        plainTextEdit->setGeometry(QRect(20, 30, 281, 181));
+        plainTextEdit->setGeometry(QRect(0, 410, 211, 121));
+        label = new QLabel(centralWidget);
+        label->setObjectName(QStringLiteral("label"));
+        label->setGeometry(QRect(200, 0, 47, 13));
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 600, 21));
+        menuBar->setGeometry(QRect(0, 0, 897, 21));
         viewerClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(viewerClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -69,6 +74,7 @@ public:
         viewerClass->setWindowTitle(QApplication::translate("viewerClass", "Typesetter", 0));
         renderButton->setText(QApplication::translate("viewerClass", "Render", 0));
         plainTextEdit->setPlainText(QApplication::translate("viewerClass", "The quick brown fox jumps over the lazy dog.", 0));
+        label->setText(QApplication::translate("viewerClass", "TextLabel", 0));
     } // retranslateUi
 
 };

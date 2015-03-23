@@ -36,8 +36,10 @@ private:
 	string content_;
 	FT_Library  library_;
 	FT_Face face_;
-	vector<Box> boxes_;
+	Box* root_;
 
-	void clean() { boxes_ = vector<Box>(); };
+	void clean();
+
+	void Align();
 
 };

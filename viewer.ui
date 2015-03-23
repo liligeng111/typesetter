@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>897</width>
+    <height>642</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="renderButton">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>260</y>
+      <x>70</x>
+      <y>560</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -30,14 +30,27 @@
    <widget class="QPlainTextEdit" name="plainTextEdit">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>281</width>
-      <height>181</height>
+      <x>0</x>
+      <y>410</y>
+      <width>211</width>
+      <height>121</height>
      </rect>
     </property>
     <property name="plainText">
      <string>The quick brown fox jumps over the lazy dog.</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>0</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
     </property>
    </widget>
   </widget>
@@ -46,7 +59,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>897</width>
      <height>21</height>
     </rect>
    </property>

@@ -53,6 +53,71 @@
      <string>TextLabel</string>
     </property>
    </widget>
+   <widget class="QCheckBox" name="spaceBorderButton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>30</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Space Border</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="wordBorderButton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>70</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Word Border</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="charBorderButton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>50</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Char Border</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="pageBorderButton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>110</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Page Border</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="lineBorderButton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>90</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Line Border</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

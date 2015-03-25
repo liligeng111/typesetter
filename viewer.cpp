@@ -47,3 +47,28 @@ void Viewer::on_renderButton_clicked()
 	ui.label->setPixmap(QPixmap::fromImage(image));
 	ui.label->update();
 }
+
+void Viewer::on_spaceBorderButton_clicked(bool checked)
+{
+	settings::border_[Box::BoxType::SPACE] = checked;
+}
+
+void Viewer::on_charBorderButton_clicked(bool checked)
+{
+	settings::border_[Box::BoxType::CHAR] = checked;
+}
+
+void Viewer::on_wordBorderButton_clicked(bool checked)
+{
+	settings::border_[Box::BoxType::WORD] = checked;
+}
+
+void Viewer::on_lineBorderButton_clicked(bool checked)
+{
+	settings::border_[Box::BoxType::LINE] = checked;
+}
+
+void Viewer::on_pageBorderButton_clicked(bool checked)
+{
+	settings::border_[Box::BoxType::PAGE] = checked;
+}

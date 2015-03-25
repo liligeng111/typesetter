@@ -40,6 +40,7 @@ Typesetter::Typesetter()
 
 	root_ = new Box(NULL, Box::BoxType::PAGE);
 	root_->set_geometry(settings::mm_to_char(settings::margin_left_), settings::mm_to_char(settings::margin_top_), settings::content_width_char(), settings::content_height_char());
+	Box::set_descender(face_->descender);
 }
 
 Typesetter::~Typesetter()
@@ -86,14 +87,14 @@ void Typesetter::Typeset()
 		if (content_[i] == ' ' && (i == 0 || content_[i - 1] != ' '))
 		{
 			current_box = new Box(NULL, Box::BoxType::SPACE);
-			current_box->set_geometry(x_cursor, 0, 0, face_->units_per_EM);
+			current_box->set_geometry(x_cursor, 0, 0, -face_->units_per_EM);
 			words_.push_back(current_box);
 		}
 		//new word
 		else if (content_[i] != ' ' && (i == 0 || content_[i - 1] == ' '))
 		{
 			current_box = new Box(NULL, Box::BoxType::WORD);
-			current_box->set_geometry(x_cursor, face_->units_per_EM - face_->descender, 0, 0);
+			current_box->set_geometry(x_cursor, 0, 0, 0);
 			words_.push_back(current_box);
 		}
 
@@ -103,13 +104,14 @@ void Typesetter::Typeset()
 		if (content_[i] == ' ')
 		{
 			box = new Box(glyph, NULL, Box::BoxType::CHAR);
+			box->set_geometry(x_cursor - current_box->x(), 0, box->glyph()->advance().x(), box->glyph()->advance().y());
 		}
 		else
 		{
 			box = new Box(glyph, current_box, Box::BoxType::CHAR);
+			box->set_geometry(x_cursor - current_box->x() + box->glyph()->hori_bearing_x(), box->glyph()->hori_bearing_y(), box->glyph()->width(), -box->glyph()->height());
 		}
 
-		box->set_geometry(x_cursor - current_box->x() + box->glyph()->hori_bearing_x(), -box->glyph()->hori_bearing_y(), box->glyph()->width(), box->glyph()->height());
 		current_box->ExpandBox(box);
 		x_cursor += box->glyph()->advance().x();
 	}
@@ -135,10 +137,10 @@ void Typesetter::Align()
 			x_adjust = -child->x();
 			y_adjust += face_->units_per_EM;
 			current_line->set_geometry(0, y_adjust, 0, face_->units_per_EM);
-			current_line->ExpandBox(child);
 		}
 		child->Translate(x_adjust, 0);
 		child->set_parent(current_line);
+		current_line->ExpandBox(child);
 	}
 
 }
@@ -158,7 +160,7 @@ void Typesetter::Render(RenderTarget target)
 		file << "	xmlns:svg=\"http://www.w3.org/2000/svg\"\n";
 		file << "	xmlns=\"http://www.w3.org/2000/svg\"\n";
 		file << "	version=\"1.1\"\n";
-		file << "	viewBox=\"0 0 " + to_string(settings::mm_to_char(settings::paper_width_)) + " " + to_string(settings::mm_to_char(settings::paper_height_)) + "\">\n";
+		file << "	viewBox=\"0 0 " + to_string(settings::mm_to_char(settings::page_width_)) + " " + to_string(settings::mm_to_char(settings::page_height_)) + "\">\n";
 		file << "<defs>\n";
 		file << "</defs>\n";
 		file << "<g transform = \"scale(1, 1)\">\n";

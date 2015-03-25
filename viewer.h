@@ -4,6 +4,7 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_viewer.h"
 #include "typesetter.h"
+#include "settings.h"
 
 using namespace std;
 
@@ -20,6 +21,11 @@ public:
 
 private slots:
 	void on_renderButton_clicked();
+	void on_spaceBorderButton_clicked(bool checked);
+	void on_charBorderButton_clicked(bool checked);
+	void on_wordBorderButton_clicked(bool checked);
+	void on_lineBorderButton_clicked(bool checked);
+	void on_pageBorderButton_clicked(bool checked);
 
 private:
 	Ui::viewerClass ui;

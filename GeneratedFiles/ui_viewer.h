@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
@@ -32,6 +33,11 @@ public:
     QPushButton *renderButton;
     QPlainTextEdit *plainTextEdit;
     QLabel *label;
+    QCheckBox *spaceBorderButton;
+    QCheckBox *wordBorderButton;
+    QCheckBox *charBorderButton;
+    QCheckBox *pageBorderButton;
+    QCheckBox *lineBorderButton;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -52,6 +58,21 @@ public:
         label = new QLabel(centralWidget);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(200, 0, 47, 13));
+        spaceBorderButton = new QCheckBox(centralWidget);
+        spaceBorderButton->setObjectName(QStringLiteral("spaceBorderButton"));
+        spaceBorderButton->setGeometry(QRect(30, 30, 82, 17));
+        wordBorderButton = new QCheckBox(centralWidget);
+        wordBorderButton->setObjectName(QStringLiteral("wordBorderButton"));
+        wordBorderButton->setGeometry(QRect(30, 70, 82, 17));
+        charBorderButton = new QCheckBox(centralWidget);
+        charBorderButton->setObjectName(QStringLiteral("charBorderButton"));
+        charBorderButton->setGeometry(QRect(30, 50, 82, 17));
+        pageBorderButton = new QCheckBox(centralWidget);
+        pageBorderButton->setObjectName(QStringLiteral("pageBorderButton"));
+        pageBorderButton->setGeometry(QRect(30, 110, 82, 17));
+        lineBorderButton = new QCheckBox(centralWidget);
+        lineBorderButton->setObjectName(QStringLiteral("lineBorderButton"));
+        lineBorderButton->setGeometry(QRect(30, 90, 82, 17));
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -75,6 +96,11 @@ public:
         renderButton->setText(QApplication::translate("viewerClass", "Render", 0));
         plainTextEdit->setPlainText(QApplication::translate("viewerClass", "The quick brown fox jumps over the lazy dog.", 0));
         label->setText(QApplication::translate("viewerClass", "TextLabel", 0));
+        spaceBorderButton->setText(QApplication::translate("viewerClass", "Space Border", 0));
+        wordBorderButton->setText(QApplication::translate("viewerClass", "Word Border", 0));
+        charBorderButton->setText(QApplication::translate("viewerClass", "Char Border", 0));
+        pageBorderButton->setText(QApplication::translate("viewerClass", "Page Border", 0));
+        lineBorderButton->setText(QApplication::translate("viewerClass", "Line Border", 0));
     } // retranslateUi
 
 };

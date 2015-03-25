@@ -2,6 +2,8 @@
 #include "typesetter.h"
 #include "settings.h"
 
+long Box::descender_ = 0;
+
 Box::Box(Glyph* glyph, Box* parent, BoxType type)
 {
 	glyph_ = glyph;
@@ -62,21 +64,20 @@ string Box::SVG() const
 		str += "</g>";
 	}
 	else
-	{
+	{	
+		//reverse for line
+		if (type_ == LINE)
+		{
+			str += "<g transform = 'scale(1, -1) translate(0, " + to_string(-descender_ - height_) + ")'>\n";
+		}
 		//a recurse
 		for (Box* child : children_)
 		{
-			//reverse for line
-			if (type_ == LINE)
-			{
-				str += "<g transform = 'scale(1, -1)'>\n";
-				str += child->SVG();
-				str += "</g>";
-			}
-			else
-			{
-				str += child->SVG();
-			}
+			str += child->SVG();
+		}
+		if (type_ == LINE)
+		{
+			str += "</g>";
 		}
 	}
 

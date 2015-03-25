@@ -38,6 +38,7 @@ public:
 	//void set_y(long y) { y_ = y; }
 	//void set_width(long width) { width_ = width; }
 	//void set_height(long height) { height_ = height; }
+	static void set_descender(long descender) { descender_ = descender; }
 	void set_geometry(long x, long y, long width, long height) { x_ = x; y_ = y; width_ = width; height_ = height; }
 	void Translate(long x, long y) { x_ += x; y_ += y; }
 	void ExpandBox(Box* box);
@@ -52,6 +53,7 @@ private:
 	long y_;
 	long width_;
 	long height_;
+	static long descender_;
 	Glyph* glyph_;
 	//Matrix matrix_;
 };

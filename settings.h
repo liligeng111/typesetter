@@ -4,8 +4,8 @@
 namespace settings
 {
 	// in mm.
-	extern float paper_width_;
-	extern float paper_height_;
+	extern float page_width_;
+	extern float page_height_;
 	// Diff for first page?
 	extern float margin_top_;
 	extern float margin_left_;
@@ -22,12 +22,12 @@ namespace settings
 	// not so sure if I am doing this correctly
 	inline extern float mm_to_char(float a) { return a * 72 * 64 / 25.4; }
 
-	inline extern int display_width() { return paper_width_ * dpi_ / 25.4; }
-	inline extern int display_height() { return paper_height_ * dpi_ / 25.4; }
+	inline extern int display_width() { return page_width_ * dpi_ / 25.4; }
+	inline extern int display_height() { return page_height_ * dpi_ / 25.4; }
 
 	// space in char exclude all margins.
-	inline extern int content_width_char() { return mm_to_char(paper_width_ - margin_left_ - margin_right_); }
-	inline extern int content_height_char() { return mm_to_char(paper_height_ - margin_top_ - margin_bottom_); }
+	inline extern int content_width_char() { return mm_to_char(page_width_ - margin_left_ - margin_right_); }
+	inline extern int content_height_char() { return mm_to_char(page_height_ - margin_top_ - margin_bottom_); }
 
 	//borders
 	extern bool border_[];

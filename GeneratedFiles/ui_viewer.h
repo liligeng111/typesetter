@@ -48,7 +48,7 @@ public:
         renderButton->setGeometry(QRect(70, 560, 75, 23));
         plainTextEdit = new QPlainTextEdit(centralWidget);
         plainTextEdit->setObjectName(QStringLiteral("plainTextEdit"));
-        plainTextEdit->setGeometry(QRect(0, 410, 211, 121));
+        plainTextEdit->setGeometry(QRect(20, 410, 211, 121));
         label = new QLabel(centralWidget);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(200, 0, 47, 13));

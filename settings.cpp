@@ -12,4 +12,8 @@ namespace settings
 	int dpi_ = 96;
 
 	int font_size_ = 12;
+
+	//sapce, char, word, line, page
+	bool border_[] = { true, false, true, true, true };
+	std::string border_color[] = { "(15, 250, 0)", "(250, 15, 0)", "(250, 150, 0)", "(120, 120, 0)", "(0, 150, 200)" };
 };

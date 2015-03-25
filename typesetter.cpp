@@ -6,10 +6,10 @@
 
 Typesetter::Typesetter()
 {
-	root_ = new Box(NULL);
 	//just to be sure
 	content_ = "";
 	
+	// init all th FT stuff
 	FT_Error error = FT_Init_FreeType(&library_);
 	if (error)
 	{
@@ -38,6 +38,8 @@ Typesetter::Typesetter()
 		Message("Cannot set pixel size");
 	}
 
+	root_ = new Box(NULL, Box::BoxType::PAGE);
+	root_->set_geometry(settings::mm_to_char(settings::margin_left_), settings::mm_to_char(settings::margin_top_), settings::content_width_char(), settings::content_height_char());
 }
 
 Typesetter::~Typesetter()
@@ -51,8 +53,8 @@ void Typesetter::Message(const string& msg)
 
 void Typesetter::clean()
 {
-	delete root_; 
-	root_ = new Box(NULL);
+	root_->Clear();
+	words_ = vector<Box*>();
 }
 
 void Typesetter::Typeset()
@@ -80,25 +82,35 @@ void Typesetter::Typeset()
 		last_char = content_[i];
 		
 
-		//ignore space
-		if (content_[i] == ' ')
+		//new space
+		if (content_[i] == ' ' && (i == 0 || content_[i - 1] != ' '))
 		{
-			x_cursor += face_->glyph->advance.x;
-			continue;
+			current_box = new Box(NULL, Box::BoxType::SPACE);
+			current_box->set_geometry(x_cursor, 0, 0, face_->units_per_EM);
+			words_.push_back(current_box);
 		}
 		//new word
-		if (i == 0 || content_[i - 1] == ' ')
+		else if (content_[i] != ' ' && (i == 0 || content_[i - 1] == ' '))
 		{
-			current_box = new Box(root_);
-			current_box->set_x(x_cursor);
+			current_box = new Box(NULL, Box::BoxType::WORD);
+			current_box->set_geometry(x_cursor, face_->units_per_EM - face_->descender, 0, 0);
+			words_.push_back(current_box);
 		}
 
 		Glyph* glyph = new Glyph(face_->glyph);
-		Box* box = new Box(glyph, current_box);
+		Box* box;
+		// noly add char
+		if (content_[i] == ' ')
+		{
+			box = new Box(glyph, NULL, Box::BoxType::CHAR);
+		}
+		else
+		{
+			box = new Box(glyph, current_box, Box::BoxType::CHAR);
+		}
 
-		box->set_x(x_cursor - current_box->x());
-		//not really beautiful
-		current_box->set_width(x_cursor - current_box->x() + box->glyph()->advance().x());
+		box->set_geometry(x_cursor - current_box->x() + box->glyph()->hori_bearing_x(), -box->glyph()->hori_bearing_y(), box->glyph()->width(), box->glyph()->height());
+		current_box->ExpandBox(box);
 		x_cursor += box->glyph()->advance().x();
 	}
 
@@ -108,22 +120,25 @@ void Typesetter::Typeset()
 void Typesetter::Align()
 {
 	//clear previous boxes
-	long x_cursor = 0;
 	long x_adjust = 0;
-	long y_cursor = 0;
 	long y_adjust = 0;
+	Box* current_line = new Box(root_, Box::BoxType::LINE);
+	current_line->set_geometry(0, y_adjust, 0, face_->units_per_EM);
 
 	//check eack box
-	for (Box* child : *(root_->children()))
+	for (Box* child : words_)
 	{
 		if (child->x() + child->width() + x_adjust > settings::content_width_char())
 		{
 			//need newline
-			x_cursor = 0;
+			current_line = new Box(root_, Box::BoxType::LINE);
 			x_adjust = -child->x();
-			y_adjust -= 2000;
+			y_adjust += face_->units_per_EM;
+			current_line->set_geometry(0, y_adjust, 0, face_->units_per_EM);
+			current_line->ExpandBox(child);
 		}
-		child->Transform(x_adjust, y_adjust);
+		child->Translate(x_adjust, 0);
+		child->set_parent(current_line);
 	}
 
 }
@@ -143,10 +158,10 @@ void Typesetter::Render(RenderTarget target)
 		file << "	xmlns:svg=\"http://www.w3.org/2000/svg\"\n";
 		file << "	xmlns=\"http://www.w3.org/2000/svg\"\n";
 		file << "	version=\"1.1\"\n";
-		file << "	viewBox=\"0 0 " + to_string(settings::mm_to_char_(settings::paper_width_)) + " " + to_string(settings::mm_to_char_(settings::paper_height_)) + "\">\n";
+		file << "	viewBox=\"0 0 " + to_string(settings::mm_to_char(settings::paper_width_)) + " " + to_string(settings::mm_to_char(settings::paper_height_)) + "\">\n";
 		file << "<defs>\n";
 		file << "</defs>\n";
-		file << "<g transform = \"translate(" + to_string(settings::mm_to_char_(settings::margin_left_)) + ", " + to_string(settings::mm_to_char_(settings::margin_top_))+ ") scale(1, -1)\">\n";
+		file << "<g transform = \"scale(1, 1)\">\n";
 
 
 		//print all the boxes

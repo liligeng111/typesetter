@@ -37,6 +37,8 @@ private:
 	FT_Library  library_;
 	FT_Face face_;
 	Box* root_;
+	vector<Box*> words_;
+
 
 	void clean();
 

@@ -13,6 +13,10 @@ public:
 	long linear_hori_advance() const { return linear_hori_advance_; }
 	long linear_vert_advance() const { return linear_vert_advance_; }
 	Vector3l advance() const { return advance_; }
+	long width() const { return width_; }
+	long height() const { return height_; }
+	long hori_bearing_x() const { return hori_bearing_x_; }
+	long hori_bearing_y() const { return hori_bearing_y_; }
 
 	
 private:
@@ -20,5 +24,10 @@ private:
 	long linear_hori_advance_;
 	long linear_vert_advance_;
 	Vector3l advance_;
+	long width_;
+	long height_;
+
+	long hori_bearing_x_;
+	long hori_bearing_y_;
 };
 

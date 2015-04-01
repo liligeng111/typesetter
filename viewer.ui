@@ -30,14 +30,36 @@
    <widget class="QPlainTextEdit" name="plainTextEdit">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>410</y>
-      <width>211</width>
-      <height>121</height>
+      <x>10</x>
+      <y>330</y>
+      <width>321</width>
+      <height>211</height>
      </rect>
     </property>
     <property name="plainText">
-     <string>The quick brown fox jumps over the lazy dog.</string>
+     <string>In olden times, when wishing still did some good, there lived a king whose daughters were all beautiful, but the youngest was so beautiful that the sun itself, who, indeed, has seen so much, marveled every time it shone upon her face. In the vicinity of the king's castle there was a large, dark forest, and in this forest, beneath an old linden tree, there was a well. In the heat of the day the princess would go out into the forest and sit on the edge of the cool well. To pass the time she would take a golden ball, throw it into the air, and then catch it. It was her favorite plaything.
+
+Now one day it happened that the princess's golden ball did not fall into her hands, that she held up high, but instead it fell to the ground and rolled right into the water. The princess followed it with her eyes, but the ball disappeared, and the well was so deep that she could not see its bottom. Then she began to cry. She cried louder and louder, and she could not console herself.
+
+As she was thus lamenting, someone called out to her, &quot;What is the matter with you, princess? Your crying would turn a stone to pity.&quot;
+
+She looked around to see where the voice was coming from and saw a frog, who had stuck his thick, ugly head out of the water. &quot;Oh, it's you, old water-splasher,&quot; she said. &quot;I am crying because my golden ball has fallen into the well.&quot;
+
+&quot;Be still and stop crying,&quot; answered the frog. I can help you, but what will you give me if I bring back your plaything?&quot;
+
+&quot;Whatever you want, dear frog,&quot; she said, &quot;my clothes, my pearls and precious stones, and even the golden crown that I am wearing.&quot;
+
+The frog answered, &quot;I do not want your clothes, your pearls and precious stones, nor your golden crown, but if you will love me and accept me as a companion and playmate, and let me sit next to you at your table and eat from your golden plate and drink from your cup and sleep in your bed, if you will promise this to me, then I'll dive down and bring your golden ball back to you.&quot;
+
+&quot;Oh, yes,&quot; she said, &quot;I promise all of that to you if you will just bring the ball back to me.&quot; But she thought, &quot;What is this stupid frog trying to say? He just sits here in the water with his own kind and croaks. He cannot be a companion to a human.&quot;
+
+As soon as the frog heard her say &quot;yes&quot; he stuck his head under and dove to the bottom. He paddled back up a short time later with the golden ball in his mouth and threw it onto the grass. The princess was filled with joy when she saw her beautiful plaything once again, picked it up, and ran off.
+
+&quot;Wait, wait,&quot; called the frog, &quot;take me along. I cannot run as fast as you.&quot; But what did it help him, that he croaked out after her as loudly as he could? She paid no attention to him, but instead hurried home and soon forgot the poor frog, who had to return again to his well.
+
+The next day the princess was sitting at the table with the king and all the people of the court, and was eating from her golden plate when something came creeping up the marble steps: plip, plop, plip, plop. As soon as it reached the top, there came a knock at the door, and a voice called out, &quot;Princess, youngest, open the door for me!&quot;
+
+</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -117,6 +139,81 @@
     <property name="text">
      <string>Line Border</string>
     </property>
+   </widget>
+   <widget class="QCheckBox" name="riverButton">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>150</y>
+      <width>82</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show River</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="fontSizeBox">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>250</y>
+      <width>60</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>32</number>
+    </property>
+    <property name="value">
+     <number>12</number>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>250</y>
+      <width>50</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Font Size:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="alignBox">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>280</y>
+      <width>120</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Ragged Right</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>First Fit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Best Fit</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Optimum Fit</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

@@ -5,6 +5,7 @@
 #include <vector>
 #include FT_FREETYPE_H
 #include "box.h"
+#include "river.h"
 
 using namespace std;
 
@@ -30,6 +31,7 @@ public:
 	static void Message(const string& msg);
 	void Typeset();
 
+	void LoadFace();
 
 private:
 
@@ -38,10 +40,16 @@ private:
 	FT_Face face_;
 	Box* root_;
 	vector<Box*> words_;
+	vector<Box*> lines_;
+	vector<River*> rivers_;
+	long line_height_;
+	
+	void Clean();
 
-
-	void clean();
-
-	void Align();
-
+	void RaggedRight();
+	void FirstFit();
+	void BestFit();
+	void OptimumFit();
+	void Justify();
+	void DetectRiver();
 };

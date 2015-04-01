@@ -26,6 +26,9 @@ private slots:
 	void on_wordBorderButton_clicked(bool checked);
 	void on_lineBorderButton_clicked(bool checked);
 	void on_pageBorderButton_clicked(bool checked);
+	void on_riverButton_clicked(bool checked);
+	void on_fontSizeBox_valueChanged(int arg1);
+	void on_alignBox_currentIndexChanged(int index);
 
 private:
 	Ui::viewerClass ui;

@@ -32,6 +32,7 @@ void Viewer::Resize()
 
 void Viewer::on_renderButton_clicked()
 {
+	Resize();
 	string content = ui.plainTextEdit->toPlainText().toStdString();
 	typesetter.set_content(content);
 	typesetter.Typeset();
@@ -71,4 +72,20 @@ void Viewer::on_lineBorderButton_clicked(bool checked)
 void Viewer::on_pageBorderButton_clicked(bool checked)
 {
 	settings::border_[Box::BoxType::PAGE] = checked;
+}
+
+void Viewer::on_riverButton_clicked(bool checked)
+{
+	settings::show_river_ = checked;
+}
+
+void Viewer::on_fontSizeBox_valueChanged(int arg1)
+{
+	settings::font_size_ = arg1;
+	typesetter.LoadFace();
+}
+
+void Viewer::on_alignBox_currentIndexChanged(int index)
+{
+	settings::align_mode_ = static_cast<settings::AlignMode>(index);
 }

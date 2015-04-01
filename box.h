@@ -9,6 +9,7 @@ class Box
 public:
 	enum BoxType
 	{
+		BACKSPACE = -1,
 		SPACE = 0,
 		CHAR = 1,
 		WORD = 2,
@@ -22,7 +23,8 @@ public:
 	~Box();
 
 	Glyph* glyph() { return glyph_; }
-	void set_glyph(Glyph* glyph) { glyph_ = glyph; }
+	void set_glyph(Glyph* glyph) { glyph_ = glyph; }	
+	BoxType type() const { return type_; }
 
 	const Box* parent() const { return parent_; }
 	const vector<Box*>* children() const { return &children_; }
@@ -34,14 +36,15 @@ public:
 	long y() const { return y_; }
 	long width() const { return width_; }
 	long height() const { return height_; }
-	//void set_x(long x) { x_ = x; }
-	//void set_y(long y) { y_ = y; }
-	//void set_width(long width) { width_ = width; }
-	//void set_height(long height) { height_ = height; }
+	void set_x(long x) { x_ = x; }
+	void set_y(long y) { y_ = y; }
+	void set_width(long width) { width_ = width; }
+	void set_height(long height) { height_ = height; }
 	static void set_descender(long descender) { descender_ = descender; }
 	void set_geometry(long x, long y, long width, long height) { x_ = x; y_ = y; width_ = width; height_ = height; }
 	void Translate(long x, long y) { x_ += x; y_ += y; }
 	void ExpandBox(Box* box);
+	Vector3l MidPoint() const { return Vector3l(x_ + width_ / 2, y_ + height_ / 2); }
 
 	string SVG() const;
 	

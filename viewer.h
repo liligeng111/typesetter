@@ -30,9 +30,12 @@ private slots:
 	void on_fontSizeBox_valueChanged(int arg1);
 	void on_alignBox_currentIndexChanged(int index);
 
+    void on_actionOpen_File_triggered();
+
 private:
 	Ui::viewerClass ui;
 	Typesetter typesetter;
+	string content;
 
 	void Resize();
 };

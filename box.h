@@ -36,6 +36,7 @@ public:
 	long y() const { return y_; }
 	long width() const { return width_; }
 	long height() const { return height_; }
+	long EndAt() const { return width_ + x_; }
 	void set_x(long x) { x_ = x; }
 	void set_y(long y) { y_ = y; }
 	void set_width(long width) { width_ = width; }

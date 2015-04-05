@@ -2,13 +2,18 @@
 #include <qmessagebox.h>
 #include <QSvgRenderer>
 #include <qpainter>
+#include <qfiledialog.h>
 #include "settings.h"
+#include <fstream>
+#include <streambuf>
+
 
 
 Viewer::Viewer(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+	content = ui.plainTextEdit->toPlainText().toStdString();
 	showMaximized();
 	on_renderButton_clicked();
 	// for some reason, you cannot get screen size in constructor, so go with 1920.
@@ -33,12 +38,11 @@ void Viewer::Resize()
 void Viewer::on_renderButton_clicked()
 {
 	Resize();
-	string content = ui.plainTextEdit->toPlainText().toStdString();
 	typesetter.set_content(content);
 	typesetter.Typeset();
 	typesetter.Render(Typesetter::SVG);
 
-	QSvgRenderer renderer(QString("./output.svg"));
+	QSvgRenderer renderer(QString("./output/page0.svg"));
 	QImage image(settings::display_width(), settings::display_height(), QImage::Format_ARGB32);
 	//background
 	image.fill(0xffffffff);
@@ -88,4 +92,15 @@ void Viewer::on_fontSizeBox_valueChanged(int arg1)
 void Viewer::on_alignBox_currentIndexChanged(int index)
 {
 	settings::align_mode_ = static_cast<settings::AlignMode>(index);
+}
+
+
+void Viewer::on_actionOpen_File_triggered()
+{
+	string fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "",tr("Files")).toStdString();
+	
+	ifstream t(fileName);
+	content = string((std::istreambuf_iterator<char>(t)),
+					 std::istreambuf_iterator<char>());
+	ui.plainTextEdit->setPlainText(QString::fromStdString(content));
 }

@@ -6,6 +6,7 @@
 #include FT_FREETYPE_H
 #include "box.h"
 #include "river.h"
+#include "breakpoint.h"
 
 using namespace std;
 
@@ -38,9 +39,10 @@ private:
 	string content_;
 	FT_Library  library_;
 	FT_Face face_;
-	Box* root_;
 	vector<Box*> words_;
 	vector<Box*> lines_;
+	vector<Box*> pages_;
+	vector<Breakpoint*> breakpoints_;
 	vector<River*> rivers_;
 	long line_height_;
 	
@@ -50,6 +52,9 @@ private:
 	void FirstFit();
 	void BestFit();
 	void OptimumFit();
+
+	void BreakLines();
 	void Justify();
+
 	void DetectRiver();
 };

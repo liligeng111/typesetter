@@ -42,8 +42,6 @@ void Typesetter::LoadFace()
 		Message("Cannot set pixel size");
 	}
 
-	root_ = new Box(NULL, Box::BoxType::PAGE);
-	root_->set_geometry(settings::mm_to_fixed_point(settings::margin_left_), settings::mm_to_fixed_point(settings::margin_top_), settings::content_width_fixed_point(), settings::content_height_fixed_point());
 	Box::set_descender(face_->descender);
 	line_height_ = face_->size->metrics.y_ppem * 64;
 
@@ -64,10 +62,11 @@ void Typesetter::Message(const string& msg)
 
 void Typesetter::Clean()
 {
-	root_->Clear();
 	words_ = vector<Box*>();
 	lines_ = vector<Box*>();
+	pages_ = vector<Box*>();
 	rivers_ = vector<River*>();
+	breakpoints_ = vector<Breakpoint*>();
 }
 
 void Typesetter::Typeset()
@@ -200,66 +199,45 @@ void Typesetter::DetectRiver()
 
 void Typesetter::RaggedRight()
 {
-	long x_adjust = 0;
-	long y_adjust = 0;
-	Box* current_line = new Box(root_, Box::BoxType::LINE);
-	current_line->set_geometry(0, y_adjust, 0, line_height_);
-	lines_.push_back(current_line);
-
+	Breakpoint* breakpoint = new Breakpoint(words_[0]);
+	breakpoints_.push_back(breakpoint);
 	//check each box
 	for (Box* child : words_)
 	{
-		if (child->type() == Box::BoxType::BACKSPACE || (child->type() == Box::BoxType::WORD && child->x() + child->width() + x_adjust > settings::content_width_fixed_point()))
+		if (child->type() == Box::BoxType::BACKSPACE || (child->type() == Box::BoxType::WORD && child->EndAt() -  breakpoint->x()> settings::content_width_fixed_point()))
 		{
-			//need newline
-			current_line = new Box(root_, Box::BoxType::LINE);
-			x_adjust = -child->x();
-			y_adjust += line_height_;
-			current_line->set_geometry(0, y_adjust, 0, line_height_);
-			lines_.push_back(current_line);
+			//break line
+			breakpoint = new Breakpoint(child);
+			breakpoints_.push_back(breakpoint);
 		}
-		child->Translate(x_adjust, 0);
-		child->set_parent(current_line);
-		current_line->ExpandBox(child);
 	}
 
+	BreakLines();
 }
 
 void Typesetter::FirstFit()
 {
-	long x_adjust = 0;
-	long y_adjust = 0;
-	Box* current_line = new Box(root_, Box::BoxType::LINE);
-	current_line->set_geometry(0, y_adjust, 0, line_height_);
-	lines_.push_back(current_line);
-
+	Breakpoint* breakpoint = new Breakpoint(words_[0]);
+	breakpoints_.push_back(breakpoint);
 	//check each box
 	for (Box* child : words_)
 	{
-		if (child->type() == Box::BoxType::BACKSPACE || (child->type() == Box::BoxType::WORD && child->x() + child->width() / 2 + x_adjust > settings::content_width_fixed_point()))
+		if (child->type() == Box::BoxType::BACKSPACE || (child->type() == Box::BoxType::WORD && child->EndAt() -  breakpoint->x()> settings::content_width_fixed_point()))
 		{
-			//need newline
-			current_line = new Box(root_, Box::BoxType::LINE);
-			x_adjust = -child->x();
-			y_adjust += line_height_;
-			current_line->set_geometry(0, y_adjust, 0, line_height_);
-			lines_.push_back(current_line);
+			//break line
+			breakpoint = new Breakpoint(child);
+			breakpoints_.push_back(breakpoint);
 		}
-		child->Translate(x_adjust, 0);
-		child->set_parent(current_line);
-		current_line->ExpandBox(child);
 	}
-
+	
+	BreakLines();
 	Justify();
 }
 
 void Typesetter::BestFit()
 {
-	long x_adjust = 0;
-	long y_adjust = 0;
-	Box* current_line = new Box(root_, Box::BoxType::LINE);
-	current_line->set_geometry(0, y_adjust, 0, line_height_);
-	lines_.push_back(current_line);
+	Breakpoint* breakpoint = new Breakpoint(words_[0]);
+	breakpoints_.push_back(breakpoint);
 
 	//check each box
 	for (int i = 0; i < words_.size(); i++)
@@ -274,7 +252,7 @@ void Typesetter::BestFit()
 		//calculate r
 		if (!new_line && child->type() == Box::BoxType::WORD)
 		{
-			long L = child->x() + child->width() + x_adjust;
+			long L = child->EndAt() -  breakpoint->x();
 			long l = settings::content_width_fixed_point();
 
 			float r = settings::AdjustmentRatio(L, l);
@@ -286,7 +264,7 @@ void Typesetter::BestFit()
 
 				for (int j = i + 1; r > 0 && j < words_.size(); j++)
 				{
-					L = words_[j]->x() + words_[j]->width() + x_adjust;
+					L = words_[j]->EndAt() -  breakpoint->x();
 					r = settings::AdjustmentRatio(L, l);
 					float temp = 100 * r * r * abs(r);
 					//found better
@@ -302,19 +280,52 @@ void Typesetter::BestFit()
 
 		if (new_line)
 		{
+			//break line
+			breakpoint = new Breakpoint(child);
+			breakpoints_.push_back(breakpoint);
+		}
+	}
+	
+	BreakLines();
+	Justify();
+}
+
+void Typesetter::BreakLines()
+{
+	long x_adjust = 0;
+	long y_adjust = 0;
+	Box* current_line;
+	Box* current_page = new Box(NULL, Box::BoxType::PAGE);
+	current_page->set_geometry(settings::mm_to_fixed_point(settings::margin_left_), settings::mm_to_fixed_point(settings::margin_top_), settings::content_width_fixed_point(), settings::content_height_fixed_point());
+	pages_.push_back(current_page);
+
+	int i = 0;
+
+	//check each box, first must be a breakpoint
+	for (Box* child : words_)
+	{
+		if (i < breakpoints_.size() && child == breakpoints_[i]->box())
+		{
 			//need newline
-			current_line = new Box(root_, Box::BoxType::LINE);
+			//new page
+			if (y_adjust + line_height_ > settings::content_height_fixed_point())
+			{
+				y_adjust = 0;
+				current_page = new Box(NULL, Box::BoxType::PAGE);
+				current_page->set_geometry(settings::mm_to_fixed_point(settings::margin_left_), settings::mm_to_fixed_point(settings::margin_top_), settings::content_width_fixed_point(), settings::content_height_fixed_point());
+				pages_.push_back(current_page);
+			}			
+			i++;
+			current_line = new Box(current_page, Box::BoxType::LINE);
+			current_line->set_geometry(0, y_adjust, 0, line_height_);
 			x_adjust = -child->x();
 			y_adjust += line_height_;
-			current_line->set_geometry(0, y_adjust, 0, line_height_);
 			lines_.push_back(current_line);
 		}
 		child->Translate(x_adjust, 0);
 		child->set_parent(current_line);
 		current_line->ExpandBox(child);
 	}
-
-	Justify();
 }
 
 void Typesetter::Justify()
@@ -374,38 +385,41 @@ void Typesetter::Render(RenderTarget target)
 {
 	if (target == RenderTarget::SVG)
 	{
-		ofstream file;
-		file.open("output.svg");
-		file << "<?xml version=\"1.0\" standalone=\"no\"?>\n";
-		file << "<svg\n";
-		file << "	xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n";
-		file << "	xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n";
-		file << "	xmlns:cc=\"http://creativecommons.org/ns#\"\n";
-		file << "	xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n";
-		file << "	xmlns:svg=\"http://www.w3.org/2000/svg\"\n";
-		file << "	xmlns=\"http://www.w3.org/2000/svg\"\n";
-		file << "	version=\"1.1\"\n";
-		file << "	viewBox=\"0 0 " + to_string(settings::mm_to_fixed_point(settings::page_width_)) + " " + to_string(settings::mm_to_fixed_point(settings::page_height_)) + "\">\n";
-		file << "<defs>\n";
-		file << "</defs>\n";
-		file << "<g transform = \"scale(1, 1)\">\n";
-
-
-		//print all the boxes
-		file << root_->SVG() << endl;
-
-		if (settings::show_river_)
+		for ( int i = 0; i < pages_.size(); i++)
 		{
-			file << "<g transform='translate(" + to_string(root_->x()) + ", " + to_string(root_->y()) + ")'>\n";
-			for (River* river : rivers_)
-			{
-				file << river->SVG() << endl;
-			}
-			file << "</g>\n";
-		}
+			ofstream file;
+			file.open("output/page" + to_string(i) + ".svg");
+			file << "<?xml version=\"1.0\" standalone=\"no\"?>\n";
+			file << "<svg\n";
+			file << "	xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n";
+			file << "	xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n";
+			file << "	xmlns:cc=\"http://creativecommons.org/ns#\"\n";
+			file << "	xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n";
+			file << "	xmlns:svg=\"http://www.w3.org/2000/svg\"\n";
+			file << "	xmlns=\"http://www.w3.org/2000/svg\"\n";
+			file << "	version=\"1.1\"\n";
+			file << "	viewBox=\"0 0 " + to_string(settings::mm_to_fixed_point(settings::page_width_)) + " " + to_string(settings::mm_to_fixed_point(settings::page_height_)) + "\">\n";
+			file << "<defs>\n";
+			file << "</defs>\n";
+			file << "<g transform = \"scale(1, 1)\">\n";
 
-		file << "</g>\n";
-		file << "</svg>\n";
-		file.close();
+
+			//print all the boxes
+			file <<pages_[i]->SVG() << endl;
+
+			if (settings::show_river_)
+			{
+				//file << "<g transform='translate(" + to_string(root_->x()) + ", " + to_string(root_->y()) + ")'>\n";
+				for (River* river : rivers_)
+				{
+					file << river->SVG() << endl;
+				}
+				file << "</g>\n";
+			}
+
+			file << "</g>\n";
+			file << "</svg>\n";
+			file.close();
+		}
 	}
 }

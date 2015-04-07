@@ -65,7 +65,7 @@ void Typesetter::Clean()
 	words_ = vector<Box*>();
 	lines_ = vector<Box*>();
 	pages_ = vector<Box*>();
-	rivers_ = vector<River*>();
+	rivers_ = vector<vector<River*>>();
 	breakpoints_ = vector<Breakpoint*>();
 }
 
@@ -157,42 +157,72 @@ void Typesetter::Typeset()
 
 void Typesetter::DetectRiver()
 {
-	for (int i = 1; i < lines_.size() - 1; i++)
+	for (int p = 0; p < pages_.size(); p++)
 	{
-		for (Box* box : *(lines_[i]->children()))
-		{
-			if (box->type() != Box::BoxType::SPACE)
-				continue;	
-			Box* up = NULL;
-			Box* down = NULL;
-			for (Box* temp : *(lines_[i - 1]->children()))
-			{
-				if (temp->type() != Box::BoxType::SPACE)
-					continue;
-				if (labs(box->MidPoint().x() - temp->MidPoint().x()) < 2 * box->width())
-				{
-					up = temp;
-					break;
-				}
-			}
+		Box* page = pages_[p];
+		rivers_.push_back(vector<River*>());
+		const vector<Box*>* lines = page->children();
 
-			for (Box* temp : *(lines_[i + 1]->children()))
+		//wtf is this bug
+		int max_i = lines->size() - 2;
+		for (int i = 0; i < max_i; i++)
+		{
+			for (int b = 0; b < lines->at(i)->ChildrenSize(); b++)
 			{
-				if (temp->type() != Box::BoxType::SPACE)
-					continue;
-				if (labs(box->MidPoint().x() - temp->MidPoint().x()) < 2 * box->width())
+				Box* box = lines->at(i)->child(b);
+				if (box->type() != Box::BoxType::SPACE)
+					continue;	
+				
+				//check up for duplicate
+				Box* up = NULL;
+				for (int t = 0; i > 0 && t < lines->at(i - 1)->ChildrenSize(); t++)
 				{
-					down = temp;
-					break;
+					Box* temp = lines->at(i - 1)->child(t);
+					if (temp->type() != Box::BoxType::SPACE)
+						continue;
+					if (labs(box->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * (box->width() + temp->width()) / 2)
+					{
+						up = temp;
+						break;
+					}
+				}
+
+				if (up != NULL)
+					continue;
+				
+				River* river = new River();
+				Box* last = box;
+				bool found = true;
+				int search = i;
+				while (found)
+				{
+					river->AddBox(last);
+					found = false;	
+					search++;
+
+					for (int t = 0; search < lines->size() && t < lines->at(search)->ChildrenSize(); t++)
+					{
+						Box* temp = lines->at(search)->child(t);
+						if (temp->type() != Box::BoxType::SPACE)
+							continue;
+						if (labs(last->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * (last->width() + temp->width()) / 2)
+						{
+							last = temp;
+							found = true;
+							break;
+						}
+					}
+				}
+
+				if (river->size() > 2)
+				{
+					rivers_[p].push_back(river);
+				}
+				else
+				{
+					delete river;
 				}
 			}
-			if (up == NULL || down == NULL)
-				continue;
-			River* river = new River();
-			rivers_.push_back(river);
-			river->AddBox(box);
-			river->AddBox(up);
-			river->AddBox(down);
 		}
 	}
 }
@@ -409,9 +439,10 @@ void Typesetter::Render(RenderTarget target)
 
 			if (settings::show_river_)
 			{
-				//file << "<g transform='translate(" + to_string(root_->x()) + ", " + to_string(root_->y()) + ")'>\n";
-				for (River* river : rivers_)
+				file << "<g transform='translate(" + to_string(pages_[i]->x()) + ", " + to_string(pages_[i]->y()) + ")'>\n";
+				for (River* river : rivers_[i])
 				{
+					river->Analyse();
 					file << river->SVG() << endl;
 				}
 				file << "</g>\n";

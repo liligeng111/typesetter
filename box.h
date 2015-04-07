@@ -28,7 +28,9 @@ public:
 
 	const Box* parent() const { return parent_; }
 	const vector<Box*>* children() const { return &children_; }
+	Box* child(int i) const { return children_[i]; }
 	void AddChild(Box* child) { children_.push_back(child); }
+	int ChildrenSize() const { return children_.size(); }
 	void set_parent(Box* parent) { parent_ = parent; parent_->AddChild(this); }
 	void Clear();
 

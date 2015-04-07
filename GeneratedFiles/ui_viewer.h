@@ -46,6 +46,7 @@ public:
     QSpinBox *fontSizeBox;
     QLabel *label_2;
     QComboBox *alignBox;
+    QComboBox *comboBox;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QToolBar *mainToolBar;
@@ -98,6 +99,9 @@ public:
         alignBox = new QComboBox(centralWidget);
         alignBox->setObjectName(QStringLiteral("alignBox"));
         alignBox->setGeometry(QRect(30, 280, 120, 20));
+        comboBox = new QComboBox(centralWidget);
+        comboBox->setObjectName(QStringLiteral("comboBox"));
+        comboBox->setGeometry(QRect(30, 210, 69, 22));
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));

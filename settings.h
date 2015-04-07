@@ -48,5 +48,6 @@ namespace settings
 	extern std::string border_color[];
 
 	extern bool show_river_;
+	extern float river_threshold_;
 };
 

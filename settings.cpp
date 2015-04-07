@@ -22,6 +22,7 @@ namespace settings
 	std::string border_color[] = { "(25, 50, 150)", "(250, 15, 0)", "(250, 150, 0)", "(120, 120, 0)", "(0, 150, 200)" };
 
 	bool show_river_ = false;
+	float river_threshold_ = 2.0f;
 
 
 	float AdjustmentRatio(long L, long l)

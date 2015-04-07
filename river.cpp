@@ -1,8 +1,12 @@
 #include "river.h"
 
+int River::next_id_ = 0;
 
-River::River()
+River::River(int page)
 {
+	id_ = next_id_;
+	next_id_++;
+	page_ = page;
 }
 
 
@@ -15,7 +19,7 @@ string River::SVG() const
 {
 	string str = "";	
 	string regression = "";
-	str += "<path fill='none' stroke-width='64' stroke='rgb(250, 0, 0)' d='M " + to_string(list[0]->MidPoint().x()) + " " + to_string(list[0]->parent()->y());
+	str += "<path id='" + to_string(id_) + "' fill='none' stroke-width='64' stroke='rgb(250, 0, 0)' d='M " + to_string(list[0]->MidPoint().x()) + " " + to_string(list[0]->parent()->y());
 	regression += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='M " + to_string(list[0]->MidPoint().x()) + " " + to_string(alpha_ + beta_ * list[0]->MidPoint().x());
 	for (int i = 1; i < list.size(); i++)
 	{
@@ -59,4 +63,11 @@ void River::Analyse()
 	}
 	beta_ = l_xy / l_xx;
 	alpha_ = y_bar_ - beta_ * x_bar_;
+
+	global_deviation_ = 0;
+	for (Box* box : list)
+	{
+		global_deviation_ += (box->parent()->y() - alpha_ - beta_ * box->MidPoint().x()) * (box->parent()->y() - alpha_ - beta_ * box->MidPoint().x());
+	}
+	global_deviation_ /= list.size() - 2;
 }

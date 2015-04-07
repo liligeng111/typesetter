@@ -39,12 +39,14 @@ public:
 	long width() const { return width_; }
 	long height() const { return height_; }
 	long EndAt() const { return width_ + x_; }
+	bool justify() const { return justify_; }
 	void set_x(long x) { x_ = x; }
 	void set_y(long y) { y_ = y; }
 	void set_width(long width) { width_ = width; }
 	void set_height(long height) { height_ = height; }
 	static void set_descender(long descender) { descender_ = descender; }
 	void set_geometry(long x, long y, long width, long height) { x_ = x; y_ = y; width_ = width; height_ = height; }
+	void set_justify(bool justify) { justify_ = justify; }
 	void Translate(long x, long y) { x_ += x; y_ += y; }
 	void ExpandBox(Box* box);
 	Vector3l MidPoint() const { return Vector3l(x_ + width_ / 2, y_ + height_ / 2); }
@@ -61,6 +63,7 @@ private:
 	long height_;
 	static long descender_;
 	Glyph* glyph_;
+	bool justify_;
 	//Matrix matrix_;
 };
 

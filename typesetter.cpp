@@ -170,7 +170,7 @@ void Typesetter::DetectRiver()
 			for (int b = 0; b < lines->at(i)->ChildrenSize(); b++)
 			{
 				Box* box = lines->at(i)->child(b);
-				if (box->type() != Box::BoxType::SPACE)
+				if (box->type() != Box::BoxType::SPACE || box == box->parent()->child(box->parent()->ChildrenSize() - 1))
 					continue;	
 				
 				//check up for duplicate
@@ -178,7 +178,7 @@ void Typesetter::DetectRiver()
 				for (int t = 0; i > 0 && t < lines->at(i - 1)->ChildrenSize(); t++)
 				{
 					Box* temp = lines->at(i - 1)->child(t);
-					if (temp->type() != Box::BoxType::SPACE)
+					if (temp->type() != Box::BoxType::SPACE || temp == temp->parent()->child(temp->parent()->ChildrenSize() - 1))
 						continue;
 					if (labs(box->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * (box->width() + temp->width()) / 2)
 					{
@@ -190,7 +190,7 @@ void Typesetter::DetectRiver()
 				if (up != NULL)
 					continue;
 				
-				River* river = new River();
+				River* river = new River(p);
 				Box* last = box;
 				bool found = true;
 				int search = i;
@@ -203,7 +203,7 @@ void Typesetter::DetectRiver()
 					for (int t = 0; search < lines->size() && t < lines->at(search)->ChildrenSize(); t++)
 					{
 						Box* temp = lines->at(search)->child(t);
-						if (temp->type() != Box::BoxType::SPACE)
+						if (temp->type() != Box::BoxType::SPACE || temp == temp->parent()->child(temp->parent()->ChildrenSize() - 1))
 							continue;
 						if (labs(last->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * (last->width() + temp->width()) / 2)
 						{
@@ -346,6 +346,11 @@ void Typesetter::BreakLines()
 				pages_.push_back(current_page);
 			}			
 			i++;
+			//do not jusify before backspace
+			if (child->type() == Box::BoxType::BACKSPACE)
+			{
+				current_line->set_justify(false);
+			}
 			current_line = new Box(current_page, Box::BoxType::LINE);
 			current_line->set_geometry(0, y_adjust, 0, line_height_);
 			x_adjust = -child->x();
@@ -364,8 +369,8 @@ void Typesetter::Justify()
 	for (int i = 0; i < lines_.size(); i++)
 	{
 		Box* line = lines_[i];
-		//skip last line
-		if (i == lines_.size() - 1 || lines_[i + 1]->width() == 0)
+		//skip special lines
+		if (!lines_[i]->justify())
 			continue;
 
 		const vector<Box*>* children = line->children();
@@ -450,6 +455,22 @@ void Typesetter::Render(RenderTarget target)
 
 			file << "</g>\n";
 			file << "</svg>\n";
+			file.close();
+		}
+
+		//output river xml
+		if (settings::show_river_)
+		{
+			ofstream file;
+			file.open("output/script/rivers.js");
+			file << "rivers = [];\n";
+			for (vector<River*> rivers : rivers_)
+			{
+				for (River* river : rivers)
+				{
+					file << "rivers.push({id:" + to_string(river->id()) + ", page:" + to_string(river->page()) + ", size:" + to_string(river->size()) + ", local:" + to_string(river->local_deviation()) + ", global:" + to_string(river->global_deviation()) + "});\n";
+				}
+			}
 			file.close();
 		}
 	}

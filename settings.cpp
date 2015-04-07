@@ -12,7 +12,7 @@ namespace settings
 	int dpi_ = 96;
 
 	int font_size_ = 12;
-	AlignMode align_mode_ = settings::FIRST_FIT;
+	AlignMode align_mode_ = settings::BEST_FIT;
 	long space_width_ = 0;
 	long stretchability_ = 0;
 	long shrinkability_ = 0;

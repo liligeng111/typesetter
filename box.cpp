@@ -13,6 +13,7 @@ Box::Box(Glyph* glyph, Box* parent, BoxType type)
 	y_ = 0;
 	width_ = 0;
 	children_ = vector<Box*>();
+	justify_ = true;
 
 	if (parent != NULL)
 	{

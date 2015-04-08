@@ -16,20 +16,23 @@ public:
 	int id() const { return id_; }
 	int page() const { return page_; }
 	long local_deviation() const { return local_deviation_; }
-	long global_deviation() const { return global_deviation_; }
+	float global_deviation() const { return global_deviation_; }
 
 	string SVG() const;
 
 private:
 	vector<Box*> list;
 	long local_deviation_;
-	long global_deviation_;
+	float global_deviation_;
 
 	//regression y = a + bx
 	float alpha_;
 	float beta_;
 	long x_sum_;
 	long y_sum_;
+	long xy_sum_;
+	long x_square_sum_;
+	long y_square_sum_;
 	float x_bar_;
 	float y_bar_;
 	int id_;

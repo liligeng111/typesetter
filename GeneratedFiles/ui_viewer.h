@@ -121,7 +121,7 @@ public:
 
         retranslateUi(viewerClass);
 
-        alignBox->setCurrentIndex(1);
+        alignBox->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(viewerClass);

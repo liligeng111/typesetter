@@ -180,7 +180,8 @@ void Typesetter::DetectRiver()
 					Box* temp = lines->at(i - 1)->child(t);
 					if (temp->type() != Box::BoxType::SPACE || temp == temp->parent()->child(temp->parent()->ChildrenSize() - 1))
 						continue;
-					if (labs(box->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * (box->width() + temp->width()) / 2)
+					//if (labs(box->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * (box->width() + temp->width()) / 2)
+					if (labs(box->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * settings::space_width_)
 					{
 						up = temp;
 						break;
@@ -205,7 +206,7 @@ void Typesetter::DetectRiver()
 						Box* temp = lines->at(search)->child(t);
 						if (temp->type() != Box::BoxType::SPACE || temp == temp->parent()->child(temp->parent()->ChildrenSize() - 1))
 							continue;
-						if (labs(last->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * (last->width() + temp->width()) / 2)
+						if (labs(last->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * settings::space_width_)
 						{
 							last = temp;
 							found = true;

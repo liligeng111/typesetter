@@ -67,6 +67,10 @@
 						var page = "page" + rivers[i].page + ".svg";
 						$("#svg").attr("data", page);
 						$('#svg').load(page);
+						console.log(rivers[i]);
+						var  str = "$('#" + rivers[i].id + "').attr('stroke-width', '64');"
+						console.log(str);
+    					setTimeout(str, 2000);
 					}
 				}
 			}

@@ -41,7 +41,7 @@ void Viewer::on_renderButton_clicked()
 	typesetter.Typeset();
 	typesetter.Render(Typesetter::SVG);
 
-	QSvgRenderer renderer(QString("./output/page0.svg"));
+	QSvgRenderer renderer(QString("./output/svg/page0.svg"));
 	QImage image(settings::display_width(), settings::display_height(), QImage::Format_ARGB32);
 	//background
 	image.fill(0xffffffff);
@@ -88,6 +88,11 @@ void Viewer::on_fontSizeBox_valueChanged(int arg1)
 	typesetter.LoadFace();
 }
 
+void Viewer::on_riverThresholdSpinBox_valueChanged(double arg1)
+{
+	settings::river_threshold_ = arg1;
+}
+
 void Viewer::on_alignBox_currentIndexChanged(int index)
 {
 	settings::align_mode_ = static_cast<settings::AlignMode>(index);
@@ -104,4 +109,69 @@ void Viewer::on_actionOpen_File_triggered()
 	ui.plainTextEdit->setPlainText(QString::fromStdString(content));
 	//for now
 	content = fileName;
+}
+
+
+void Viewer::on_paperBox_currentIndexChanged(QString page)
+{
+	if (page == "A7")
+	{
+		settings::page_width_ = 74;
+		settings::page_height_ = 105;
+	}
+	else if (page == "A6")
+	{
+		settings::page_width_ = 105;
+		settings::page_height_ = 148;
+	}
+	else if (page == "A5")
+	{
+		settings::page_width_ = 148;
+		settings::page_height_ = 210;
+	}
+	else if (page == "A4")
+	{
+		settings::page_width_ = 210;
+		settings::page_height_ = 297;
+	}
+	else if (page == "A3")
+	{
+		settings::page_width_ = 297;
+		settings::page_height_ = 420;
+	}
+	else if (page == "A2")
+	{
+		settings::page_width_ = 420;
+		settings::page_height_ = 594;
+	}
+	else if (page == "B7")
+	{
+		settings::page_width_ = 88;
+		settings::page_height_ = 125;
+	}
+	else if (page == "B6")
+	{
+		settings::page_width_ = 125;
+		settings::page_height_ = 176;
+	}
+	else if (page == "B5")
+	{
+		settings::page_width_ = 176;
+		settings::page_height_ = 250;
+	}
+	else if (page == "B4")
+	{
+		settings::page_width_ = 250;
+		settings::page_height_ = 353;
+	}
+	else if (page == "B3")
+	{
+		settings::page_width_ = 353;
+		settings::page_height_ = 500;
+	}
+	else if (page == "B2")
+	{
+		settings::page_width_ = 500;
+		settings::page_height_ = 707;
+	}
 }

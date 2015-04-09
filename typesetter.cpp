@@ -7,7 +7,7 @@
 Typesetter::Typesetter()
 {
 	//just to be sure
-	content_ = "";	
+	file_ = "";
 	LoadFace();
 }
 
@@ -30,25 +30,25 @@ void Typesetter::LoadFace()
 		Message("Unable to read the font file or it is broken.");
 	}
 
-	error = FT_Set_Char_Size(face_, 0, settings::font_size_ * 64, 0, settings::dpi_);
+	error = FT_Set_Char_Size(face_, 0, settings::font_size_ * 64, 0, 72);
 	if (error)
 	{
 		Message("Cannot set char size");
 	}
 	// according to http://www.freetype.org/freetype2/docs/glyphs/glyphs-2.html
-	error = FT_Set_Pixel_Sizes(face_, 0, settings::font_size_ * settings::dpi_ / 72);
-	if (error)
-	{
-		Message("Cannot set pixel size");
-	}
+	//error = FT_Set_Pixel_Sizes(face_, 0, settings::font_size_ * settings::dpi_ / 72);
+	//if (error)
+	//{
+	//	Message("Cannot set pixel size");
+	//}
 
 	Box::set_descender(face_->descender);
-	line_height_ = face_->size->metrics.y_ppem * 64;
+	settings::em_size_ = face_->units_per_EM;
+	settings::line_height_ = face_->units_per_EM;
 
-
-	settings::space_width_ = face_->size->metrics.x_ppem * 64 / 3;
-	settings::stretchability_ = face_->size->metrics.x_ppem * 64 / 6;
-	settings::shrinkability_ = face_->size->metrics.x_ppem * 64 / 9;
+	settings::space_width_ = face_->units_per_EM / 3;
+	settings::stretchability_ = face_->units_per_EM / 6;
+	settings::shrinkability_ = face_->units_per_EM / 9;
 }
 
 Typesetter::~Typesetter()
@@ -76,11 +76,17 @@ void Typesetter::Typeset()
 
 	Box* current_box;
 	long x_cursor = 0;
-	FT_UInt last_char = 0;
 
-	for (int i = 0; i < content_.length(); i++)
+	char last_ch = 0;
+	char ch = 0;
+	fstream fin(file_, fstream::in);
+	while (fin >> noskipws >> ch)
 	{
-		FT_Error error = FT_Load_Char(face_, content_[i], FT_LOAD_DEFAULT);
+		//what it is?
+		if (ch < 0)
+			continue;
+
+		FT_Error error = FT_Load_Char(face_, ch, FT_LOAD_NO_SCALE);
 		if (error)
 		{
 			Message("Error loading character");		
@@ -89,38 +95,39 @@ void Typesetter::Typeset()
 		//kern
 		FT_Vector* kern = new FT_Vector();
 		//? what are the modes?
-		FT_Get_Kerning(face_, last_char, content_[i], FT_KERNING_DEFAULT, kern);
+		FT_Get_Kerning(face_, last_ch, ch, FT_KERNING_DEFAULT, kern);
 		x_cursor += kern->x;
-		last_char = content_[i];
 		
 		//backspace
-		if (content_[i] == '\n')
+		if (ch == '\n')
 		{
 			current_box = new Box(NULL, Box::BoxType::BACKSPACE);
 			current_box->set_geometry(x_cursor, 0, 0, 0);
 			words_.push_back(current_box);
+			last_ch = ch;
 			continue;
 		}
 
 		//new space
-		if (content_[i] == ' ' && (i == 0 || content_[i - 1] != ' '))
+		if (ch == ' ' && (last_ch == 0 || last_ch != ' '))
 		{
 			current_box = new Box(NULL, Box::BoxType::SPACE);
 			current_box->set_geometry(x_cursor, 0, 0, 0);
 			words_.push_back(current_box);
 		}
 		//new word
-		else if (content_[i] != ' ' && (i == 0 || content_[i - 1] == ' '))
+		else if (ch != ' ' && (last_ch == 0 || last_ch == ' '))
 		{
 			current_box = new Box(NULL, Box::BoxType::WORD);
 			current_box->set_geometry(x_cursor, 0, 0, 0);
 			words_.push_back(current_box);
 		}
+		last_ch = ch;
 
 		Glyph* glyph = new Glyph(face_->glyph);
 		Box* box;
 		// noly add char
-		if (content_[i] == ' ')
+		if (ch == ' ')
 		{
 			box = new Box(glyph, NULL, Box::BoxType::CHAR);
 			box->set_geometry(x_cursor - current_box->x(), 0, settings::space_width_, box->glyph()->advance().y());
@@ -235,7 +242,7 @@ void Typesetter::RaggedRight()
 	//check each box
 	for (Box* child : words_)
 	{
-		if (child->type() == Box::BoxType::BACKSPACE || (child->type() == Box::BoxType::WORD && child->EndAt() -  breakpoint->x()> settings::content_width_fixed_point()))
+		if (child->type() == Box::BoxType::BACKSPACE || (child->type() == Box::BoxType::WORD && child->EndAt() -  breakpoint->x()> settings::content_width_point()))
 		{
 			//break line
 			breakpoint = new Breakpoint(child);
@@ -253,7 +260,7 @@ void Typesetter::FirstFit()
 	//check each box
 	for (Box* child : words_)
 	{
-		if (child->type() == Box::BoxType::BACKSPACE || (child->type() == Box::BoxType::WORD && child->EndAt() -  breakpoint->x()> settings::content_width_fixed_point()))
+		if (child->type() == Box::BoxType::BACKSPACE || (child->type() == Box::BoxType::WORD && child->EndAt() -  breakpoint->x()> settings::content_width_point()))
 		{
 			//break line
 			breakpoint = new Breakpoint(child);
@@ -284,7 +291,7 @@ void Typesetter::BestFit()
 		if (!new_line && child->type() == Box::BoxType::WORD)
 		{
 			long L = child->EndAt() -  breakpoint->x();
-			long l = settings::content_width_fixed_point();
+			long l = settings::content_width_point();
 
 			float r = settings::AdjustmentRatio(L, l);
 			//if is a possible breakpoint, check for better
@@ -327,7 +334,7 @@ void Typesetter::BreakLines()
 	long y_adjust = 0;
 	Box* current_line;
 	Box* current_page = new Box(NULL, Box::BoxType::PAGE);
-	current_page->set_geometry(settings::mm_to_fixed_point(settings::margin_left_), settings::mm_to_fixed_point(settings::margin_top_), settings::content_width_fixed_point(), settings::content_height_fixed_point());
+	current_page->set_geometry(settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_), settings::content_width_point(), settings::content_height_point());
 	pages_.push_back(current_page);
 
 	int i = 0;
@@ -339,11 +346,11 @@ void Typesetter::BreakLines()
 		{
 			//need newline
 			//new page
-			if (y_adjust + line_height_ > settings::content_height_fixed_point())
+			if (y_adjust + settings::line_height_ > settings::content_height_point())
 			{
 				y_adjust = 0;
 				current_page = new Box(NULL, Box::BoxType::PAGE);
-				current_page->set_geometry(settings::mm_to_fixed_point(settings::margin_left_), settings::mm_to_fixed_point(settings::margin_top_), settings::content_width_fixed_point(), settings::content_height_fixed_point());
+				current_page->set_geometry(settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_), settings::content_width_point(), settings::content_height_point());
 				pages_.push_back(current_page);
 			}			
 			i++;
@@ -353,9 +360,9 @@ void Typesetter::BreakLines()
 				current_line->set_justify(false);
 			}
 			current_line = new Box(current_page, Box::BoxType::LINE);
-			current_line->set_geometry(0, y_adjust, 0, line_height_);
+			current_line->set_geometry(0, y_adjust, 0, settings::line_height_);
 			x_adjust = -child->x();
-			y_adjust += line_height_;
+			y_adjust += settings::line_height_;
 			lines_.push_back(current_line);
 		}
 		child->Translate(x_adjust, 0);
@@ -394,7 +401,7 @@ void Typesetter::Justify()
 		//no space
 		if (count == 0)
 			continue;
-		float extra = settings::content_width_fixed_point() - last->width() - last->x();
+		float extra = settings::content_width_point() - last->width() - last->x();
 
 
 		//move everything
@@ -424,7 +431,7 @@ void Typesetter::Render(RenderTarget target)
 		for ( int i = 0; i < pages_.size(); i++)
 		{
 			ofstream file;
-			file.open("output/page" + to_string(i) + ".svg");
+			file.open("output/svg/page" + to_string(i) + ".svg");
 			file << "<?xml version=\"1.0\" standalone=\"no\"?>\n";
 			file << "<svg\n";
 			file << "	xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n";
@@ -434,7 +441,7 @@ void Typesetter::Render(RenderTarget target)
 			file << "	xmlns:svg=\"http://www.w3.org/2000/svg\"\n";
 			file << "	xmlns=\"http://www.w3.org/2000/svg\"\n";
 			file << "	version=\"1.1\"\n";
-			file << "	viewBox=\"0 0 " + to_string(settings::mm_to_fixed_point(settings::page_width_)) + " " + to_string(settings::mm_to_fixed_point(settings::page_height_)) + "\">\n";
+			file << "	viewBox=\"0 0 " + to_string(settings::mm_to_point(settings::page_width_)) + " " + to_string(settings::mm_to_point(settings::page_height_)) + "\">\n";
 			file << "<defs>\n";
 			file << "</defs>\n";
 			file << "<g transform = \"scale(1, 1)\">\n";

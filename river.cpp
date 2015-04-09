@@ -20,20 +20,22 @@ string River::SVG() const
 {
 	string str = "";	
 	string regression = "";
-	str += "<path id='" + to_string(id_) + "' fill='none' stroke-width='0' stroke='rgb(250, 0, 0)' d='M " + to_string(list[0]->MidPoint().x()) + " " + to_string(list[0]->parent()->y());
-	regression += "<path id='" + to_string(id_) + "' fill='none' stroke-width='0' stroke='rgb(25, 0, 250)' d='M " + to_string(alpha_ * settings::space_width_ + beta_ * list[0]->parent()->y()) + " " + to_string(list[0]->parent()->y());
+	str += "<path class='river' id='river" + to_string(id_) + "' fill='none' stroke-width='0' stroke='rgb(250, 0, 0)' local='" + to_string(local_deviation_) + "' global='" + to_string(global_deviation_) + "' d='M " + to_string(list[0]->MidPoint().x()) + " " + to_string(list[0]->parent()->y() + settings::line_height_ / 2);
+	regression += "<path class='regression' id='regression" + to_string(id_) + "' fill='none' stroke-width='0' stroke='rgb(25, 0, 250)' d='M " + to_string(alpha_ * settings::space_width_ + beta_ * list[0]->parent()->y()) + " " + to_string(list[0]->parent()->y() + settings::line_height_ / 2);
 	for (int i = 1; i < list.size(); i++)
 	{
-		str += " L " + to_string(list[i]->MidPoint().x()) + " " + to_string(list[i]->parent()->y());
-		regression += " L " + to_string(alpha_ * settings::space_width_ + beta_ * list[i]->parent()->y()) + " " + to_string(list[i]->parent()->y());
+		str += " L " + to_string(list[i]->MidPoint().x()) + " " + to_string(list[i]->parent()->y() + settings::line_height_ / 2);
+		regression += " L " + to_string(alpha_ * settings::space_width_ + beta_ * list[i]->parent()->y()) + " " + to_string(list[i]->parent()->y() + settings::line_height_ / 2);
 	}
 	str += "'/> \n";
 	regression += "'/>";
 
-	//str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='a b " + to_string(alpha_) + " " + to_string(beta_) + "'/>";
-	//str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='lxx lyy lxy " + to_string(Lxx_) + " " + to_string(Lyy_) + " " + to_string(Lxy_) + "'/>";
-	//str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='sum x y xy " + to_string(x_sum_) + " " + to_string(y_sum_) + " " + to_string(xy_sum_) + "'/>";
-	//str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='sumsq x y " + to_string(x_square_sum_) + " " + to_string(y_square_sum_) + "'/>";
+	/*
+	str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='a b " + to_string(alpha_) + " " + to_string(beta_) + "'/>";
+	str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='lxx lyy lxy " + to_string(Lxx_) + " " + to_string(Lyy_) + " " + to_string(Lxy_) + "'/>";
+	str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='sum x y xy " + to_string(x_sum_) + " " + to_string(y_sum_) + " " + to_string(xy_sum_) + "'/>";
+	str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='sumsq x y " + to_string(x_square_sum_) + " " + to_string(y_square_sum_) + "'/>";
+	*/
 	return str + regression;
 }
 

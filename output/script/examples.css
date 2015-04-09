@@ -95,3 +95,18 @@ input[type=checkbox] {
 .legend table {
 	border-spacing: 5px;
 }
+
+.river:hover
+{
+	stroke-width: 128;
+}
+
+#river_tooltip
+{
+	position: absolute;
+	display: none;
+	border: 1px solid #deb;
+	padding: 2px;
+	background-color: #efc;
+	opacity: 0.95
+}

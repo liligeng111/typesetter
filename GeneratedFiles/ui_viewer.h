@@ -15,6 +15,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
@@ -46,7 +47,9 @@ public:
     QSpinBox *fontSizeBox;
     QLabel *label_2;
     QComboBox *alignBox;
-    QComboBox *comboBox;
+    QComboBox *paperBox;
+    QDoubleSpinBox *riverThresholdSpinBox;
+    QLabel *label_3;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QToolBar *mainToolBar;
@@ -99,9 +102,16 @@ public:
         alignBox = new QComboBox(centralWidget);
         alignBox->setObjectName(QStringLiteral("alignBox"));
         alignBox->setGeometry(QRect(30, 280, 120, 20));
-        comboBox = new QComboBox(centralWidget);
-        comboBox->setObjectName(QStringLiteral("comboBox"));
-        comboBox->setGeometry(QRect(30, 210, 69, 22));
+        paperBox = new QComboBox(centralWidget);
+        paperBox->setObjectName(QStringLiteral("paperBox"));
+        paperBox->setGeometry(QRect(30, 210, 69, 22));
+        riverThresholdSpinBox = new QDoubleSpinBox(centralWidget);
+        riverThresholdSpinBox->setObjectName(QStringLiteral("riverThresholdSpinBox"));
+        riverThresholdSpinBox->setGeometry(QRect(90, 180, 60, 20));
+        riverThresholdSpinBox->setValue(2);
+        label_3 = new QLabel(centralWidget);
+        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setGeometry(QRect(30, 180, 50, 20));
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -122,6 +132,7 @@ public:
         retranslateUi(viewerClass);
 
         alignBox->setCurrentIndex(2);
+        paperBox->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(viewerClass);
@@ -220,6 +231,22 @@ public:
          << QApplication::translate("viewerClass", "Best Fit", 0)
          << QApplication::translate("viewerClass", "Optimum Fit", 0)
         );
+        paperBox->clear();
+        paperBox->insertItems(0, QStringList()
+         << QApplication::translate("viewerClass", "A2", 0)
+         << QApplication::translate("viewerClass", "A3", 0)
+         << QApplication::translate("viewerClass", "A4", 0)
+         << QApplication::translate("viewerClass", "A5", 0)
+         << QApplication::translate("viewerClass", "A6", 0)
+         << QApplication::translate("viewerClass", "A7", 0)
+         << QApplication::translate("viewerClass", "B2", 0)
+         << QApplication::translate("viewerClass", "B3", 0)
+         << QApplication::translate("viewerClass", "B4", 0)
+         << QApplication::translate("viewerClass", "B5", 0)
+         << QApplication::translate("viewerClass", "B6", 0)
+         << QApplication::translate("viewerClass", "B7", 0)
+        );
+        label_3->setText(QApplication::translate("viewerClass", "Threshold:", 0));
         menuFile->setTitle(QApplication::translate("viewerClass", "File", 0));
     } // retranslateUi
 

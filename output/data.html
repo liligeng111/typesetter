@@ -15,6 +15,7 @@
 	{
 
 		var graph = [];
+		loading_svg = false;
 		for (var i = 0; i < rivers.length; i++) 
 		{
 			if (rivers[i].size < min_length)
@@ -47,7 +48,8 @@
 			opacity: 0.80
 		}).appendTo("body");
 
-		$("#placeholder").bind("plothover", function (event, pos, item) {
+		$("#placeholder").bind("plothover", function (event, pos, item)
+		{
 			if (item) {
 					var x = item.datapoint[0].toFixed(2),
 						y = item.datapoint[1].toFixed(2);
@@ -60,24 +62,114 @@
 			}
 		});
 
-		$("#placeholder").bind("plotclick", function (event, pos, item) {
+		$("#placeholder").bind("plotclick", function (event, pos, item) 
+		{
 			if (item) 
 			{
 				//search for data
 				for (var i = 0; i < rivers.length; i++)
 				{
-					if (rivers[i].local == item.datapoint[0] || rivers[i].global == item.datapoint[0])
+					if (rivers[i].local == item.datapoint[0] && rivers[i].global == item.datapoint[1])
 					{
-						var page = "page" + rivers[i].page + ".svg";
+						var page = "svg/page" + rivers[i].page + ".svg";
+						selected_id = rivers[i].id;
 						$("#svg").attr("data", page);
 						$("#page_num").text(page);
-						var  str = "$('#" + rivers[i].id + "').attr('stroke-width', '64');"
-						$('#svg').load(page, function() {setTimeout(str, 0);});
+						$('#svg').load(page, function() {change_width();});
 						console.log(rivers[i]);
-						console.log(str);
+
 					}
 				}
 			}
+		});
+	}
+
+	function change_width()
+	{
+		var width = 72;
+
+		if ($('#show_all_river')[0].checked)
+		{
+			$('.river').attr('stroke-width', width);
+		}
+		else
+		{
+			$('.river').attr('stroke-width', 0);
+		}
+
+		if ($('#show_all_regression')[0].checked)
+		{
+			$('.regression').attr('stroke-width', width);
+		}
+		else
+		{
+			$('.regression').attr('stroke-width', 0);
+		}
+
+		if ($('#show_river')[0].checked)
+		{
+			$('#river' + selected_id).attr('stroke-width', width);
+		}
+		else
+		{
+			$('#river' + selected_id).attr('stroke-width', 0);
+		}
+
+		if ($('#show_regression')[0].checked)
+		{
+			$('#regression' + selected_id).attr('stroke-width', width);
+		}
+		else
+		{
+			$('#regression' + selected_id).attr('stroke-width', 0);
+		}
+
+		if ($('#show_char')[0].checked)
+		{
+			$('.char').attr('fill', 'rgb(0, 0, 0)');
+		}
+		else
+		{
+			$('.char').attr('fill', 'rgb(255, 255, 255)');
+		}
+
+		if ($('#show_space')[0].checked)
+		{
+			$('.border0').attr('stroke-width', width);
+		}
+		else
+		{
+			$('.border0').attr('stroke-width', 0);
+		}
+
+		if ($('#show_char_box')[0].checked)
+		{
+			$('.border1').attr('stroke-width', width);
+		}
+		else
+		{
+			$('.border1').attr('stroke-width', 0);
+		}
+
+		if ($('#show_page')[0].checked)
+		{
+			$('.border4').attr('stroke-width', width);
+		}
+		else
+		{
+			$('.border4').attr('stroke-width', 0);
+		}
+						
+		$('.river').hover(function(event) 
+		{					
+			console.log(event.target);
+			$("#river_tooltip").html("local: " + $(event.target).attr("local") + ", global: " + $(event.target).attr("global"))
+						.css({top:  event.pageY+5, left:  event.pageX+5})
+						.fadeIn(200);
+			//$("#river_tooltip").css("backgroundColor","#efg");
+		}, function()
+		{
+			$("#river_tooltip").hide();
 		});
 	}
 
@@ -88,15 +180,28 @@
 		show_graph();
 	}
 
-	$(document).ready(function(){
+	$(document).ready(function()
+	{
 		show_graph();
 		$('input#min').click(function(e) {min_click(e);});
+		$(':checkbox').click(function() {change_width();});
 	});
 	</script>
 <style type="text/css"></style></head>
 <body>
 
 	<div id="header">
+	</div>
+	<div id='river_tooltip' style="position:absolute;"></div>
+	<div id="check_booxes" style='position:fixed; background-color:#eee'/>
+  <input id='show_page' type="checkbox" checked> Show Page Border<br>
+  <input id='show_char' type="checkbox" checked> Show Character<br>
+  <input id='show_char_box' type="checkbox" unchecked> Show Character Box<br>
+  <input id='show_space' type="checkbox" unchecked> Show Space Box<br>
+  <input id='show_river' type="checkbox" checked> Show Selected River<br>
+  <input id='show_regression' type="checkbox" checked> Show Selected River Regression<br>
+  <input id='show_all_river' type="checkbox" unchecked> Show All River<br>
+  <input id='show_all_regression' type="checkbox" unchecked> Show All River Regression<br>
 	</div>
 
 	<div id="content">

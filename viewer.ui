@@ -258,7 +258,7 @@ Once again, and then once again the prince heard a cracking sound and thought th
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="paperBox">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -266,6 +266,95 @@ Once again, and then once again the prince heard a cracking sound and thought th
       <width>69</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="currentIndex">
+     <number>2</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>A2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>A3</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>A4</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>A5</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>A6</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>A7</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B3</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B4</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B5</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B6</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B7</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QDoubleSpinBox" name="riverThresholdSpinBox">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>180</y>
+      <width>60</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="value">
+     <double>2.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>180</y>
+      <width>50</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Threshold:</string>
     </property>
    </widget>
   </widget>

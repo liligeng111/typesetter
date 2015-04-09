@@ -26,7 +26,7 @@ public:
 	Typesetter();
 	~Typesetter();
 
-	void set_content(string& content) { content_ = content; }
+	void set_content(string& content) { file_ = content; }
 
 	void Render(RenderTarget target);
 	static void Message(const string& msg);
@@ -36,7 +36,7 @@ public:
 
 private:
 
-	string content_;
+	string file_;
 	FT_Library  library_;
 	FT_Face face_;
 	vector<Box*> words_;
@@ -44,7 +44,6 @@ private:
 	vector<Box*> pages_;
 	vector<Breakpoint*> breakpoints_;
 	vector<vector<River*>> rivers_;
-	long line_height_;
 	
 	void Clean();
 

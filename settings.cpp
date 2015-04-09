@@ -9,17 +9,19 @@ namespace settings
 	float margin_right_ = 13.2;
 	float margin_bottom_ = 36.7;
 	
-	int dpi_ = 96;
+	int dpi_ = 72; 
 
 	int font_size_ = 12;
 	AlignMode align_mode_ = settings::BEST_FIT;
+	long em_size_ = 2048;
+	long line_height_ = 2048;
 	long space_width_ = 0;
 	long stretchability_ = 0;
 	long shrinkability_ = 0;
 
 	//sapce, char, word, line, page
 	bool border_[] = { false, false, false, false, false };
-	std::string border_color[] = { "(25, 50, 150)", "(250, 15, 0)", "(250, 150, 0)", "(120, 120, 0)", "(0, 150, 200)" };
+	std::string border_color[] = { "(25, 50, 150)", "(250, 15, 200)", "(250, 150, 0)", "(120, 120, 0)", "(0, 150, 200)" };
 
 	bool show_river_ = false;
 	float river_threshold_ = 2.0f;

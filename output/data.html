@@ -2,19 +2,23 @@
 <!-- saved from url=(0062)http://www.flotcharts.org/flot/examples/basic-usage/index.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
-	<title>Flot Examples: Basic Usage</title>
+	<title>Rivers</title>
 	<link href="./script/examples.css" rel="stylesheet" type="text/css">
 	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
 	<script language="javascript" type="text/javascript" src="./script/jquery.js"></script>
 	<script language="javascript" type="text/javascript" src="./script/jquery.flot.js"></script>
 	<script language="javascript" type="text/javascript" src="./script/rivers.js"></script>
 	<script type="text/javascript">
+	min_length = 3;
 
-	$(function() {
+	function show_graph()
+	{
 
 		var graph = [];
 		for (var i = 0; i < rivers.length; i++) 
 		{
+			if (rivers[i].size < min_length)
+				continue;
 			var found = false;
 			for (var j = 0; j < graph.length; j++)
 			{
@@ -66,20 +70,28 @@
 					{
 						var page = "page" + rivers[i].page + ".svg";
 						$("#svg").attr("data", page);
-						$('#svg').load(page);
-						console.log(rivers[i]);
+						$("#page_num").text(page);
 						var  str = "$('#" + rivers[i].id + "').attr('stroke-width', '64');"
+						$('#svg').load(page, function() {setTimeout(str, 0);});
+						console.log(rivers[i]);
 						console.log(str);
-    					setTimeout(str, 2000);
 					}
 				}
 			}
 		});
-		// Add the Flot version string to the footer
+	}
 
-		$("#footer").prepend("Flot " + $.plot.version + " &ndash; ");
+	function min_click(e)
+	{     	
+     	e.preventDefault();
+		min_length = $('#min_box')[0].value;
+		show_graph();
+	}
+
+	$(document).ready(function(){
+		show_graph();
+		$('input#min').click(function(e) {min_click(e);});
 	});
-
 	</script>
 <style type="text/css"></style></head>
 <body>
@@ -94,8 +106,15 @@
 		</div>
 
 
+	<div>
+	<p2 id="page_num"></p2>
 	</div>
-	<object id="svg" data="000" type="image/svg+xml" style="width:1000px">
+	<form>
+	Min Length: <input id='min_box' type="number" name="length" min="1" max="100" />
+	<input id="min" type="submit" />
+	</form>
+	</div>
+	<object id="svg" data="000" type="image/svg+xml">
 	</object>
 	<div id="footer">Flot 0.8.3 – 
 		Copyright © 2007 - 2014 IOLA and Ole Laursen

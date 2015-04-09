@@ -13,9 +13,8 @@ Viewer::Viewer(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-	content = ui.plainTextEdit->toPlainText().toStdString();
+	content = "input/sample.txt";
 	showMaximized();
-	on_renderButton_clicked();
 	// for some reason, you cannot get screen size in constructor, so go with 1920.
 	ui.label->setGeometry((1920 - settings::display_width()) / 2, 20, settings::display_width(), settings::display_height());
 }
@@ -97,10 +96,12 @@ void Viewer::on_alignBox_currentIndexChanged(int index)
 
 void Viewer::on_actionOpen_File_triggered()
 {
-	string fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "",tr("Files")).toStdString();
+	string fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "",tr("")).toStdString();
 	
 	ifstream t(fileName);
 	content = string((std::istreambuf_iterator<char>(t)),
 					 std::istreambuf_iterator<char>());
 	ui.plainTextEdit->setPlainText(QString::fromStdString(content));
+	//for now
+	content = fileName;
 }

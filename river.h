@@ -23,21 +23,18 @@ public:
 private:
 	vector<Box*> list;
 	long local_deviation_;
-	float global_deviation_;
+	double global_deviation_;
 
-	//regression y = a + bx
-	float alpha_;
-	float beta_;
-	long x_sum_;
-	long y_sum_;
-	long xy_sum_;
-	long x_square_sum_;
-	long y_square_sum_;
-	float x_bar_;
-	float y_bar_;
+	//regression x = a + by
+	double alpha_;
+	double beta_;
+	double x_sum_, y_sum_;
+	double xy_sum_, x_square_sum_, y_square_sum_;
+	double x_bar_, y_bar_;
 	int id_;
 	int page_;
 
 	static int next_id_;
+	double Lxx_, Lyy_, Lxy_;
 };
 

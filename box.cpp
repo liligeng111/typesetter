@@ -23,7 +23,11 @@ Box::Box(Glyph* glyph, Box* parent, BoxType type)
 
 Box::~Box()
 {
-	Clear();
+	// kill all the children!
+	for (Box* child : children_)
+	{
+		delete child;
+	}
 }
 
 void Box::ExpandBox(Box* box)
@@ -34,15 +38,6 @@ void Box::ExpandBox(Box* box)
 	height_ = height > height_ ? height : height_;
 }
 
-void Box::Clear()
-{
-	// kill all the children!
-	for (Box* child : children_)
-	{
-		delete child;
-	}
-	children_ = vector<Box*>();
-}
 
 string Box::SVG() const
 {

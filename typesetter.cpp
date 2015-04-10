@@ -63,6 +63,19 @@ void Typesetter::Message(const string& msg)
 
 void Typesetter::Clean()
 {
+	for (Box* page : pages_)
+	{
+		delete page;
+	}
+
+	for (auto rivers : rivers_)
+	{
+		for (auto river : rivers)
+		{
+			delete river;
+		}
+	}
+
 	words_ = vector<Box*>();
 	lines_ = vector<Box*>();
 	pages_ = vector<Box*>();
@@ -95,18 +108,6 @@ void Typesetter::Typeset()
 		//what it is?
 		if (ch < 0)
 			continue;
-
-		FT_Error error = FT_Load_Char(face_, ch, FT_LOAD_NO_SCALE);
-		if (error)
-		{
-			Message("Error loading character");		
-		}
-		
-		//kern
-		FT_Vector* kern = new FT_Vector();
-		//? what are the modes?
-		FT_Get_Kerning(face_, last_ch, ch, FT_KERNING_DEFAULT, kern);
-		x_cursor += kern->x;
 		
 		//backspace
 		if (ch == '\n')
@@ -139,6 +140,11 @@ void Typesetter::Typeset()
 		//seach cache
 		if (cache_index == glyph_cache_.end())
 		{
+			FT_Error error = FT_Load_Char(face_, ch, FT_LOAD_NO_SCALE);
+			if (error)
+			{
+				Message("Error loading character");
+			}
 			glyph = new Glyph(face_->glyph);
 			glyph_cache_[ch] = glyph;
 		}
@@ -146,6 +152,13 @@ void Typesetter::Typeset()
 		{
 			glyph = cache_index->second;
 		}
+
+
+		//kern
+		FT_Vector* kern = new FT_Vector();
+		//? what are the modes?
+		FT_Get_Kerning(face_, last_ch, ch, FT_KERNING_DEFAULT, kern);
+		x_cursor += kern->x;
 
 		Box* box;
 		// only add char
@@ -162,6 +175,7 @@ void Typesetter::Typeset()
 			x_cursor += box->glyph()->advance().x();
 		}
 
+		continue;
 		current_box->ExpandBox(box);
 	}
 

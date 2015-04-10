@@ -32,7 +32,6 @@ public:
 	void AddChild(Box* child) { children_.push_back(child); }
 	int ChildrenSize() const { return children_.size(); }
 	void set_parent(Box* parent) { parent_ = parent; parent_->AddChild(this); }
-	void Clear();
 
 	long x() const { return x_; }
 	long y() const { return y_; }

@@ -18,7 +18,8 @@ public:
 	long local_deviation() const { return local_deviation_; }
 	float global_deviation() const { return global_deviation_; }
 
-	string SVG() const;
+	void SVG(ofstream& file) const;
+	static double ratio_;
 
 private:
 	vector<Box*> list;

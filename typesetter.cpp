@@ -465,6 +465,7 @@ void Typesetter::Justify()
 
 void Typesetter::Render(RenderTarget target)
 {
+	Progress("Generating optput files");
 	if (target == RenderTarget::SVG || target == RenderTarget::SVG_CACHE)
 	{
 		for ( int i = 0; i < pages_.size(); i++)
@@ -480,22 +481,23 @@ void Typesetter::Render(RenderTarget target)
 			file << "	xmlns:svg=\"http://www.w3.org/2000/svg\"\n";
 			file << "	xmlns=\"http://www.w3.org/2000/svg\"\n";
 			file << "	version=\"1.1\"\n";
-			file << "	viewBox=\"0 0 " + to_string(settings::mm_to_point(settings::page_width_)) + " " + to_string(settings::mm_to_point(settings::page_height_)) + "\">\n";
+			file << "	viewBox=\"0 0 " << settings::mm_to_point(settings::page_width_) << " " << settings::mm_to_point(settings::page_height_) << "\">\n";
 			file << "<defs>\n";
 			file << "</defs>\n";
 			file << "<g transform = \"scale(1, 1)\">\n";
 
 
 			//print all the boxes
-			file << pages_[i]->SVG(target == RenderTarget::SVG_CACHE) << endl;
+			pages_[i]->SVG(file, target == RenderTarget::SVG_CACHE);
+			file << "\n";
 
 			if (settings::show_river_)
 			{
-				file << "<g transform='translate(" + to_string(pages_[i]->x()) + ", " + to_string(pages_[i]->y()) + ")'>\n";
+				file << "<g transform='translate(" << pages_[i]->x() << ", " << pages_[i]->y() << ")'>\n";
 				for (River* river : rivers_[i])
 				{
 					river->Analyse();
-					file << river->SVG() << endl;
+					river->SVG(file);
 				}
 				file << "</g>\n";
 			}
@@ -515,7 +517,7 @@ void Typesetter::Render(RenderTarget target)
 			{
 				for (River* river : rivers)
 				{
-					file << "rivers.push({id:" + to_string(river->id()) + ", page:" + to_string(river->page()) + ", size:" + to_string(river->size()) + ", local:" + to_string(river->local_deviation()) + ", global:" + to_string(river->global_deviation()) + "});\n";
+					file << "rivers.push({id:" << river->id() << ", page:"  << river->page() << ", size:" << river->size() << ", local:" << river->local_deviation() << ", global:" << river->global_deviation() << "});\n";
 				}
 			}
 			file.close();
@@ -541,4 +543,5 @@ void Typesetter::Render(RenderTarget target)
 		file.close();
 
 	}
+	Progress("Done");
 }

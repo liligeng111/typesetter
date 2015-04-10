@@ -1,7 +1,9 @@
 #include "river.h"
 #include "settings.h"
+#include <fstream>
 
 int River::next_id_ = 0;
+double River::ratio_ = 64.0;
 
 River::River(int page)
 {
@@ -16,27 +18,28 @@ River::~River()
 }
 
 
-string River::SVG() const
+void River::SVG(ofstream& file) const
 {
-	string str = "";	
-	string regression = "";
-	str += "<path class='river' id='river" + to_string(id_) + "' local='" + to_string(local_deviation_) + "' global='" + to_string(global_deviation_) + "' d='M " + to_string(list[0]->MidPoint().x()) + " " + to_string(list[0]->parent()->y() + settings::line_height_ / 2);
-	regression += "<path class='regression' id='regression" + to_string(id_) + "' d='M " + to_string(alpha_ * settings::space_width_ + beta_ * list[0]->parent()->y()) + " " + to_string(list[0]->parent()->y() + settings::line_height_ / 2);
+	file << "<path class='river' id='river" << id_ << "' local='" << local_deviation_ << "' global='" << global_deviation_ << "' d='M " << list[0]->MidPoint().x() << " " << list[0]->parent()->y() + settings::line_height_ / 2;
 	for (int i = 1; i < list.size(); i++)
 	{
-		str += " L " + to_string(list[i]->MidPoint().x()) + " " + to_string(list[i]->parent()->y() + settings::line_height_ / 2);
-		regression += " L " + to_string(alpha_ * settings::space_width_ + beta_ * list[i]->parent()->y()) + " " + to_string(list[i]->parent()->y() + settings::line_height_ / 2);
+		file << " L " << list[i]->MidPoint().x() << " " << list[i]->parent()->y() + settings::line_height_ / 2;
 	}
-	str += "'/> \n";
-	regression += "'/>";
+	file << "'/> \n";
+
+	file << "<path class='regression' id='regression" << id_ << "' d='M " << alpha_ * ratio_ + beta_ * list[0]->parent()->y() << " " << list[0]->parent()->y() + settings::line_height_ / 2;
+	for (int i = 1; i < list.size(); i++)
+	{
+		file << " L " << alpha_ * ratio_ + beta_ * list[i]->parent()->y() << " " << list[i]->parent()->y() + settings::line_height_ / 2;
+	}
+	file << "'/> \n";
 
 	/*
-	str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='a b " + to_string(alpha_) + " " + to_string(beta_) + "'/>";
-	str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='lxx lyy lxy " + to_string(Lxx_) + " " + to_string(Lyy_) + " " + to_string(Lxy_) + "'/>";
-	str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='sum x y xy " + to_string(x_sum_) + " " + to_string(y_sum_) + " " + to_string(xy_sum_) + "'/>";
-	str += "<path fill='none' stroke-width='64' stroke='rgb(25, 0, 250)' d='sumsq x y " + to_string(x_square_sum_) + " " + to_string(y_square_sum_) + "'/>";
+	file << "<path d='a b ratio" + to_string(alpha_) + " " + to_string(beta_) + " " + to_string(ratio_) + "'/>";
+	file << "<path d='lxx lyy lxy " + to_string(Lxx_) + " " + to_string(Lyy_) + " " + to_string(Lxy_) + "'/>";
+	file << "<path d='sum x y xy " + to_string(x_sum_) + " " + to_string(y_sum_) + " " + to_string(xy_sum_) + "'/>";
+	file << "<path d='sumsq x y " + to_string(x_square_sum_) + " " + to_string(y_square_sum_) + "'/>";
 	*/
-	return str + regression;
 }
 
 void River::Analyse()
@@ -57,8 +60,8 @@ void River::Analyse()
 	y_square_sum_ = 0;
 	for (Box* box : list)
 	{
-		float x = 1.0 * box->MidPoint().x() / settings::space_width_;
-		float y = 1.0 * box->parent()->y() / settings::space_width_;
+		double x = box->MidPoint().x() / ratio_;
+		double y = box->parent()->y() / ratio_;
 		x_sum_ += x;
 		y_sum_ += y;
 		xy_sum_ += x * y;

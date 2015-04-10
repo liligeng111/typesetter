@@ -1,6 +1,7 @@
 #include "box.h"
 #include "typesetter.h"
 #include "settings.h"
+#include <fstream>
 
 long Box::descender_ = 0;
 
@@ -39,45 +40,43 @@ void Box::ExpandBox(Box* box)
 }
 
 
-string Box::SVG(bool cache) const
+void Box::SVG(ofstream& file, bool cache) const
 {
-	string str = "";
-	str += "<g transform='translate(" + to_string(x_) + ", " + to_string(y_) + ")'>";
+	file << "<g transform='translate(" << x_ << ", " << y_ << ")'>";
 
 	//all kinds of borders
 	if (settings::border_[type_])
 	{
-		str += "<path fill='none' class='border" + to_string(type_)  + "' d='M 0 0 L 0 " + to_string(height_) + " " + to_string(width_) + " " + to_string(height_) + " " + to_string(width_) + " 0 0 0'/>";
+		file << "<path fill='none' class='border" << type_ << "' d='M 0 0 L 0 " << height_ << " " << width_ << " " << height_ << " " << width_ << " 0 0 0'/>";
 	}
 
 	if (glyph_ != NULL)
 	{
 		//a char
-		str += "<g transform='translate(" + to_string(-glyph_->hori_bearing_x())  + ", " + to_string(-glyph_->hori_bearing_y()) + ")'>\n";
-		str += "<path class='char char" + to_string(int(glyph_->content())) + "'";
+		file << "<g transform='translate(" << -glyph_->hori_bearing_x() << ", " << -glyph_->hori_bearing_y() << ")'>\n";
+		file << "<path class='char char" << int(glyph_->content()) << "'";
 		if (!cache)
-			str += "d='" + glyph_->path()->SVG() + "'";
-		str += "/>";
-		str += "</g>";
+			file << "d='" << glyph_->path()->SVG() << "'";
+		file << "/>";
+		file << "</g>";
 	}
 	else
 	{	
 		//reverse for line
 		if (type_ == LINE)
 		{
-			str += "<g transform = 'scale(1, -1) translate(0, " + to_string(-descender_ - height_) + ")'>\n";
+			file << "<g transform = 'scale(1, -1) translate(0, " << -descender_ - height_ << ")'>\n";
 		}
 		//a recurse
 		for (Box* child : children_)
 		{
-			str += child->SVG(cache);
+			child->SVG(file, cache);
 		}
 		if (type_ == LINE)
 		{
-			str += "</g>";
+			file << "</g>";
 		}
 	}
 
-	str += "</g>";
-	return str;
+	file << "</g>";
 }

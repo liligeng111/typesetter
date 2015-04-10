@@ -39,7 +39,7 @@ void Box::ExpandBox(Box* box)
 }
 
 
-string Box::SVG() const
+string Box::SVG(bool cache) const
 {
 	string str = "";
 	str += "<g transform='translate(" + to_string(x_) + ", " + to_string(y_) + ")'>";
@@ -47,16 +47,17 @@ string Box::SVG() const
 	//all kinds of borders
 	if (settings::border_[type_])
 	{
-		str += "<path fill='none' class='border" + to_string(type_)  + "' stroke-width='32' stroke='rgb" + settings::border_color[type_] + "' d='M 0 0 L 0 " + to_string(height_) + " " + to_string(width_) + " " + to_string(height_) + " " + to_string(width_) + " 0 0 0'/>";
+		str += "<path fill='none' class='border" + to_string(type_)  + "' d='M 0 0 L 0 " + to_string(height_) + " " + to_string(width_) + " " + to_string(height_) + " " + to_string(width_) + " 0 0 0'/>";
 	}
 
 	if (glyph_ != NULL)
 	{
 		//a char
 		str += "<g transform='translate(" + to_string(-glyph_->hori_bearing_x())  + ", " + to_string(-glyph_->hori_bearing_y()) + ")'>\n";
-		str += "<path class='char' fill='rgb(0, 0, 0)' d = '";
-		str += glyph_->path()->SVG();
-		str += "'/>";
+		str += "<path class='char char" + to_string(int(glyph_->content())) + "'";
+		if (!cache)
+			str += "d='" + glyph_->path()->SVG() + "'";
+		str += "/>";
 		str += "</g>";
 	}
 	else
@@ -69,7 +70,7 @@ string Box::SVG() const
 		//a recurse
 		for (Box* child : children_)
 		{
-			str += child->SVG();
+			str += child->SVG(cache);
 		}
 		if (type_ == LINE)
 		{

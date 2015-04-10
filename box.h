@@ -50,7 +50,7 @@ public:
 	void ExpandBox(Box* box);
 	Vector3l MidPoint() const { return Vector3l(x_ + width_ / 2, y_ + height_ / 2); }
 
-	string SVG() const;
+	string SVG(bool cache) const;
 	
 private:
 	BoxType type_;

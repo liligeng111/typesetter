@@ -235,3 +235,4 @@ output.svg
 *.txt
 output/script/rivers.js
 output/script/rivers.js
+output/script/cache.js

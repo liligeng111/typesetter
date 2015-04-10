@@ -1,7 +1,7 @@
 #include "glyph.h"
 
 
-Glyph::Glyph(FT_GlyphSlot glyph) : path_(glyph->outline)
+Glyph::Glyph(FT_GlyphSlot glyph, char ch) : path_(glyph->outline)
 {
 	linear_hori_advance_ = glyph->linearHoriAdvance;
 	linear_vert_advance_ = glyph->linearVertAdvance;
@@ -10,6 +10,7 @@ Glyph::Glyph(FT_GlyphSlot glyph) : path_(glyph->outline)
 	height_ = glyph->metrics.height;
 	hori_bearing_x_ = glyph->metrics.horiBearingX;
 	hori_bearing_y_ = glyph->metrics.horiBearingY;
+	content_ = ch;
 }
 
 

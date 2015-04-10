@@ -20,8 +20,8 @@ string River::SVG() const
 {
 	string str = "";	
 	string regression = "";
-	str += "<path class='river' id='river" + to_string(id_) + "' fill='none' stroke-width='0' stroke='rgb(250, 0, 0)' local='" + to_string(local_deviation_) + "' global='" + to_string(global_deviation_) + "' d='M " + to_string(list[0]->MidPoint().x()) + " " + to_string(list[0]->parent()->y() + settings::line_height_ / 2);
-	regression += "<path class='regression' id='regression" + to_string(id_) + "' fill='none' stroke-width='0' stroke='rgb(25, 0, 250)' d='M " + to_string(alpha_ * settings::space_width_ + beta_ * list[0]->parent()->y()) + " " + to_string(list[0]->parent()->y() + settings::line_height_ / 2);
+	str += "<path class='river' id='river" + to_string(id_) + "' local='" + to_string(local_deviation_) + "' global='" + to_string(global_deviation_) + "' d='M " + to_string(list[0]->MidPoint().x()) + " " + to_string(list[0]->parent()->y() + settings::line_height_ / 2);
+	regression += "<path class='regression' id='regression" + to_string(id_) + "' d='M " + to_string(alpha_ * settings::space_width_ + beta_ * list[0]->parent()->y()) + " " + to_string(list[0]->parent()->y() + settings::line_height_ / 2);
 	for (int i = 1; i < list.size(); i++)
 	{
 		str += " L " + to_string(list[i]->MidPoint().x()) + " " + to_string(list[i]->parent()->y() + settings::line_height_ / 2);

@@ -145,14 +145,14 @@ void Typesetter::Typeset()
 			{
 				Message("Error loading character");
 			}
-			glyph = new Glyph(face_->glyph);
+
+			glyph = new Glyph(face_->glyph, ch);
 			glyph_cache_[ch] = glyph;
 		}
 		else
 		{
 			glyph = cache_index->second;
 		}
-
 
 		//kern
 		FT_Vector* kern = new FT_Vector();
@@ -175,7 +175,6 @@ void Typesetter::Typeset()
 			x_cursor += box->glyph()->advance().x();
 		}
 
-		continue;
 		current_box->ExpandBox(box);
 	}
 
@@ -466,7 +465,7 @@ void Typesetter::Justify()
 
 void Typesetter::Render(RenderTarget target)
 {
-	if (target == RenderTarget::SVG)
+	if (target == RenderTarget::SVG || target == RenderTarget::SVG_CACHE)
 	{
 		for ( int i = 0; i < pages_.size(); i++)
 		{
@@ -488,7 +487,7 @@ void Typesetter::Render(RenderTarget target)
 
 
 			//print all the boxes
-			file <<pages_[i]->SVG() << endl;
+			file << pages_[i]->SVG(target == RenderTarget::SVG_CACHE) << endl;
 
 			if (settings::show_river_)
 			{
@@ -521,5 +520,25 @@ void Typesetter::Render(RenderTarget target)
 			}
 			file.close();
 		}
+	}
+
+	//output cache
+	if (target == RenderTarget::SVG_CACHE)
+	{
+		ofstream file;
+		file.open("output/script/cache.js");
+		file << "path_chche = [];\n";
+		for (auto& kv : glyph_cache_)
+		{
+			//string special;
+			//if (kv.first == '\"' || kv.first == '\'')
+			//	special = "\\";
+			//else
+			//	special = "";
+
+			file << "path_chche[" << int(kv.first) << "] = '" << kv.second->path()->SVG() << "';\n";
+		}
+		file.close();
+
 	}
 }

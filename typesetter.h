@@ -2,7 +2,9 @@
 
 #include <string>
 #include <ft2build.h>
+#include <map> 
 #include <vector>
+#include <chrono>
 #include FT_FREETYPE_H
 #include "box.h"
 #include "river.h"
@@ -39,11 +41,15 @@ private:
 	string file_;
 	FT_Library  library_;
 	FT_Face face_;
+	map<char, Glyph*> glyph_cache_;
 	vector<Box*> words_;
 	vector<Box*> lines_;
 	vector<Box*> pages_;
 	vector<Breakpoint*> breakpoints_;
 	vector<vector<River*>> rivers_;
+	chrono::high_resolution_clock::time_point start_time_;
+
+	void Progress(string msg);
 	
 	void Clean();
 

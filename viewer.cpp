@@ -39,7 +39,7 @@ void Viewer::on_renderButton_clicked()
 	Resize();
 	typesetter.set_content(content);
 	typesetter.Typeset();
-	typesetter.Render(Typesetter::SVG);
+	//typesetter.Render(Typesetter::SVG);
 
 	QSvgRenderer renderer(QString("./output/svg/page0.svg"));
 	QImage image(settings::display_width(), settings::display_height(), QImage::Format_ARGB32);

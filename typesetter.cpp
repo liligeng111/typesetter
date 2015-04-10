@@ -1,6 +1,7 @@
 #include "typesetter.h"
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include "viewer.h"
 #include "settings.h"
 
@@ -69,11 +70,20 @@ void Typesetter::Clean()
 	breakpoints_ = vector<Breakpoint*>();
 }
 
+void Typesetter::Progress(string msg)
+{
+	cout << fixed << setprecision(3) << chrono::duration_cast<std::chrono::milliseconds>(chrono::high_resolution_clock::now() - start_time_).count() / 1000.0 << "s--" << msg << "\n";
+}
+
 void Typesetter::Typeset()
 {
+	start_time_ = chrono::high_resolution_clock::now();
+
+	Progress("Cleaning previous data");
 	//clear previous boxes
 	Clean();
 
+	Progress("Reading input file");
 	Box* current_box;
 	long x_cursor = 0;
 
@@ -124,9 +134,21 @@ void Typesetter::Typeset()
 		}
 		last_ch = ch;
 
-		Glyph* glyph = new Glyph(face_->glyph);
+		Glyph* glyph;
+		auto cache_index = glyph_cache_.find(ch);
+		//seach cache
+		if (cache_index == glyph_cache_.end())
+		{
+			glyph = new Glyph(face_->glyph);
+			glyph_cache_[ch] = glyph;
+		}
+		else
+		{
+			glyph = cache_index->second;
+		}
+
 		Box* box;
-		// noly add char
+		// only add char
 		if (ch == ' ')
 		{
 			box = new Box(glyph, NULL, Box::BoxType::CHAR);
@@ -143,6 +165,8 @@ void Typesetter::Typeset()
 		current_box->ExpandBox(box);
 	}
 
+	//cout << "cache size: " << glyph_cache_.size() << endl;
+	Progress("Typesetting");
 	if (settings::align_mode_ == settings::AlignMode::RAGGED_RIGHT)
 	{
 		RaggedRight();
@@ -158,8 +182,10 @@ void Typesetter::Typeset()
 
 	if (settings::show_river_)
 	{
+		Progress("Detecting River");
 		DetectRiver();
 	}
+	Progress("Typesetting Done");
 }
 
 void Typesetter::DetectRiver()

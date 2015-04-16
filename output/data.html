@@ -10,16 +10,18 @@
 	<script language="javascript" type="text/javascript" src="./script/rivers.js"></script>
 	<script language="javascript" type="text/javascript" src="./script/cache.js"></script>
 	<script type="text/javascript">
-	min_length = 3;
 
 	function show_graph()
 	{
 
 		var graph = [];
 		loading_svg = false;
+		var x = $('.x_cood:radio:checked').val();
+		var y = $('.y_cood:radio:checked').val();
+
 		for (var i = 0; i < rivers.length; i++) 
 		{
-			if (rivers[i].size < min_length)
+			if (rivers[i].size < min_length || rivers[i].min_left_length < min_left || rivers[i].min_right_length < min_right || rivers[i].left_length_bar < avg_left || rivers[i].right_length_bar < avg_right || rivers[i].up_length > up_length || rivers[i].down_length > down_length)
 				continue;
 			var found = false;
 			for (var j = 0; j < graph.length; j++)
@@ -35,11 +37,11 @@
 				graph.push({label:rivers[i].size, data:[]});
 				j = graph.length - 1;
 			}
-			graph[j].data.push([rivers[i].local, rivers[i].global]);
+			graph[j].data.push([rivers[i][x], rivers[i][y]]);
 		}
 		//console.log(graph);
-
-		$.plot("#placeholder", graph, {series:{points:{show:true}}, grid:{hoverable:true,clickable:true}});
+		$( "#placeholder" ).unbind();
+		$.plot("#placeholder", graph, {series:{points:{show:true}}, grid:{hoverable:true,clickable:true}, legend:{container:$("#legendContainer"), noColumns:0}});
 		$("<div id='tooltip'></div>").css({
 			position: "absolute",
 			display: "none",
@@ -51,7 +53,8 @@
 
 		$("#placeholder").bind("plothover", function (event, pos, item)
 		{
-			if (item) {
+			if (item)
+			{
 					var x = item.datapoint[0].toFixed(2),
 						y = item.datapoint[1].toFixed(2);
 
@@ -65,12 +68,13 @@
 
 		$("#placeholder").bind("plotclick", function (event, pos, item) 
 		{
+			console.log("click event")
 			if (item) 
 			{
 				//search for data
 				for (var i = 0; i < rivers.length; i++)
 				{
-					if (rivers[i].local == item.datapoint[0] && rivers[i].global == item.datapoint[1])
+					if (rivers[i][x] == item.datapoint[0] && rivers[i][y] == item.datapoint[1])
 					{
 						var page = "svg/page" + rivers[i].page + ".svg";
 						selected_id = rivers[i].id;
@@ -78,7 +82,7 @@
 						$("#page_num").text(page);
 						$('#svg').load(page, function() {change_width();});
 						console.log(rivers[i]);
-
+						$('#river_info').text(JSON.stringify(rivers[i]));
 					}
 				}
 			}
@@ -100,7 +104,7 @@
 
 		if ($('#show_all_regression')[0].checked)
 		{
-			$('.regression').attr('stroke-width', width);
+			$('.regression').each(function(){$(this).attr('stroke-width', $(this).attr('width'));});
 		}
 		else
 		{
@@ -118,7 +122,7 @@
 
 		if ($('#show_regression')[0].checked)
 		{
-			$('#regression' + selected_id).attr('stroke-width', width);
+			$('#regression' + selected_id).attr('stroke-width', $('#river' + selected_id).attr('width'));
 		}
 		else
 		{
@@ -182,6 +186,7 @@
 		}
 		$('.border0').attr('stroke', '#12c');
 		$('.border1').attr('stroke', '#f1e');
+		$('.border4').attr('stroke', '#36f');
 		$('.river').attr('stroke', '#e01');
 		$('.river').attr('fill', 'none');
 		$('.regression').attr('stroke', '#10e');
@@ -190,16 +195,25 @@
 
 	function min_click(e)
 	{     	
-     	e.preventDefault();
+		console.log('min')
 		min_length = $('#min_box')[0].value;
+		min_left = $('#min_left_box')[0].value;
+		min_right = $('#min_right_box')[0].value;
+		avg_left = $('#avg_left_box')[0].value;
+		avg_right = $('#avg_right_box')[0].value;
+		up_length = $('#up_box')[0].value;
+		down_length = $('#down_box')[0].value;
 		show_graph();
+		if (e)
+     		e.preventDefault();
 	}
 
 	$(document).ready(function()
 	{
-		show_graph();
+		min_click(null);
 		$('input#min').click(function(e) {min_click(e);});
 		$(':checkbox').click(function() {change_width();});
+		$(':radio').click(function() {show_graph();});
 	});
 	</script>
 <style type="text/css"></style></head>
@@ -208,20 +222,40 @@
 	<div id="header">
 	</div>
 	<div id='river_tooltip' style="position:absolute;"></div>
-	<div id="check_booxes" style='position:fixed; background-color:#eee'/>
-  <input id='show_page' type="checkbox" checked> Show Page Border<br>
-  <input id='show_char' type="checkbox" checked> Show Character<br>
-  <input id='show_char_box' type="checkbox" unchecked> Show Character Box<br>
-  <input id='show_space' type="checkbox" unchecked> Show Space Box<br>
-  <input id='show_river' type="checkbox" checked> Show Selected River<br>
-  <input id='show_regression' type="checkbox" checked> Show Selected River Regression<br>
-  <input id='show_all_river' type="checkbox" unchecked> Show All River<br>
-  <input id='show_all_regression' type="checkbox" unchecked> Show All River Regression<br>
+	<div id="check_booxes" style='position:fixed; background-color:#eee; left:10px; top:10px;'>
+		<input id='show_page' type="checkbox" checked> Show Page Border<br>
+		<input id='show_char' type="checkbox" checked> Show Character<br>
+		<input id='show_char_box' type="checkbox" unchecked> Show Character Box<br>
+		<input id='show_space' type="checkbox" unchecked> Show Space Box<br>
+		<input id='show_river' type="checkbox" checked> Show Selected River<br>
+		<input id='show_regression' type="checkbox" checked> Show Selected River Regression<br>
+		<input id='show_all_river' type="checkbox" unchecked> Show All River<br>
+		<input id='show_all_regression' type="checkbox" unchecked> Show All River Regression<br>
+
+		<br>
+		X Coordinate
+		<form>
+			<input type="radio" class="x_cood" name="x_cood" value="local" /> Local Deviation <br>
+			<input type="radio" class="x_cood" name="x_cood" value="global" /> Global Deviation <br>
+			<input type="radio" class="x_cood" name="x_cood" value="width_std" /> Standard Variance of Space Width <br>
+			<input type="radio" class="x_cood" name="x_cood" value="volume" checked/> Volume <br>
+		</form>
+
+		<br>
+		Y Coordinate
+		<form>
+			<input type="radio" class="y_cood" name="y_cood" value="local"/> Local Deviation <br>
+			<input type="radio" class="y_cood" name="y_cood" value="global" /> Global Deviation <br>
+			<input type="radio" class="y_cood" name="y_cood" value="width_std" checked/> Standard Variance of Space Width <br>
+			<input type="radio" class="y_cood" name="y_cood" value="volume" /> Volume <br>
+		</form>
 	</div>
+	
 
 	<div id="content">
 
 		<div class="demo-container">
+    		<div id="legendContainer"></div>    
 			<div id="placeholder" class="demo-placeholder" style="padding: 0px; position: relative;"></div>
 		</div>
 
@@ -230,10 +264,17 @@
 	<p2 id="page_num"></p2>
 	</div>
 	<form>
-	Min Length: <input id='min_box' type="number" name="length" min="1" max="100" />
+	Min Length: <input id='min_box' type="number" name="length" min="1" value='5' max="100" /> <br>
+	Min Left Word Length: <input id='min_left_box' type="number" name="left" value='1000' min="1" max="10000" /> <br>
+	Min Left Word Length: <input id='min_right_box' type="number" name="right" value='1000' min="1" max="10000" /> <br>
+	Avg Left Word Length: <input id='avg_left_box' type="number" name="left" value='1500' min="1" max="10000" /> <br>
+	Avg Left Word Length: <input id='avg_right_box' type="number" name="right" value='1500' min="1" max="10000" /> <br>
+	Up Length: <input id='up_box' type="number" name="right" value='0' min="0" max="1" /> <br>
+	Down Length: <input id='down_box' type="number" name="right" value='0' min="0" max="1" /> <br>
 	<input id="min" type="submit" />
 	</form>
 	</div>
+	<p3 id="river_info"></p3>
 	<object id="svg" data="000" type="image/svg+xml">
 	</object>
 	<div id="footer">Flot 0.8.3 – 

@@ -9,6 +9,8 @@ Box::Box(Glyph* glyph, Box* parent, BoxType type)
 {
 	glyph_ = glyph;
 	parent_ = parent;
+	left_ = NULL;
+	right_ = NULL;
 	type_ = type;
 	x_ = 0;
 	y_ = 0;

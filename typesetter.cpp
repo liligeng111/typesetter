@@ -45,7 +45,7 @@ void Typesetter::LoadFace()
 
 	Box::set_descender(face_->descender);
 	settings::em_size_ = face_->units_per_EM;
-	settings::line_height_ = face_->units_per_EM;
+	settings::line_height_ = 1.2 * face_->units_per_EM;
 
 	settings::space_width_ = face_->units_per_EM / 3;
 	settings::stretchability_ = face_->units_per_EM / 6;
@@ -216,7 +216,7 @@ void Typesetter::DetectRiver()
 			for (int b = 0; b < lines->at(i)->ChildrenSize(); b++)
 			{
 				Box* box = lines->at(i)->child(b);
-				if (box->type() != Box::BoxType::SPACE || box == box->parent()->child(box->parent()->ChildrenSize() - 1))
+				if (box->type() != Box::BoxType::SPACE || box == box->parent()->child(box->parent()->ChildrenSize() - 1) || box->width() >  2 * settings::space_width_)
 					continue;	
 				
 				//check up for duplicate
@@ -224,7 +224,7 @@ void Typesetter::DetectRiver()
 				for (int t = 0; i > 0 && t < lines->at(i - 1)->ChildrenSize(); t++)
 				{
 					Box* temp = lines->at(i - 1)->child(t);
-					if (temp->type() != Box::BoxType::SPACE || temp == temp->parent()->child(temp->parent()->ChildrenSize() - 1))
+					if (temp->type() != Box::BoxType::SPACE || temp == temp->parent()->child(temp->parent()->ChildrenSize() - 1) || temp->width() >  2 * settings::space_width_)
 						continue;
 					//if (labs(box->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * (box->width() + temp->width()) / 2)
 					if (labs(box->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * settings::space_width_)
@@ -250,7 +250,7 @@ void Typesetter::DetectRiver()
 					for (int t = 0; search < lines->size() && t < lines->at(search)->ChildrenSize(); t++)
 					{
 						Box* temp = lines->at(search)->child(t);
-						if (temp->type() != Box::BoxType::SPACE || temp == temp->parent()->child(temp->parent()->ChildrenSize() - 1))
+						if (temp->type() != Box::BoxType::SPACE || temp == temp->parent()->child(temp->parent()->ChildrenSize() - 1) || temp->width() >  2 * settings::space_width_)
 							continue;
 						if (labs(last->MidPoint().x() - temp->MidPoint().x()) < settings::river_threshold_ * settings::space_width_)
 						{
@@ -377,6 +377,7 @@ void Typesetter::BreakLines()
 	pages_.push_back(current_page);
 
 	int i = 0;
+	Box* last = NULL;
 
 	//check each box, first must be a breakpoint
 	for (Box* child : words_)
@@ -398,15 +399,20 @@ void Typesetter::BreakLines()
 			{
 				current_line->set_justify(false);
 			}
-			current_line = new Box(current_page, Box::BoxType::LINE);
+			Box* new_line = new Box(current_page, Box::BoxType::LINE);
+			new_line->set_left(current_line);
+			current_line = new_line;
 			current_line->set_geometry(0, y_adjust, 0, settings::line_height_);
 			x_adjust = -child->x();
 			y_adjust += settings::line_height_;
 			lines_.push_back(current_line);
+			last = NULL;
 		}
 		child->Translate(x_adjust, 0);
 		child->set_parent(current_line);
+		child->set_left(last);
 		current_line->ExpandBox(child);
+		last = child;
 	}
 }
 
@@ -517,7 +523,16 @@ void Typesetter::Render(RenderTarget target)
 			{
 				for (River* river : rivers)
 				{
-					file << "rivers.push({id:" << river->id() << ", page:"  << river->page() << ", size:" << river->size() << ", local:" << river->local_deviation() << ", global:" << river->global_deviation() << "});\n";
+					file << "rivers.push({id:" << river->id() << ", page:" << river->page() << ", size:" << river->size() << ", local:" << river->local_deviation_ << ", global:" << river->global_deviation_;
+					file << ", width_std:" << river->width_std_;
+					file << ", min_left_length:" << river->min_left_length_;
+					file << ", min_right_length:" << river->min_right_length_;
+					file << ", left_length_bar:" << river->left_length_bar_;
+					file << ", right_length_bar:" << river->right_length_bar_;
+					file << ", up_length:" << river->up_length_;
+					file << ", down_length:" << river->down_length_;
+					file << ", volume:" << river->volume_;
+					file << "});\n";
 				}
 			}
 			file.close();

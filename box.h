@@ -27,11 +27,14 @@ public:
 	BoxType type() const { return type_; }
 
 	const Box* parent() const { return parent_; }
+	const Box* left() const { return left_; }
+	const Box* right() const { return right_; }
 	const vector<Box*>* children() const { return &children_; }
 	Box* child(int i) const { return children_[i]; }
 	void AddChild(Box* child) { children_.push_back(child); }
 	int ChildrenSize() const { return children_.size(); }
 	void set_parent(Box* parent) { parent_ = parent; parent_->AddChild(this); }
+	void set_left(Box* left) { left_ = left; if (left != NULL) left->right_ = this; }
 
 	long x() const { return x_; }
 	long y() const { return y_; }
@@ -55,6 +58,8 @@ public:
 private:
 	BoxType type_;
 	Box* parent_;
+	Box* left_;
+	Box* right_;
 	vector<Box*> children_;
 	long x_;
 	long y_;

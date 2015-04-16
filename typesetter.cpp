@@ -4,6 +4,9 @@
 #include <iomanip>
 #include "viewer.h"
 #include "settings.h"
+#include "lib\libhyphenate\Hyphenator.h"
+
+using namespace Hyphenate;
 
 Typesetter::Typesetter()
 {
@@ -91,6 +94,10 @@ void Typesetter::Progress(string msg)
 void Typesetter::Typeset()
 {
 	start_time_ = chrono::high_resolution_clock::now();
+
+	Hyphenator hyphenator = (RFC_3066::Language("en"));
+	string hyp = "example";
+	Progress(hyphenator.hyphenate(hyp));
 
 	Progress("Cleaning previous data");
 	//clear previous boxes

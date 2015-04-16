@@ -57,6 +57,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+    <NuGetPackageImportStamp>acbfba2d</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
@@ -69,6 +70,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,14 +98,14 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.\lib\freetype;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\lib\libglib;.\lib\libiconv;.\GeneratedFiles;.\lib\freetype;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\libglib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;.\lib\freetype\freetype255d.lib;Qt5Svgd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;.\lib\freetype\freetype255d.lib;Qt5Svgd.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Debug\dynamic\glib-2.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -133,7 +137,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;.\lib\freetype\freetype255.lib;Qt5Svg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;.\lib\freetype\freetype255.lib;Qt5Svg.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Release\dynamic\glib-2.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -159,6 +163,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="glyph.cpp" />
+    <ClCompile Include="lib\libhyphenate\hyphenate.cpp" />
+    <ClCompile Include="lib\libhyphenate\HyphenationRule.cpp" />
+    <ClCompile Include="lib\libhyphenate\HyphenationTree.cpp" />
+    <ClCompile Include="lib\libhyphenate\Hyphenator.cpp" />
+    <ClCompile Include="lib\libhyphenate\Language.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="path.cpp" />
     <ClCompile Include="river.cpp" />
@@ -213,6 +222,11 @@
     <ClInclude Include="breakpoint.h" />
     <ClInclude Include="GeneratedFiles\ui_viewer.h" />
     <ClInclude Include="glyph.h" />
+    <ClInclude Include="lib\libhyphenate\hyphenate.h" />
+    <ClInclude Include="lib\libhyphenate\HyphenationRule.h" />
+    <ClInclude Include="lib\libhyphenate\HyphenationTree.h" />
+    <ClInclude Include="lib\libhyphenate\Hyphenator.h" />
+    <ClInclude Include="lib\libhyphenate\Language.h" />
     <ClInclude Include="path.h" />
     <ClInclude Include="river.h" />
     <ClInclude Include="settings.h" />
@@ -239,12 +253,40 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\zlib.redist.1.2.8.7\build\native\zlib.redist.targets" Condition="Exists('..\packages\zlib.redist.1.2.8.7\build\native\zlib.redist.targets')" />
+    <Import Project="..\packages\zlib.1.2.7.30\build\native\zlib.targets" Condition="Exists('..\packages\zlib.1.2.7.30\build\native\zlib.targets')" />
+    <Import Project="..\packages\libintl.redist.0.18.2.1\build\native\libintl.redist.targets" Condition="Exists('..\packages\libintl.redist.0.18.2.1\build\native\libintl.redist.targets')" />
+    <Import Project="..\packages\libintl.0.18.2.1\build\native\libintl.targets" Condition="Exists('..\packages\libintl.0.18.2.1\build\native\libintl.targets')" />
+    <Import Project="..\packages\libffi.redist.3.0.10.3\build\native\libffi.redist.targets" Condition="Exists('..\packages\libffi.redist.3.0.10.3\build\native\libffi.redist.targets')" />
+    <Import Project="..\packages\libffi.3.0.10.3\build\native\libffi.targets" Condition="Exists('..\packages\libffi.3.0.10.3\build\native\libffi.targets')" />
+    <Import Project="..\packages\glib.redist.2.36.2.11\build\native\glib.redist.targets" Condition="Exists('..\packages\glib.redist.2.36.2.11\build\native\glib.redist.targets')" />
+    <Import Project="..\packages\glib.2.36.2.11\build\native\glib.targets" Condition="Exists('..\packages\glib.2.36.2.11\build\native\glib.targets')" />
+    <Import Project="..\packages\libiconv.redist.1.14.0.11\build\native\libiconv.redist.targets" Condition="Exists('..\packages\libiconv.redist.1.14.0.11\build\native\libiconv.redist.targets')" />
+    <Import Project="..\packages\libiconv.1.14.0.11\build\native\libiconv.targets" Condition="Exists('..\packages\libiconv.1.14.0.11\build\native\libiconv.targets')" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties MocDir=".\GeneratedFiles\$(ConfigurationName)" UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" lupdateOptions="" lupdateOnBuild="0" lreleaseOptions="" Qt5Version_x0020_Win32="msvc2013_64" Qt5Version_x0020_x64="msvc2013_64" MocOptions="" />
     </VisualStudio>
   </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\zlib.redist.1.2.8.7\build\native\zlib.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.redist.1.2.8.7\build\native\zlib.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\zlib.1.2.7.30\build\native\zlib.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.1.2.7.30\build\native\zlib.targets'))" />
+    <Error Condition="!Exists('..\packages\libintl.redist.0.18.2.1\build\native\libintl.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libintl.redist.0.18.2.1\build\native\libintl.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\libintl.0.18.2.1\build\native\libintl.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libintl.0.18.2.1\build\native\libintl.targets'))" />
+    <Error Condition="!Exists('..\packages\libffi.redist.3.0.10.3\build\native\libffi.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libffi.redist.3.0.10.3\build\native\libffi.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\libffi.3.0.10.3\build\native\libffi.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libffi.3.0.10.3\build\native\libffi.targets'))" />
+    <Error Condition="!Exists('..\packages\glib.redist.2.36.2.11\build\native\glib.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glib.redist.2.36.2.11\build\native\glib.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\glib.2.36.2.11\build\native\glib.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glib.2.36.2.11\build\native\glib.targets'))" />
+    <Error Condition="!Exists('..\packages\libiconv.redist.1.14.0.11\build\native\libiconv.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libiconv.redist.1.14.0.11\build\native\libiconv.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\libiconv.1.14.0.11\build\native\libiconv.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libiconv.1.14.0.11\build\native\libiconv.targets'))" />
+  </Target>
 </Project>

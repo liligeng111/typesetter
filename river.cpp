@@ -28,6 +28,8 @@ River::River(int page)
 	down_length_ = 0;
 	up_volume_ = 99999;
 	down_volume_ = -99999;
+	repeats_ = 0;
+	repeat_words_ = 0;
 }
 
 
@@ -196,20 +198,37 @@ void River::Analyse()
 		}
 	}
 
-	for (Box* box : list_)
+	for (int i = 0; i < list_.size(); i++)
 	{
+		Box* box = list_[i];
 		const Box* l = box->left();
 		if (l != NULL)
 		{
 			Volume(l->EndAt(), l->parent()->y());
 			Volume(l->EndAt(), l->parent()->y() + l->height());
+
+			if (i != 0)
+			{
+				if (l->Last()->glyph()->content() == list_[i - 1]->left()->Last()->glyph()->content())
+					repeats_++;
+				if (box->parent()->justify() && l->content() == list_[i - 1]->left()->content())
+					repeat_words_++;
+			}
 		}
 
 		const Box* r = box->right();
-		if (l != NULL)
+		if (r != NULL)
 		{
 			Volume(r->x(), r->parent()->y());
 			Volume(r->x(), r->parent()->y() + r->height());
+
+			if (i != 0)
+			{
+				if (r->First()->glyph()->content() == list_[i - 1]->right()->First()->glyph()->content())
+					repeats_++;
+				if (box->parent()->justify() && r->content() == list_[i - 1]->right()->content())
+					repeat_words_++;
+			}
 		}
 	}
 	volume_ = (up_volume_ - down_volume_) / sqrt(1 + beta_ * beta_);

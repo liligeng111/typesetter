@@ -22,6 +22,8 @@ Box::Box(Glyph* glyph, Box* parent, BoxType type)
 	{
 		parent->AddChild(this);
 	}
+
+	content_ = "";
 }
 
 Box::~Box()
@@ -81,4 +83,22 @@ void Box::SVG(ofstream& file, bool cache) const
 	}
 
 	file << "</g>";
+}
+
+Box* Box::NearestChild(long l) const
+{
+	long dis = 2147483647;
+	int n = 0;
+
+	for (int i = 0; i < children_.size(); i++)
+	{
+		long d = abs(children_[i]->EndAt() - l);
+		if (dis > d)
+		{
+			dis = d;
+			n = i;
+		}
+	}
+
+	return children_[n];
 }

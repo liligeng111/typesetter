@@ -167,8 +167,21 @@
 						
 		$('.river').hover(function(event) 
 		{					
+			var x = $('.x_cood:radio:checked').val();
+			var y = $('.y_cood:radio:checked').val();
+			var found;
+			for (var i = 0; i < rivers.length; i++)
+			{
+				if (rivers[i].id == $(event.target).attr("id").substring(5))
+				{
+					found = i;
+					break;					
+				}
+				//console.log(rivers[i].id + " " + $(event.target).attr("id").substring(6));
+			}
 			console.log(event.target);
-			$("#river_tooltip").html("local: " + $(event.target).attr("local") + ", global: " + $(event.target).attr("global"))
+			console.log(x + " " + y + " " + found);
+			$("#river_tooltip").html(x + ": " + rivers[found][x] + ", " + y + ": " +  rivers[found][y])
 						.css({top:  event.pageY+5, left:  event.pageX+5})
 						.fadeIn(200);
 			//$("#river_tooltip").css("backgroundColor","#efg");
@@ -228,7 +241,7 @@
 		<input id='show_char_box' type="checkbox" unchecked> Show Character Box<br>
 		<input id='show_space' type="checkbox" unchecked> Show Space Box<br>
 		<input id='show_river' type="checkbox" checked> Show Selected River<br>
-		<input id='show_regression' type="checkbox" checked> Show Selected River Regression<br>
+		<input id='show_regression' type="checkbox" unchecked> Show Selected River Regression<br>
 		<input id='show_all_river' type="checkbox" unchecked> Show All River<br>
 		<input id='show_all_regression' type="checkbox" unchecked> Show All River Regression<br>
 
@@ -246,8 +259,10 @@
 		<form>
 			<input type="radio" class="y_cood" name="y_cood" value="local"/> Local Deviation <br>
 			<input type="radio" class="y_cood" name="y_cood" value="global" /> Global Deviation <br>
-			<input type="radio" class="y_cood" name="y_cood" value="width_std" checked/> Standard Variance of Space Width <br>
+			<input type="radio" class="y_cood" name="y_cood" value="width_std" /> Standard Variance of Space Width <br>
 			<input type="radio" class="y_cood" name="y_cood" value="volume" /> Volume <br>
+			<input type="radio" class="y_cood" name="y_cood" value="repeats" checked/> Repeat Characters <br>
+			<input type="radio" class="y_cood" name="y_cood" value="repeat_words" checked/> Repeats Words<br>
 		</form>
 	</div>
 	
@@ -265,10 +280,10 @@
 	</div>
 	<form>
 	Min Length: <input id='min_box' type="number" name="length" min="1" value='5' max="100" /> <br>
-	Min Left Word Length: <input id='min_left_box' type="number" name="left" value='1000' min="1" max="10000" /> <br>
-	Min Left Word Length: <input id='min_right_box' type="number" name="right" value='1000' min="1" max="10000" /> <br>
-	Avg Left Word Length: <input id='avg_left_box' type="number" name="left" value='1500' min="1" max="10000" /> <br>
-	Avg Left Word Length: <input id='avg_right_box' type="number" name="right" value='1500' min="1" max="10000" /> <br>
+	Min Left Word Length: <input id='min_left_box' type="number" name="left" value='800' min="1" max="10000" /> <br>
+	Min Left Word Length: <input id='min_right_box' type="number" name="right" value='800' min="1" max="10000" /> <br>
+	Avg Left Word Length: <input id='avg_left_box' type="number" name="left" value='1200' min="1" max="10000" /> <br>
+	Avg Left Word Length: <input id='avg_right_box' type="number" name="right" value='1200' min="1" max="10000" /> <br>
 	Up Length: <input id='up_box' type="number" name="right" value='0' min="0" max="1" /> <br>
 	Down Length: <input id='down_box' type="number" name="right" value='0' min="0" max="1" /> <br>
 	<input id="min" type="submit" />

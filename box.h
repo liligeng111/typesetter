@@ -3,6 +3,7 @@
 #include "path.h"
 #include "glyph.h"
 #include <vector>
+#include "lib\libhyphenate\Hyphenator.h"
 
 class Box
 {
@@ -22,7 +23,7 @@ public:
 	Box(Glyph* glyph, Box* parent, BoxType type);
 	~Box();
 
-	Glyph* glyph() { return glyph_; }
+	Glyph* glyph() const { return glyph_; }
 	void set_glyph(Glyph* glyph) { glyph_ = glyph; }	
 	BoxType type() const { return type_; }
 
@@ -30,8 +31,12 @@ public:
 	const Box* left() const { return left_; }
 	const Box* right() const { return right_; }
 	const vector<Box*>* children() const { return &children_; }
+	const string& content() const{ return content_; }
 	Box* child(int i) const { return children_[i]; }
-	void AddChild(Box* child) { children_.push_back(child); }
+	Box* First() const { return children_[0]; }
+	Box* Last() const { return children_[children_.size() - 1]; }
+	Box* NearestChild(long l) const;
+	void AddChild(Box* child) { children_.push_back(child); if (type_ == WORD) content_ += child->glyph_->content(); }
 	int ChildrenSize() const { return children_.size(); }
 	void set_parent(Box* parent) { parent_ = parent; parent_->AddChild(this); }
 	void set_left(Box* left) { left_ = left; if (left != NULL) left->right_ = this; }
@@ -54,6 +59,7 @@ public:
 	Vector3l MidPoint() const { return Vector3l(x_ + width_ / 2, y_ + height_ / 2); }
 
 	void SVG(ofstream& file, bool cache) const;
+	void Hyphenate(Hyphenate::Hyphenator* hyphenator) { hyphenated_ = hyphenator->hyphenate(content_); }
 	
 private:
 	BoxType type_;
@@ -69,5 +75,6 @@ private:
 	Glyph* glyph_;
 	bool justify_;
 	//Matrix matrix_;
+	string content_, hyphenated_;
 };
 

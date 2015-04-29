@@ -96,8 +96,6 @@ void Typesetter::Typeset()
 	start_time_ = chrono::high_resolution_clock::now();
 
 	Hyphenator hyphenator = (RFC_3066::Language("en"));
-	string hyp = "example";
-	Progress(hyphenator.hyphenate(hyp));
 
 	Progress("Cleaning previous data");
 	//clear previous boxes
@@ -185,6 +183,12 @@ void Typesetter::Typeset()
 		current_box->ExpandBox(box);
 	}
 
+	Progress("Hyphenating");
+	for (Box* word : words_)
+	{
+		word->Hyphenate(&hyphenator);
+	}
+
 	//cout << "cache size: " << glyph_cache_.size() << endl;
 	Progress("Typesetting");
 	if (settings::align_mode_ == settings::AlignMode::RAGGED_RIGHT)
@@ -215,6 +219,7 @@ void Typesetter::DetectRiver()
 		Box* page = pages_[p];
 		rivers_.push_back(vector<River*>());
 		const vector<Box*>* lines = page->children();
+
 
 		//wtf is this bug
 		int max_i = lines->size() - 2;
@@ -268,7 +273,7 @@ void Typesetter::DetectRiver()
 					}
 				}
 
-				if (river->size() > 2)
+				if (river->size() >= 2)
 				{
 					rivers_[p].push_back(river);
 				}
@@ -323,50 +328,70 @@ void Typesetter::BestFit()
 	Breakpoint* breakpoint = new Breakpoint(words_[0]);
 	breakpoints_.push_back(breakpoint);
 
+	int n = 0;
+	Box* bp;
+
 	//check each box
 	for (int i = 0; i < words_.size(); i++)
 	{
-		if (i == words_.size() - 3)
+		Box* child = words_[i];
+		bool new_line = false;
+		if (child->type() == Box::BoxType::BACKSPACE)
 		{
-			int t = 0;
+			new_line = true;
+			bp = child;
 		}
 
-		Box* child = words_[i];
-		bool new_line = child->type() == Box::BoxType::BACKSPACE;
+		if (child->type() == Box::BoxType::SPACE)
+			n++;
 		//calculate r
 		if (!new_line && child->type() == Box::BoxType::WORD)
 		{
 			long L = child->EndAt() -  breakpoint->x();
 			long l = settings::content_width_point();
 
-			float r = settings::AdjustmentRatio(L, l);
-			//if is a possible breakpoint, check for better
-			if (r <= 100 && r >= -100)
+			float r = settings::AdjustmentRatio(L, l, n);
+
+			//check if next is for better
+			float beta = 100 * r * r * abs(r);
+			float next_beta;
+			int j = i + 1;
+			if (j < words_.size())
 			{
-				new_line = true;
-				float beta = 100 * r * r * abs(r);
-
-				for (int j = i + 1; r > 0 && j < words_.size(); j++)
-				{
-					L = words_[j]->EndAt() -  breakpoint->x();
-					r = settings::AdjustmentRatio(L, l);
-					float temp = 100 * r * r * abs(r);
-					//found better
-					if (temp < beta)
-					{
-						new_line = false;
-						break;
-					}
-				}
-
+				L = words_[j]->EndAt() - breakpoint->x();
+				//TODO::assuming 1 spacce here
+				r = settings::AdjustmentRatio(L, l, n + 1);
+				next_beta = 100 * r * r * abs(r);
 			}
+
+			if (beta > next_beta)
+			{
+				//there is better
+				new_line = false;
+			}
+			else
+			{
+				//break here
+				new_line = true;
+				if (r <= 1 && r >= -1)
+				{
+					bp = child;
+				}
+				else
+				{
+					//hyphenate
+					bp = child;
+				}
+			}
+
 		}
 
 		if (new_line)
 		{
 			//break line
-			breakpoint = new Breakpoint(child);
+			breakpoint = new Breakpoint(bp);
 			breakpoints_.push_back(breakpoint);
+			n = 0;
 		}
 	}
 	
@@ -539,6 +564,8 @@ void Typesetter::Render(RenderTarget target)
 					file << ", up_length:" << river->up_length_;
 					file << ", down_length:" << river->down_length_;
 					file << ", volume:" << river->volume_;
+					file << ", repeats:" << river->repeats_;
+					file << ", repeat_words:" << river->repeat_words_;
 					file << "});\n";
 				}
 			}

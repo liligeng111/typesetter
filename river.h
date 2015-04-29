@@ -36,6 +36,8 @@ public:
 	double xy_sum_, x_square_sum_, y_square_sum_;
 	double x_bar_, y_bar_;
 	double up_volume_, down_volume_, volume_;
+	int repeats_;
+	int repeat_words_;
 
 private:
 	vector<Box*> list_;

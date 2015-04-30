@@ -2,6 +2,7 @@
 #include "typesetter.h"
 #include "settings.h"
 #include <fstream>
+#include <iostream>
 
 long Box::descender_ = 0;
 
@@ -37,8 +38,8 @@ Box::~Box()
 
 void Box::ExpandBox(Box* box)
 {
-	long width = box->x_ + box->width_;
-	long height = box->y_ + box->height_;
+	long width = box->x_ + box->width_ - x_;
+	long height = box->y_ + box->height_ - y_;
 	width_ = width > width_ ? width : width_;
 	height_ = height > height_ ? height : height_;
 }
@@ -58,9 +59,15 @@ void Box::SVG(ofstream& file, bool cache) const
 	{
 		//a char
 		file << "<g transform='translate(" << -glyph_->hori_bearing_x() << ", " << -glyph_->hori_bearing_y() << ")'>\n";
-		file << "<path class='char char" << int(glyph_->content()) << "'";
-		if (!cache)
+		if (cache)
+		{
+			file << "<path class='char char" << int(glyph_->content()) << "'";
+		}
+		else
+		{
+			file << "<path fill='rgb(0,0,0)' ";
 			file << "d='" << glyph_->path()->SVG() << "'";
+		}
 		file << "/>";
 		file << "</g>";
 	}
@@ -72,9 +79,12 @@ void Box::SVG(ofstream& file, bool cache) const
 			file << "<g transform = 'scale(1, -1) translate(0, " << -descender_ - height_ << ")'>\n";
 		}
 		//a recurse
-		for (Box* child : children_)
+		if (type_ != BACKSPACE)
 		{
-			child->SVG(file, cache);
+			for (Box* child : children_)
+			{
+				child->SVG(file, cache);
+			}
 		}
 		if (type_ == LINE)
 		{
@@ -87,6 +97,8 @@ void Box::SVG(ofstream& file, bool cache) const
 
 Box* Box::NearestChild(long l) const
 {
+	return children_[0];
+
 	long dis = 2147483647;
 	int n = 0;
 

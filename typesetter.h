@@ -43,6 +43,8 @@ private:
 	FT_Library  library_;
 	FT_Face face_;
 	map<char, Glyph*> glyph_cache_;
+	long hyphen_width_;
+	vector<Box*> chars_;
 	vector<Box*> words_;
 	vector<Box*> lines_;
 	vector<Box*> pages_;

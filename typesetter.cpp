@@ -79,11 +79,12 @@ void Typesetter::Clean()
 		}
 	}
 
-	words_ = vector<Box*>();
-	lines_ = vector<Box*>();
-	pages_ = vector<Box*>();
-	rivers_ = vector<vector<River*>>();
-	breakpoints_ = vector<Breakpoint*>();
+	chars_.clear();
+	words_.clear();
+	lines_.clear();
+	pages_.clear();
+	rivers_.clear();
+	breakpoints_.clear();
 }
 
 void Typesetter::Progress(string msg)
@@ -96,6 +97,16 @@ void Typesetter::Typeset()
 	start_time_ = chrono::high_resolution_clock::now();
 
 	Hyphenator hyphenator = (RFC_3066::Language("en"));
+
+	FT_Error error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
+	if (error)
+	{
+		Message("Error loading character");
+	}
+
+	Glyph* glyph = new Glyph(face_->glyph, '-');
+	glyph_cache_['-'] = glyph;
+	hyphen_width_ = glyph->advance().x();
 
 	Progress("Cleaning previous data");
 	//clear previous boxes
@@ -120,6 +131,7 @@ void Typesetter::Typeset()
 			current_box = new Box(NULL, Box::BoxType::BACKSPACE);
 			current_box->set_geometry(x_cursor, 0, 0, 0);
 			words_.push_back(current_box);
+			chars_.push_back(current_box);
 			last_ch = ch;
 			continue;
 		}
@@ -140,7 +152,7 @@ void Typesetter::Typeset()
 		}
 		last_ch = ch;
 
-		Glyph* glyph;
+		glyph;
 		auto cache_index = glyph_cache_.find(ch);
 		//seach cache
 		if (cache_index == glyph_cache_.end())
@@ -169,15 +181,17 @@ void Typesetter::Typeset()
 		// only add char
 		if (ch == ' ')
 		{
-			box = new Box(glyph, NULL, Box::BoxType::CHAR);
-			box->set_geometry(x_cursor - current_box->x(), 0, settings::space_width_, box->glyph()->advance().y());
+			box = new Box(glyph, NULL, Box::BoxType::SPACE);
+			box->set_geometry(x_cursor, 0, settings::space_width_, box->glyph()->advance().y());
 			x_cursor += settings::space_width_;
+			chars_.push_back(current_box);
 		}
 		else
 		{
 			box = new Box(glyph, current_box, Box::BoxType::CHAR);
-			box->set_geometry(x_cursor - current_box->x() + box->glyph()->hori_bearing_x(), box->glyph()->hori_bearing_y(), box->glyph()->width(), -box->glyph()->height());
+			box->set_geometry(x_cursor + box->glyph()->hori_bearing_x(), box->glyph()->hori_bearing_y(), box->glyph()->width(), -box->glyph()->height());
 			x_cursor += box->glyph()->advance().x();
+			chars_.push_back(box);
 		}
 
 		current_box->ExpandBox(box);
@@ -325,7 +339,7 @@ void Typesetter::FirstFit()
 
 void Typesetter::BestFit()
 {
-	Breakpoint* breakpoint = new Breakpoint(words_[0]);
+	Breakpoint* breakpoint = new Breakpoint(chars_[0]);
 	breakpoints_.push_back(breakpoint);
 
 	int n = 0;
@@ -335,19 +349,19 @@ void Typesetter::BestFit()
 	for (int i = 0; i < words_.size(); i++)
 	{
 		Box* child = words_[i];
+		long length;
 		bool new_line = false;
 		if (child->type() == Box::BoxType::BACKSPACE)
 		{
 			new_line = true;
 			bp = child;
+			length = 0;
 		}
-
-		if (child->type() == Box::BoxType::SPACE)
-			n++;
-		//calculate r
-		if (!new_line && child->type() == Box::BoxType::WORD)
+		else if (child->type() == Box::BoxType::SPACE)
 		{
-			long L = child->EndAt() -  breakpoint->x();
+			//calculate r
+			n++;
+			long L = child->x() -  breakpoint->x();
 			long l = settings::content_width_point();
 
 			float r = settings::AdjustmentRatio(L, l, n);
@@ -359,7 +373,7 @@ void Typesetter::BestFit()
 			if (j < words_.size())
 			{
 				L = words_[j]->EndAt() - breakpoint->x();
-				//TODO::assuming 1 spacce here
+				//TODO::assuming 1 space here
 				r = settings::AdjustmentRatio(L, l, n + 1);
 				next_beta = 100 * r * r * abs(r);
 			}
@@ -376,11 +390,24 @@ void Typesetter::BestFit()
 				if (r <= 1 && r >= -1)
 				{
 					bp = child;
+					length = child->width();
 				}
 				else
 				{
 					//hyphenate
-					bp = child;
+					if (i == 0 || words_[i-1]->type() != Box::WORD)
+					{
+						bp = child;
+						length = child->width();
+					}
+					else
+					{
+						Box* word = words_[i - 1];
+						Box* pos = word->NearestChild(l);
+						bp = pos;
+						length = hyphen_width_;
+						cout << pos->glyph()->content() << endl;
+					}
 				}
 			}
 
@@ -391,29 +418,44 @@ void Typesetter::BestFit()
 			//break line
 			breakpoint = new Breakpoint(bp);
 			breakpoints_.push_back(breakpoint);
+			breakpoint->set_length(length);
 			n = 0;
 		}
 	}
 	
+
+	//cout << breakpoints_.size() << endl;
 	BreakLines();
-	Justify();
+	//Justify();
 }
 
 void Typesetter::BreakLines()
 {
 	long x_adjust = 0;
 	long y_adjust = 0;
-	Box* current_line;
 	Box* current_page = new Box(NULL, Box::BoxType::PAGE);
 	current_page->set_geometry(settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_), settings::content_width_point(), settings::content_height_point());
+	Box* current_line = new Box(current_page, Box::BoxType::LINE);
+	current_line->set_geometry(0, y_adjust, 0, settings::line_height_);
 	pages_.push_back(current_page);
 
 	int i = 0;
 	Box* last = NULL;
 
 	//check each box, first must be a breakpoint
-	for (Box* child : words_)
+	for (Box* child : chars_)
 	{
+		if (child->glyph() != NULL)
+		{
+			cout << child->glyph()->content() << " " << child->x() << " " << child->EndAt() << " " << x_adjust << endl;
+		}
+		else
+		{
+			cout << " " << " " << child->x() << " " << child->EndAt() << endl;
+		}
+
+		child->set_parent(current_line);
+		child->Translate(x_adjust, 0);
 		if (i < breakpoints_.size() && child == breakpoints_[i]->box())
 		{
 			//need newline
@@ -430,22 +472,37 @@ void Typesetter::BreakLines()
 			if (child->type() == Box::BoxType::BACKSPACE)
 			{
 				current_line->set_justify(false);
+				x_adjust += -child->x();
 			}
+			else if (child->type() == Box::BoxType::SPACE)
+			{
+				x_adjust += -child->EndAt();
+			}
+			else if (child->type() == Box::BoxType::CHAR)
+			{
+				auto hyphen_index = glyph_cache_.find('-');
+				Box* hyphen = new Box(hyphen_index->second, current_line, Box::BoxType::CHAR);
+				hyphen->set_geometry(child->EndAt() + hyphen->glyph()->hori_bearing_x(), hyphen->glyph()->hori_bearing_y(), hyphen->glyph()->width(), -hyphen->glyph()->height());
+				hyphen->Translate(x_adjust, 0);
+				x_adjust += -child->EndAt();
+			}
+
 			Box* new_line = new Box(current_page, Box::BoxType::LINE);
 			new_line->set_left(current_line);
 			current_line = new_line;
 			current_line->set_geometry(0, y_adjust, 0, settings::line_height_);
-			x_adjust = -child->x();
 			y_adjust += settings::line_height_;
 			lines_.push_back(current_line);
 			last = NULL;
 		}
-		child->Translate(x_adjust, 0);
-		child->set_parent(current_line);
+
+		//temp
+
 		child->set_left(last);
 		current_line->ExpandBox(child);
 		last = child;
 	}
+	cout << lines_.size() << endl;
 }
 
 void Typesetter::Justify()
@@ -470,7 +527,7 @@ void Typesetter::Justify()
 			{
 				count++;
 			}
-			else if (box->type() == Box::BoxType::WORD && last == NULL)
+			else if (box->type() == Box::BoxType::CHAR && last == NULL)
 			{
 				last = box;
 			}
@@ -492,7 +549,7 @@ void Typesetter::Justify()
 				box->set_width(box->width() + delta);
 				adjustment += delta;
 			}
-			else if (box->type() == Box::BoxType::WORD)
+			else if (box->type() == Box::BoxType::CHAR)
 			{
 				box->Translate(adjustment, 0);
 			}
@@ -526,6 +583,7 @@ void Typesetter::Render(RenderTarget target)
 
 
 			//print all the boxes
+			//cout << target << " " << (target == RenderTarget::SVG_CACHE) << endl;
 			pages_[i]->SVG(file, target == RenderTarget::SVG_CACHE);
 			file << "\n";
 

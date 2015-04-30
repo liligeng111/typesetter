@@ -28,8 +28,8 @@ public:
 	BoxType type() const { return type_; }
 
 	const Box* parent() const { return parent_; }
-	const Box* left() const { return left_; }
-	const Box* right() const { return right_; }
+	Box* left() const { return left_; }
+	Box* right() const { return right_; }
 	const vector<Box*>* children() const { return &children_; }
 	const string& content() const{ return content_; }
 	Box* child(int i) const { return children_[i]; }

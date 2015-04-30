@@ -13,6 +13,7 @@
 
 	function show_graph()
 	{
+		selected_id = 0;
 
 		var graph = [];
 		loading_svg = false;
@@ -21,7 +22,7 @@
 
 		for (var i = 0; i < rivers.length; i++) 
 		{
-			if (rivers[i].size < min_length || rivers[i].min_left_length < min_left || rivers[i].min_right_length < min_right || rivers[i].left_length_bar < avg_left || rivers[i].right_length_bar < avg_right || rivers[i].up_length > up_length || rivers[i].down_length > down_length)
+			if (rivers[i].size < min_length || rivers[i].min_left_length < min_left || rivers[i].min_right_length < min_right || rivers[i].left_length_bar < avg_left || rivers[i].right_length_bar < avg_right || rivers[i].up_length > up_length || rivers[i].down_length > down_length || rivers[i].repeat_words < repeat_w)
 				continue;
 			var found = false;
 			for (var j = 0; j < graph.length; j++)
@@ -156,6 +157,24 @@
 			$('.border1').attr('stroke-width', 0);
 		}
 
+		// if ($('#show_word')[0].checked)
+		// {
+		// 	$('.border2').attr('stroke-width', width);
+		// }
+		// else
+		// {
+		// 	$('.border2').attr('stroke-width', 0);
+		// }
+
+		if ($('#show_line')[0].checked)
+		{
+			$('.border3').attr('stroke-width', width);
+		}
+		else
+		{
+			$('.border3').attr('stroke-width', 0);
+		}
+
 		if ($('#show_page')[0].checked)
 		{
 			$('.border4').attr('stroke-width', width);
@@ -199,6 +218,8 @@
 		}
 		$('.border0').attr('stroke', '#12c');
 		$('.border1').attr('stroke', '#f1e');
+		$('.border2').attr('stroke', '#45d');
+		$('.border3').attr('stroke', '#72f');
 		$('.border4').attr('stroke', '#36f');
 		$('.river').attr('stroke', '#e01');
 		$('.river').attr('fill', 'none');
@@ -216,7 +237,19 @@
 		avg_right = $('#avg_right_box')[0].value;
 		up_length = $('#up_box')[0].value;
 		down_length = $('#down_box')[0].value;
+		repeat_w = $('#repeat_words')[0].value;
 		show_graph();
+		if (e)
+     		e.preventDefault();
+	}
+
+	function load_click(e)
+	{     	
+		console.log('load')
+		var page = "svg/page" +  $('#load_page')[0].value + ".svg";
+		$("#svg").attr("data", page);
+		$("#page_num").text(page);
+		$('#svg').load(page, function() {change_width();});
 		if (e)
      		e.preventDefault();
 	}
@@ -225,6 +258,7 @@
 	{
 		min_click(null);
 		$('input#min').click(function(e) {min_click(e);});
+		$('input#load').click(function(e) {load_click(e);});
 		$(':checkbox').click(function() {change_width();});
 		$(':radio').click(function() {show_graph();});
 	});
@@ -237,6 +271,8 @@
 	<div id='river_tooltip' style="position:absolute;"></div>
 	<div id="check_booxes" style='position:fixed; background-color:#eee; left:10px; top:10px;'>
 		<input id='show_page' type="checkbox" checked> Show Page Border<br>
+		<input id='show_line' type="checkbox" checked> Show Line<br>
+		<!-- <input id='show_word' type="checkbox" checked> Show Word<br> -->
 		<input id='show_char' type="checkbox" checked> Show Character<br>
 		<input id='show_char_box' type="checkbox" unchecked> Show Character Box<br>
 		<input id='show_space' type="checkbox" unchecked> Show Space Box<br>
@@ -279,14 +315,20 @@
 	<p2 id="page_num"></p2>
 	</div>
 	<form>
-	Min Length: <input id='min_box' type="number" name="length" min="1" value='5' max="100" /> <br>
-	Min Left Word Length: <input id='min_left_box' type="number" name="left" value='800' min="1" max="10000" /> <br>
-	Min Left Word Length: <input id='min_right_box' type="number" name="right" value='800' min="1" max="10000" /> <br>
-	Avg Left Word Length: <input id='avg_left_box' type="number" name="left" value='1200' min="1" max="10000" /> <br>
-	Avg Left Word Length: <input id='avg_right_box' type="number" name="right" value='1200' min="1" max="10000" /> <br>
-	Up Length: <input id='up_box' type="number" name="right" value='0' min="0" max="1" /> <br>
-	Down Length: <input id='down_box' type="number" name="right" value='0' min="0" max="1" /> <br>
+	Min Length: <input id='min_box' type="number" name="length" min="1" value='3' max="100" /> <br>
+	Min Left Word Length: <input id='min_left_box' type="number" name="left" value='0' min="1" max="10000" /> <br>
+	Min right Word Length: <input id='min_right_box' type="number" name="right" value='0' min="1" max="10000" /> <br>
+	Avg Left Word Length: <input id='avg_left_box' type="number" name="left" value='0' min="1" max="10000" /> <br>
+	Avg right Word Length: <input id='avg_right_box' type="number" name="right" value='0' min="1" max="10000" /> <br>
+	Up Length: <input id='up_box' type="number" name="right" value='1' min="0" max="1" /> <br>
+	Down Length: <input id='down_box' type="number" name="right" value='1' min="0" max="1" /> <br>
+	Repeat Words: <input id='repeat_words' type="number" name="right" value='1' min="0" max="50" /> <br>
 	<input id="min" type="submit" />
+	</form>
+	<br>
+	<form>
+	Load Page: <input id='load_page' type="number" name="length" min="0" value='0'/> <br>
+	<input id="load" type="submit" />
 	</form>
 	</div>
 	<p3 id="river_info"></p3>

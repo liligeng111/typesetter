@@ -12,8 +12,13 @@ public:
 	long x() const { return box_->x(); }
 	Box* box() const { return box_; }
 
+
+	void set_length(long l) { length_ = l; }
+	long length() const { return length_; }
+
 private:
 	Box* box_;
 	Breakpoint* prev_;
+	long length_;
 };
 

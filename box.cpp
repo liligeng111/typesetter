@@ -25,6 +25,7 @@ Box::Box(Glyph* glyph, Box* parent, BoxType type)
 	}
 
 	content_ = "";
+	MYWORD = NULL;
 }
 
 Box::~Box()
@@ -45,7 +46,7 @@ void Box::ExpandBox(Box* box)
 }
 
 
-void Box::SVG(ofstream& file, bool cache) const
+void Box::SVG(ofstream& file) const
 {
 	file << "<g transform='translate(" << x_ << ", " << y_ << ")'>";
 
@@ -59,16 +60,10 @@ void Box::SVG(ofstream& file, bool cache) const
 	{
 		//a char
 		file << "<g transform='translate(" << -glyph_->hori_bearing_x() << ", " << -glyph_->hori_bearing_y() << ")'>\n";
-		if (cache)
-		{
-			file << "<path class='char char" << int(glyph_->content()) << "'";
-		}
-		else
-		{
-			file << "<path fill='rgb(0,0,0)' ";
-			file << "d='" << glyph_->path()->SVG() << "'";
-		}
+
+		file << "<use xlink:href='#char" << int(glyph_->content()) << "' fill='rgb(0,0,0)' class='char char" << int(glyph_->content()) << "'";
 		file << "/>";
+
 		file << "</g>";
 	}
 	else
@@ -83,7 +78,7 @@ void Box::SVG(ofstream& file, bool cache) const
 		{
 			for (Box* child : children_)
 			{
-				child->SVG(file, cache);
+				child->SVG(file);
 			}
 		}
 		if (type_ == LINE)
@@ -97,20 +92,23 @@ void Box::SVG(ofstream& file, bool cache) const
 
 Box* Box::NearestChild(long l) const
 {
-	return children_[0];
-
 	long dis = 2147483647;
-	int n = 0;
+	int n = -1;
+	int count = 0;
 
-	for (int i = 0; i < children_.size(); i++)
+	for (std::string::size_type i = 0; i < hyphenated_.size(); i++)
 	{
-		long d = abs(children_[i]->EndAt() - l);
+		if (hyphenated_[i] != '-')
+			continue;
+		count++;
+		long d = abs(children_[i - count]->EndAt() - l);
 		if (dis > d)
 		{
 			dis = d;
-			n = i;
+			n = i - count;
 		}
 	}
-
+	if (n == -1)
+		return NULL;
 	return children_[n];
 }

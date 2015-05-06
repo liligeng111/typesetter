@@ -8,7 +8,6 @@
 	<script language="javascript" type="text/javascript" src="./script/jquery.js"></script>
 	<script language="javascript" type="text/javascript" src="./script/jquery.flot.js"></script>
 	<script language="javascript" type="text/javascript" src="./script/rivers.js"></script>
-	<script language="javascript" type="text/javascript" src="./script/cache.js"></script>
 	<script type="text/javascript">
 
 	function show_graph()
@@ -210,12 +209,6 @@
 		});
 
 
-		for (var  i = 0; i < path_chche.length; i++)
-		{
-			if(path_chche[i] == null)
-				continue;
-			$('.char' + i).attr('d', path_chche[i]);
-		}
 		$('.border0').attr('stroke', '#12c');
 		$('.border1').attr('stroke', '#f1e');
 		$('.border2').attr('stroke', '#45d');
@@ -270,8 +263,8 @@
 	</div>
 	<div id='river_tooltip' style="position:absolute;"></div>
 	<div id="check_booxes" style='position:fixed; background-color:#eee; left:10px; top:10px;'>
-		<input id='show_page' type="checkbox" checked> Show Page Border<br>
-		<input id='show_line' type="checkbox" checked> Show Line<br>
+		<input id='show_page' type="checkbox" unchecked> Show Page Border<br>
+		<input id='show_line' type="checkbox" unchecked> Show Line<br>
 		<!-- <input id='show_word' type="checkbox" checked> Show Word<br> -->
 		<input id='show_char' type="checkbox" checked> Show Character<br>
 		<input id='show_char_box' type="checkbox" unchecked> Show Character Box<br>
@@ -316,12 +309,12 @@
 	</div>
 	<form>
 	Min Length: <input id='min_box' type="number" name="length" min="1" value='3' max="100" /> <br>
-	Min Left Word Length: <input id='min_left_box' type="number" name="left" value='0' min="1" max="10000" /> <br>
-	Min right Word Length: <input id='min_right_box' type="number" name="right" value='0' min="1" max="10000" /> <br>
-	Avg Left Word Length: <input id='avg_left_box' type="number" name="left" value='0' min="1" max="10000" /> <br>
-	Avg right Word Length: <input id='avg_right_box' type="number" name="right" value='0' min="1" max="10000" /> <br>
-	Up Length: <input id='up_box' type="number" name="right" value='1' min="0" max="1" /> <br>
-	Down Length: <input id='down_box' type="number" name="right" value='1' min="0" max="1" /> <br>
+	<!-- Min Left Word Length:  --><input id='min_left_box' type="number" name="left" value='0' min="1" max="10000" hidden/>
+	<!-- Min right Word Length:  --><input id='min_right_box' type="number" name="right" value='0' min="1" max="10000" hidden/>
+	<!-- Avg Left Word Length:  --><input id='avg_left_box' type="number" name="left" value='0' min="1" max="10000" hidden/> 
+	<!-- Avg right Word Length:  --><input id='avg_right_box' type="number" name="right" value='0' min="1" max="10000" hidden/> 
+	<!-- Up Length: --> <input id='up_box' type="number" name="right" value='1' min="0" max="1" hidden/>
+	<!-- Down Length: --> <input id='down_box' type="number" name="right" value='1' min="0" max="1" hidden/>
 	Repeat Words: <input id='repeat_words' type="number" name="right" value='1' min="0" max="50" /> <br>
 	<input id="min" type="submit" />
 	</form>

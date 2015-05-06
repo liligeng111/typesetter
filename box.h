@@ -58,8 +58,11 @@ public:
 	void ExpandBox(Box* box);
 	Vector3l MidPoint() const { return Vector3l(x_ + width_ / 2, y_ + height_ / 2); }
 
-	void SVG(ofstream& file, bool cache) const;
+	void SVG(ofstream& file) const;
 	void Hyphenate(Hyphenate::Hyphenator* hyphenator) { hyphenated_ = hyphenator->hyphenate(content_); }
+
+	//temp
+	Box* MYWORD;
 	
 private:
 	BoxType type_;

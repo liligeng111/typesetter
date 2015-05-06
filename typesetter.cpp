@@ -192,6 +192,7 @@ void Typesetter::Typeset()
 			box->set_geometry(x_cursor + box->glyph()->hori_bearing_x(), box->glyph()->hori_bearing_y(), box->glyph()->width(), -box->glyph()->height());
 			x_cursor += box->glyph()->advance().x();
 			chars_.push_back(box);
+			box->MYWORD = current_box;
 		}
 
 		current_box->ExpandBox(box);
@@ -404,9 +405,17 @@ void Typesetter::BestFit()
 					{
 						Box* word = words_[i - 1];
 						Box* pos = word->NearestChild(l);
-						bp = pos;
-						length = hyphen_width_;
-						cout << pos->glyph()->content() << endl;
+						if (pos == NULL)
+						{
+							bp = child;
+							length = child->width();
+						}
+						else
+						{
+							bp = pos;
+							length = hyphen_width_;
+							//cout << pos->glyph()->content() << endl;
+						}
 					}
 				}
 			}
@@ -426,7 +435,7 @@ void Typesetter::BestFit()
 
 	//cout << breakpoints_.size() << endl;
 	BreakLines();
-	//Justify();
+	Justify();
 }
 
 void Typesetter::BreakLines()
@@ -441,18 +450,19 @@ void Typesetter::BreakLines()
 
 	int i = 0;
 	Box* last = NULL;
+	bool first = true;
 
 	//check each box, first must be a breakpoint
 	for (Box* child : chars_)
 	{
-		if (child->glyph() != NULL)
-		{
-			cout << child->glyph()->content() << " " << child->x() << " " << child->EndAt() << " " << x_adjust << endl;
-		}
-		else
-		{
-			cout << " " << " " << child->x() << " " << child->EndAt() << endl;
-		}
+		//if (child->glyph() != NULL)
+		//{
+		//	cout << child->glyph()->content() << " " << child->x() << " " << child->EndAt() << " " << x_adjust << endl;
+		//}
+		//else
+		//{
+		//	cout << " " << " " << child->x() << " " << child->EndAt() << endl;
+		//}
 
 		child->set_parent(current_line);
 		child->Translate(x_adjust, 0);
@@ -480,11 +490,18 @@ void Typesetter::BreakLines()
 			}
 			else if (child->type() == Box::BoxType::CHAR)
 			{
-				auto hyphen_index = glyph_cache_.find('-');
-				Box* hyphen = new Box(hyphen_index->second, current_line, Box::BoxType::CHAR);
-				hyphen->set_geometry(child->EndAt() + hyphen->glyph()->hori_bearing_x(), hyphen->glyph()->hori_bearing_y(), hyphen->glyph()->width(), -hyphen->glyph()->height());
-				hyphen->Translate(x_adjust, 0);
-				x_adjust += -child->EndAt();
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					auto hyphen_index = glyph_cache_.find('-');
+					Box* hyphen = new Box(hyphen_index->second, current_line, Box::BoxType::CHAR);
+					hyphen->Translate(x_adjust, 0);
+					x_adjust += -child->EndAt();
+					hyphen->set_geometry(child->EndAt() + hyphen->glyph()->hori_bearing_x(), hyphen->glyph()->hori_bearing_y(), hyphen->glyph()->width(), -hyphen->glyph()->height());
+				}
 			}
 
 			Box* new_line = new Box(current_page, Box::BoxType::LINE);
@@ -561,7 +578,7 @@ void Typesetter::Justify()
 void Typesetter::Render(RenderTarget target)
 {
 	Progress("Generating optput files");
-	if (target == RenderTarget::SVG || target == RenderTarget::SVG_CACHE)
+	if (target == RenderTarget::SVG)
 	{
 		for ( int i = 0; i < pages_.size(); i++)
 		{
@@ -578,13 +595,22 @@ void Typesetter::Render(RenderTarget target)
 			file << "	version=\"1.1\"\n";
 			file << "	viewBox=\"0 0 " << settings::mm_to_point(settings::page_width_) << " " << settings::mm_to_point(settings::page_height_) << "\">\n";
 			file << "<defs>\n";
+
+			//output cache
+			for (auto& kv : glyph_cache_)
+			{
+				file << "<path fill='rgb(0,0,0)' id='char" << int(kv.first) << "' ";
+				file << "d='" << kv.second->path()->SVG() << "'";
+				file << "/>";
+			}
+
 			file << "</defs>\n";
 			file << "<g transform = \"scale(1, 1)\">\n";
 
 
 			//print all the boxes
 			//cout << target << " " << (target == RenderTarget::SVG_CACHE) << endl;
-			pages_[i]->SVG(file, target == RenderTarget::SVG_CACHE);
+			pages_[i]->SVG(file);
 			file << "\n";
 
 			if (settings::show_river_)
@@ -624,6 +650,7 @@ void Typesetter::Render(RenderTarget target)
 					file << ", volume:" << river->volume_;
 					file << ", repeats:" << river->repeats_;
 					file << ", repeat_words:" << river->repeat_words_;
+					file << ", repeat_word:'" << river->repeat_word_ << "'";
 					file << "});\n";
 				}
 			}
@@ -631,24 +658,6 @@ void Typesetter::Render(RenderTarget target)
 		}
 	}
 
-	//output cache
-	if (target == RenderTarget::SVG_CACHE)
-	{
-		ofstream file;
-		file.open("output/script/cache.js");
-		file << "path_chche = [];\n";
-		for (auto& kv : glyph_cache_)
-		{
-			//string special;
-			//if (kv.first == '\"' || kv.first == '\'')
-			//	special = "\\";
-			//else
-			//	special = "";
 
-			file << "path_chche[" << int(kv.first) << "] = '" << kv.second->path()->SVG() << "';\n";
-		}
-		file.close();
-
-	}
 	Progress("Done");
 }

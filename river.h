@@ -38,6 +38,7 @@ public:
 	double up_volume_, down_volume_, volume_;
 	int repeats_;
 	int repeat_words_;
+	string repeat_word_;
 
 private:
 	vector<Box*> list_;

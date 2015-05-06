@@ -22,8 +22,7 @@ class Typesetter
 public:
 	enum RenderTarget
 	{
-		SVG = 0,
-		SVG_CACHE = 1
+		SVG = 0
 	};
 
 	Typesetter();

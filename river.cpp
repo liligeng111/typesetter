@@ -30,6 +30,7 @@ River::River(int page)
 	down_volume_ = -99999;
 	repeats_ = 0;
 	repeat_words_ = 0;
+	repeat_word_ = "";
 }
 
 
@@ -157,77 +158,83 @@ void River::Analyse()
 	//global_deviation_ /= list_.size() - 2;
 
 	//up
-	const Box* up = list_[0]->parent()->left();
-	if (up == NULL || up->EndAt() < list_[0]->EndAt())
-	{
-		up_length_ = 1;
-	}
-	else
-	{
-		const vector<Box*>* line = up->children();
-		for (int i = line->size() - 1; i >= 0; i--)
-		{
-			if (line->at(i)->type() != Box::BoxType::SPACE)
-				continue;
-			if ((list_[0]->x() - line->at(i)->EndAt()) * (list_[0]->EndAt() - line->at(i)->x()) < 0)
-			{
-				up_length_ = 1;
-				break;
-			}
-		}
-	}
+	//const Box* up = list_[0]->parent()->left();
+	//if (up == NULL || up->EndAt() < list_[0]->EndAt())
+	//{
+	//	up_length_ = 1;
+	//}
+	//else
+	//{
+	//	const vector<Box*>* line = up->children();
+	//	for (int i = line->size() - 1; i >= 0; i--)
+	//	{
+	//		if (line->at(i)->type() != Box::BoxType::SPACE)
+	//			continue;
+	//		if ((list_[0]->x() - line->at(i)->EndAt()) * (list_[0]->EndAt() - line->at(i)->x()) < 0)
+	//		{
+	//			up_length_ = 1;
+	//			break;
+	//		}
+	//	}
+	//}
 
 	//down
-	const Box* down = list_[list_.size() - 1]->parent()->right();
-	if (down == NULL || down->EndAt() < list_[list_.size() - 1]->EndAt())
-	{
-		down_length_ = 1;
-	}
-	else
-	{
-		const vector<Box*>* line = down->children();
-		for (int i = line->size() - 1; i >= 0; i--)
-		{
-			if (line->at(i)->type() != Box::BoxType::SPACE)
-				continue;
-			if ((list_[list_.size() - 1]->x() - line->at(i)->EndAt()) * (list_[list_.size() - 1]->EndAt() - line->at(i)->x()) < 0)
-			{
-				down_length_ = 1;
-				break;
-			}
-		}
-	}
+	//const Box* down = list_[list_.size() - 1]->parent()->right();
+	//if (down == NULL || down->EndAt() < list_[list_.size() - 1]->EndAt())
+	//{
+	//	down_length_ = 1;
+	//}
+	//else
+	//{
+	//	const vector<Box*>* line = down->children();
+	//	for (int i = line->size() - 1; i >= 0; i--)
+	//	{
+	//		if (line->at(i)->type() != Box::BoxType::SPACE)
+	//			continue;
+	//		if ((list_[list_.size() - 1]->x() - line->at(i)->EndAt()) * (list_[list_.size() - 1]->EndAt() - line->at(i)->x()) < 0)
+	//		{
+	//			down_length_ = 1;
+	//			break;
+	//		}
+	//	}
+	//}
 
 	for (int i = 0; i < list_.size(); i++)
 	{
 		Box* box = list_[i];
-		const Box* l = box->left();
+		const Box* l = box->left()->MYWORD;
 		if (l != NULL)
 		{
-			Volume(l->EndAt(), l->parent()->y());
-			Volume(l->EndAt(), l->parent()->y() + l->height());
+			Volume(l->EndAt(), box->left()->parent()->y());
+			Volume(l->EndAt(), box->left()->parent()->y() + l->height());
 
 			if (i != 0)
 			{
-				if (l->Last()->glyph()->content() == list_[i - 1]->left()->Last()->glyph()->content())
+				if (l->Last()->glyph()->content() == list_[i - 1]->left()->MYWORD->Last()->glyph()->content())
 					repeats_++;
-				if (box->parent()->justify() && l->content() == list_[i - 1]->left()->content())
+				if (box->parent()->justify() && l->content() == list_[i - 1]->left()->MYWORD->content())
+				{
 					repeat_words_++;
+					repeat_word_ = list_[i - 1]->left()->content();
+				}
 			}
 		}
 
-		const Box* r = box->right();
+		const Box* r = box->right()->MYWORD;
 		if (r != NULL)
 		{
-			Volume(r->x(), r->parent()->y());
-			Volume(r->x(), r->parent()->y() + r->height());
+			Volume(r->x(), box->right()->parent()->y());
+			Volume(r->x(), box->right()->parent()->y() + r->height());
 
 			if (i != 0)
 			{
-				if (r->First()->glyph()->content() == list_[i - 1]->right()->First()->glyph()->content())
+				if (r->First()->glyph()->content() == list_[i - 1]->right()->MYWORD->First()->glyph()->content())
 					repeats_++;
-				if (box->parent()->justify() && r->content() == list_[i - 1]->right()->content())
+				if (box->parent()->justify() && r->content() == list_[i - 1]->right()->MYWORD->content())
+				{
 					repeat_words_++;
+					repeat_word_ = list_[i - 1]->left()->content();
+				}
 			}
 		}
 	}

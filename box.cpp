@@ -61,7 +61,7 @@ void Box::SVG(ofstream& file) const
 		//a char
 		file << "<g transform='translate(" << -glyph_->hori_bearing_x() << ", " << -glyph_->hori_bearing_y() << ")'>\n";
 
-		file << "<use xlink:href='#char" << int(glyph_->content()) << "' fill='rgb(0,0,0)' class='char char" << int(glyph_->content()) << "'";
+		file << "<use xlink:href='#char" << int(glyph_->content()) << "' fill='rgb(0,0,0)'";
 		file << "/>";
 
 		file << "</g>";

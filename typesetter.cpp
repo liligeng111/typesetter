@@ -599,9 +599,9 @@ void Typesetter::Render(RenderTarget target)
 			//output cache
 			for (auto& kv : glyph_cache_)
 			{
-				file << "<path fill='rgb(0,0,0)' id='char" << int(kv.first) << "' ";
+				file << "<path fill='rgb(0,0,0)' id='char" << int(kv.first) << "' class='char' ";
 				file << "d='" << kv.second->path()->SVG() << "'";
-				file << "/>";
+				file << "/>\n";
 			}
 
 			file << "</defs>\n";

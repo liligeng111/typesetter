@@ -41,7 +41,7 @@ River::~River()
 
 void River::SVG(ofstream& file) const
 {
-	file << "<path class='river' id='river" << id_ << "' local='" << local_deviation_ << "' global='" << global_deviation_;
+	file << "<path fill='none' class='river' id='river" << id_ << "' local='" << local_deviation_ << "' global='" << global_deviation_;
 	file << "' width='" << volume_;
 	file << "' d='M " << list_[0]->MidPoint().x() << " " << list_[0]->parent()->y() + settings::line_height_ / 2;
 	for (int i = 1; i < list_.size(); i++)
@@ -50,7 +50,7 @@ void River::SVG(ofstream& file) const
 	}
 	file << "'/> \n";
 
-	file << "<path class='regression' id='regression" << id_;
+	file << "<path fill='none' class='regression' id='regression" << id_;
 	file << "' width='" << volume_;
 	file << "' d='M " << alpha_ * ratio_ + beta_ * list_[0]->parent()->y() << " " << list_[0]->parent()->y() + settings::line_height_ / 2;
 	for (int i = 1; i < list_.size(); i++)

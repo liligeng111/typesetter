@@ -1,5 +1,6 @@
 #include "path.h"
 #include "typesetter.h"
+#include "fterrors.h"
 
 int MoveTo(const FT_Vector* to, void* user)
 {
@@ -21,8 +22,8 @@ int ConicTo(const FT_Vector* control, const FT_Vector* to, void* user)
 
 int CubicTo(const FT_Vector* control1, const FT_Vector* control2, const FT_Vector* to, void* user)
 {
-	Typesetter::Message("Cannot handle cubic curve");
-	return 1;
+	((string*)user)->append(" C " + to_string(control1->x) + " " + to_string(control1->y) + " " + to_string(control2->x) + " " + to_string(control2->y) + " " + to_string(to->x) + " " + to_string(to->y));
+	return 0;
 }
 
 
@@ -59,7 +60,7 @@ Path::Path(FT_Outline outline)
 	FT_Error error = FT_Outline_Decompose(&outline, &funcs, &svg_);
 	if (error)
 	{
-		Typesetter::Message("Error decomposing outline");
+		Typesetter::Message("Error decomposing outline: " + to_string(error));
 	}
 }
 

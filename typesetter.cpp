@@ -24,7 +24,7 @@ void Typesetter::LoadFace()
 		Message("An error occurred during FT library initialization.");
 	}
 
-	error = FT_New_Face(library_, "./fonts/Adobe Caslon Pro.ttf", 0, &face_);
+	error = FT_New_Face(library_, "./fonts/MinionPro-Regular.otf", 0, &face_);
 	if (error == FT_Err_Unknown_File_Format)
 	{
 		Message("This font format is unsupported.");

@@ -74,9 +74,6 @@
     <ClCompile Include="river.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="breakpoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lib\libhyphenate\hyphenate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -90,6 +87,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lib\libhyphenate\Language.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="item.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="penalty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="container.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="breakpoint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -132,9 +144,6 @@
     <ClInclude Include="river.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="breakpoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="lib\libhyphenate\hyphenate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -148,6 +157,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\libhyphenate\Language.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="penalty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="container.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="breakpoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

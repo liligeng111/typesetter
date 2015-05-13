@@ -15,16 +15,3 @@ public:
 private:
 	long x_, y_, z_;
 };
-
-
-class Matrix
-{
-public:
-	Matrix();
-	~Matrix();
-
-	void Translate(float x, float y);
-	
-private:
-	//float m_[][];
-};

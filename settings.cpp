@@ -12,12 +12,12 @@ namespace settings
 	int dpi_ = 72; 
 
 	int font_size_ = 12;
-	AlignMode align_mode_ = settings::BEST_FIT;
 	long em_size_ = 2048;
 	long line_height_ = 2048;
 	long space_width_ = 0;
 	long stretchability_ = 0;
 	long shrinkability_ = 0;
+	long descender_ = 0;
 
 	//sapce, char, word, line, page
 	bool border_[] = { false, false, false, false, false };
@@ -26,16 +26,4 @@ namespace settings
 	bool show_river_ = false;
 	float river_threshold_ = 2.0f;
 
-
-	float AdjustmentRatio(long L, long l, int n)
-	{
-		float r;
-		if (L == l)
-			r = 0;
-		else if (L < l)
-			r = (l - L) * 1.0f / (settings::stretchability_ * n);
-		else
-			r = (l - L) * 1.0f / (settings::shrinkability_ * n);
-		return r;
-	}
 };

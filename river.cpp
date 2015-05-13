@@ -41,12 +41,13 @@ River::~River()
 
 void River::SVG(ofstream& file) const
 {
+	/*
 	file << "<path fill='none' class='river' id='river" << id_ << "' local='" << local_deviation_ << "' global='" << global_deviation_;
 	file << "' width='" << volume_;
-	file << "' d='M " << list_[0]->MidPoint().x() << " " << list_[0]->parent()->y() + settings::line_height_ / 2;
+	file << "' d='M " << list_[0]->mid_point().x() << " " << list_[0]->parent()->y() + settings::line_height_ / 2;
 	for (int i = 1; i < list_.size(); i++)
 	{
-		file << " L " << list_[i]->MidPoint().x() << " " << list_[i]->parent()->y() + settings::line_height_ / 2;
+		file << " L " << list_[i]->mid_point().x() << " " << list_[i]->parent()->y() + settings::line_height_ / 2;
 	}
 	file << "'/> \n";
 
@@ -64,7 +65,7 @@ void River::SVG(ofstream& file) const
 	file << "<path d='lxx lyy lxy " + to_string(Lxx_) + " " + to_string(Lyy_) + " " + to_string(Lxy_) + "'/>";
 	file << "<path d='sum x y xy " + to_string(x_sum_) + " " + to_string(y_sum_) + " " + to_string(xy_sum_) + "'/>";
 	file << "<path d='sumsq x y " + to_string(x_square_sum_) + " " + to_string(y_square_sum_) + "'/>";
-	*/
+	*/	
 }
 
 void River::Volume(long x, long y)
@@ -84,6 +85,7 @@ void River::Volume(long x, long y)
 
 void River::Analyse()
 {
+	/*
 	//local first
 	for (int i = 1; i < list_.size(); i++)
 	{
@@ -239,4 +241,5 @@ void River::Analyse()
 		}
 	}
 	volume_ = (up_volume_ - down_volume_) / sqrt(1 + beta_ * beta_);
+	*/
 }

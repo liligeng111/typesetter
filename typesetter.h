@@ -4,9 +4,12 @@
 #include <ft2build.h>
 #include <map> 
 #include <vector>
+#include <list>
 #include <chrono>
 #include FT_FREETYPE_H
 #include "box.h"
+#include "glue.h"
+#include "penalty.h"
 #include "river.h"
 #include "breakpoint.h"
 
@@ -43,25 +46,26 @@ private:
 	FT_Face face_;
 	map<char, Glyph*> glyph_cache_;
 	long hyphen_width_;
-	vector<Box*> chars_;
+
+	//input sequence
+	vector<Item*> items_;
+
 	vector<Box*> words_;
-	vector<Box*> lines_;
-	vector<Box*> pages_;
-	vector<Breakpoint*> breakpoints_;
+	vector<Line*> lines_;
+	vector<Page*> pages_;
+	list<Breakpoint*> active_list_;
+	list<Breakpoint*> passive_list_;
 	vector<vector<River*>> rivers_;
 	chrono::high_resolution_clock::time_point start_time_;
+	Breakpoint* start_; //first breakpoint
 
 	void Progress(string msg);
 	
-	void Clean();
+	void clean();
 
-	void RaggedRight();
-	void FirstFit();
-	void BestFit();
-	void OptimumFit();
+	void optimum_fit();
+	void break_lines();
+	void justify();
 
-	void BreakLines();
-	void Justify();
-
-	void DetectRiver();
+	void detect_river();
 };

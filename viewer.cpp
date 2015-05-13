@@ -54,27 +54,27 @@ void Viewer::on_renderButton_clicked()
 
 void Viewer::on_spaceBorderButton_clicked(bool checked)
 {
-	settings::border_[Box::BoxType::SPACE] = checked;
+	settings::border_[Item::GLUE] = checked;
 }
 
 void Viewer::on_charBorderButton_clicked(bool checked)
 {
-	settings::border_[Box::BoxType::CHAR] = checked;
+	settings::border_[Item::BOX] = checked;
 }
 
 void Viewer::on_wordBorderButton_clicked(bool checked)
 {
-	settings::border_[Box::BoxType::WORD] = checked;
+	settings::border_[Item::WORD] = checked;
 }
 
 void Viewer::on_lineBorderButton_clicked(bool checked)
 {
-	settings::border_[Box::BoxType::LINE] = checked;
+	settings::border_[Item::LINE] = checked;
 }
 
 void Viewer::on_pageBorderButton_clicked(bool checked)
 {
-	settings::border_[Box::BoxType::PAGE] = checked;
+	settings::border_[Item::PAGE] = checked;
 }
 
 void Viewer::on_riverButton_clicked(bool checked)
@@ -92,12 +92,6 @@ void Viewer::on_riverThresholdSpinBox_valueChanged(double arg1)
 {
 	settings::river_threshold_ = arg1;
 }
-
-void Viewer::on_alignBox_currentIndexChanged(int index)
-{
-	settings::align_mode_ = static_cast<settings::AlignMode>(index);
-}
-
 
 void Viewer::on_actionOpen_File_triggered()
 {

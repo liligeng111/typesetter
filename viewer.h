@@ -29,7 +29,6 @@ private slots:
 	void on_riverButton_clicked(bool checked);
 	void on_fontSizeBox_valueChanged(int arg1);
 	void on_riverThresholdSpinBox_valueChanged(double arg1);
-	void on_alignBox_currentIndexChanged(int index);
 	void on_paperBox_currentIndexChanged(QString page);
 
     void on_actionOpen_File_triggered();

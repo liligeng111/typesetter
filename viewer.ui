@@ -225,39 +225,6 @@ Once again, and then once again the prince heard a cracking sound and thought th
      <string>Font Size:</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="alignBox">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>280</y>
-      <width>120</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>2</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>Ragged Right</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>First Fit</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Best Fit</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Optimum Fit</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QComboBox" name="paperBox">
     <property name="geometry">
      <rect>

@@ -162,7 +162,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="glue.cpp" />
     <ClCompile Include="glyph.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="lib\libhyphenate\hyphenate.cpp" />
     <ClCompile Include="lib\libhyphenate\HyphenationRule.cpp" />
     <ClCompile Include="lib\libhyphenate\HyphenationTree.cpp" />
@@ -170,11 +172,13 @@
     <ClCompile Include="lib\libhyphenate\Language.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="path.cpp" />
+    <ClCompile Include="penalty.cpp" />
     <ClCompile Include="river.cpp" />
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="typesetter.cpp" />
     <ClCompile Include="viewer.cpp" />
     <ClCompile Include="viewport.cpp" />
+    <ClCompile Include="container.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="viewer.h">
@@ -221,17 +225,21 @@
     <ClInclude Include="box.h" />
     <ClInclude Include="breakpoint.h" />
     <ClInclude Include="GeneratedFiles\ui_viewer.h" />
+    <ClInclude Include="glue.h" />
     <ClInclude Include="glyph.h" />
+    <ClInclude Include="item.h" />
     <ClInclude Include="lib\libhyphenate\hyphenate.h" />
     <ClInclude Include="lib\libhyphenate\HyphenationRule.h" />
     <ClInclude Include="lib\libhyphenate\HyphenationTree.h" />
     <ClInclude Include="lib\libhyphenate\Hyphenator.h" />
     <ClInclude Include="lib\libhyphenate\Language.h" />
     <ClInclude Include="path.h" />
+    <ClInclude Include="penalty.h" />
     <ClInclude Include="river.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="typesetter.h" />
     <ClInclude Include="viewport.h" />
+    <ClInclude Include="container.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="viewer.qrc">

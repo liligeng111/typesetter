@@ -1,24 +1,27 @@
 #pragma once
 
-#include "box.h"
+#include "item.h"
 
 class Breakpoint
 {
 public:
-	Breakpoint(Box* box) : box_(box) {};
+	Breakpoint(Item* item);
+	Breakpoint(Item* item, int line, float demerits, float r, Breakpoint* prev);
 	~Breakpoint();
 
-	long EndAt() const { return box_->EndAt(); }
-	long x() const { return box_->x(); }
-	Box* box() const { return box_; }
-
-
-	void set_length(long l) { length_ = l; }
-	long length() const { return length_; }
+	Item* item() const { return item_; }
+	int line() const { return line_; }
+	float demerits() const { return demerits_; }
+	float r() const { return r_; }
+	Breakpoint* prev() const { return prev_; }
+	Breakpoint* next() const { return next_; }
 
 private:
-	Box* box_;
+	Item* item_;
+	int line_; //# of line end at here
+	float demerits_;
+	float r_;
 	Breakpoint* prev_;
-	long length_;
+	Breakpoint* next_;
 };
 

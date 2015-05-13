@@ -46,7 +46,6 @@ public:
     QCheckBox *riverButton;
     QSpinBox *fontSizeBox;
     QLabel *label_2;
-    QComboBox *alignBox;
     QComboBox *paperBox;
     QDoubleSpinBox *riverThresholdSpinBox;
     QLabel *label_3;
@@ -99,9 +98,6 @@ public:
         label_2 = new QLabel(centralWidget);
         label_2->setObjectName(QStringLiteral("label_2"));
         label_2->setGeometry(QRect(30, 250, 50, 20));
-        alignBox = new QComboBox(centralWidget);
-        alignBox->setObjectName(QStringLiteral("alignBox"));
-        alignBox->setGeometry(QRect(30, 280, 120, 20));
         paperBox = new QComboBox(centralWidget);
         paperBox->setObjectName(QStringLiteral("paperBox"));
         paperBox->setGeometry(QRect(30, 210, 69, 22));
@@ -131,7 +127,6 @@ public:
 
         retranslateUi(viewerClass);
 
-        alignBox->setCurrentIndex(2);
         paperBox->setCurrentIndex(2);
 
 
@@ -224,13 +219,6 @@ public:
         lineBorderButton->setText(QApplication::translate("viewerClass", "Line Border", 0));
         riverButton->setText(QApplication::translate("viewerClass", "Show River", 0));
         label_2->setText(QApplication::translate("viewerClass", "Font Size:", 0));
-        alignBox->clear();
-        alignBox->insertItems(0, QStringList()
-         << QApplication::translate("viewerClass", "Ragged Right", 0)
-         << QApplication::translate("viewerClass", "First Fit", 0)
-         << QApplication::translate("viewerClass", "Best Fit", 0)
-         << QApplication::translate("viewerClass", "Optimum Fit", 0)
-        );
         paperBox->clear();
         paperBox->insertItems(0, QStringList()
          << QApplication::translate("viewerClass", "A2", 0)

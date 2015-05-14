@@ -3,6 +3,8 @@
 #include <algebra.h>
 #include <fstream>
 #include <iostream>
+#include <string>
+#include "glyph.h"
 
 using namespace std;
 
@@ -37,17 +39,24 @@ public:
 	void translate(long x, long y) { x_ += x; y_ += y; }
 	Vector3l mid_point() const { return Vector3l(x_ + width_ / 2, y_ + height_ / 2); }
 	long end_at() const { return width_ + x_; }
+	long stretchability() { return stretchability_; }
+	long shrinkability() { return shrinkability_; }
+	Glyph* glyph() const { return glyph_; }
+	void set_glyph(Glyph* glyph) { glyph_ = glyph; }
 
 	void set_parent(Container* parent) { parent_ = parent; }
-	void set_prev(Item* prev) { prev_ = prev; if (prev_ != nullptr) prev->next_ = this; }
+	void set_prev(Item* prev);
 	Item* prev() const { return prev_; }
 	Item* next() const { return next_; }
 	Item* after();  //used by optimum fit
 
 	//used by optimum fit algorithm
-	unsigned long long sum_w_, sum_y_, sum_z_;
+	unsigned long long sum_y_, sum_z_;
 
 	void SVG(ofstream& file) const;
+
+	//for debug
+	virtual string content() { return "item_type: " + to_string(type_); }
 
 protected:
 	Item(ItemType type);
@@ -58,6 +67,9 @@ protected:
 	long x_;
 	long y_;
 	int p_; //penalty
+	long stretchability_;
+	long shrinkability_;
+	Glyph* glyph_; //for box and penalty
 
 	Container* parent_;
 	Item* prev_;

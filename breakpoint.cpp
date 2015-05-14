@@ -13,9 +13,6 @@ Breakpoint::Breakpoint(Item* item, int line, float demerits, float r, Breakpoint
 	demerits_ = demerits;
 	r_ = r;
 	prev_ = prev;
-	next_ = nullptr;
-	if (prev_ != nullptr)
-		prev_->next_ = this;
 }
 
 

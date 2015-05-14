@@ -130,6 +130,9 @@ Once again, and then once again the prince heard a cracking sound and thought th
     <property name="text">
      <string>Space Border</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QCheckBox" name="wordBorderButton">
     <property name="geometry">
@@ -142,6 +145,9 @@ Once again, and then once again the prince heard a cracking sound and thought th
     </property>
     <property name="text">
      <string>Word Border</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QCheckBox" name="charBorderButton">
@@ -156,6 +162,9 @@ Once again, and then once again the prince heard a cracking sound and thought th
     <property name="text">
      <string>Char Border</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QCheckBox" name="pageBorderButton">
     <property name="geometry">
@@ -169,6 +178,9 @@ Once again, and then once again the prince heard a cracking sound and thought th
     <property name="text">
      <string>Page Border</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QCheckBox" name="lineBorderButton">
     <property name="geometry">
@@ -181,6 +193,9 @@ Once again, and then once again the prince heard a cracking sound and thought th
     </property>
     <property name="text">
      <string>Line Border</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QCheckBox" name="riverButton">

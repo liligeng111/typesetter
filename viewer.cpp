@@ -26,7 +26,7 @@ Viewer::~Viewer()
 
 void Viewer::Message(const string& msg)
 {
-	QMessageBox::critical(NULL, "Error", QString::fromStdString(msg));
+	QMessageBox::critical(NULL, "Error", QString::fromLocal8Bit(msg.c_str()));
 }
 
 void Viewer::Resize()
@@ -95,14 +95,16 @@ void Viewer::on_riverThresholdSpinBox_valueChanged(double arg1)
 
 void Viewer::on_actionOpen_File_triggered()
 {
-	string fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "",tr("")).toStdString();
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "",tr("*"));
 	
-	ifstream t(fileName);
-	content = string((std::istreambuf_iterator<char>(t)),
-					 std::istreambuf_iterator<char>());
-	ui.plainTextEdit->setPlainText(QString::fromStdString(content));
+	//ifstream t(fileName);
+	//content = string((std::istreambuf_iterator<char>(t)),
+	//				 std::istreambuf_iterator<char>());
+	//ui.plainTextEdit->setPlainText(QString::fromStdString(content));
 	//for now
-	content = fileName;
+	string file = fileName.toUtf8().constData();
+	cout << "Reading file: " << file << endl;
+	content = file;
 }
 
 

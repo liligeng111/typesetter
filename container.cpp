@@ -21,11 +21,18 @@ void Container::expand_box(Item* item)
 
 Word::Word() : Container(Item::WORD)
 {
+	content_ = new string;
 }
 
 
 Word::~Word()
 {
+	delete content_;
+}
+
+void Word::hyphenate(Hyphenate::Hyphenator* hyphenator)
+{
+	hyphenated_ = hyphenator->hyphenate(*content_);
 }
 
 Line::Line() : Container(Item::LINE)

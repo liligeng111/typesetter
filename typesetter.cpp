@@ -50,9 +50,16 @@ void Typesetter::LoadFace()
 	settings::em_size_ = face_->units_per_EM;
 	settings::line_height_ = 1.2 * face_->units_per_EM;
 
-	settings::space_width_ = face_->units_per_EM / 3;
-	settings::stretchability_ = face_->units_per_EM / 6;
-	settings::shrinkability_ = face_->units_per_EM / 9;
+
+	error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
+	if (error)
+	{
+		Message("Error loading character");
+	}
+
+	settings::space_width_ = face_->glyph->advance.x;
+	settings::stretchability_ = settings::space_width_ / 3;
+	settings::shrinkability_ = settings::space_width_ / 3;
 }
 
 Typesetter::~Typesetter()
@@ -80,10 +87,12 @@ void Typesetter::clean()
 	}
 
 	items_.clear();
+	paragraph_.clear();
 	words_.clear();
 	lines_.clear();
 	pages_.clear();
 	rivers_.clear();
+	breakpoints.clear();
 	active_list_.clear();
 	passive_list_.clear();
 }
@@ -91,6 +100,44 @@ void Typesetter::clean()
 void Typesetter::Progress(string msg)
 {
 	cout << fixed << setprecision(3) << chrono::duration_cast<std::chrono::milliseconds>(chrono::high_resolution_clock::now() - start_time_).count() / 1000.0 << "s--" << msg << "\n";
+}
+
+void Typesetter::insert_hyphen(string hyphenated)
+{
+	//cout << hyphenated << endl;
+	auto last = paragraph_.rbegin();
+	for (int i = hyphenated.length() - 1; i >= 0; i--)
+	{
+		if (hyphenated[i] != '-')
+		{
+			last++;
+			continue;
+		}
+		//TODO::is that the correct penalty?
+		if ((*last)->glyph() == hyphen_glyph_)
+		{
+			Penalty* penalty = new Penalty(0);
+			penalty->set_geometry((*last)->end_at(), 0, 0, 0);
+			penalty->sum_y_ = (*last)->sum_y_;
+			penalty->sum_z_ = (*last)->sum_z_;
+			penalty->set_prev((*last));
+			penalty->set_glyph(nullptr);
+			paragraph_.insert(last.base(), penalty);
+			last++;
+			last++;
+		}
+		else
+		{
+			Penalty* penalty = new Penalty(50);
+			penalty->set_geometry((*last)->end_at(), hyphen_glyph_->hori_bearing_y(), hyphen_width_, hyphen_glyph_->height());
+			penalty->sum_y_ = (*last.base())->sum_y_;
+			penalty->sum_z_ = (*last.base())->sum_z_;
+			penalty->set_prev((*last));
+			penalty->set_glyph(hyphen_glyph_);
+			paragraph_.insert(last.base(), penalty);
+			last++;
+		}
+	}
 }
 
 void Typesetter::Typeset()
@@ -106,73 +153,118 @@ void Typesetter::Typeset()
 	}
 
 	//load hyphen glyph
-	Glyph* glyph = new Glyph(face_->glyph, '-');
-	glyph_cache_['-'] = glyph;
-	hyphen_width_ = glyph->advance().x();
+	hyphen_glyph_ = new Glyph(face_->glyph, '-');
+	glyph_cache_['-'] = hyphen_glyph_;
+	hyphen_width_ = hyphen_glyph_->advance().x();
+	Glyph* glyph;
 
 	Progress("Cleaning previous data");
 	//clear previous data
 	clean();
 
-	Progress("Reading input file");
+	Progress("Typesetting");
+	cout << "Page width: " << settings::content_width_point() << endl;
 
 	unsigned long long x_cursor = 0;
 	unsigned long long sum_y = 0;
 	unsigned long long sum_z = 0;
 
-	char last_ch = 0;
+	unsigned char last_ch = 0;
 	Item* last_item = nullptr;
-	char ch = 0;
+	Word* word = nullptr;
+	unsigned char ch = 0;
 	fstream fin(file_, fstream::in);
-	while (fin >> noskipws >> ch)
+	bool new_paragraph = true;
+	unsigned char next_ch;
+
+	while (true)
 	{
+		fin >> noskipws >> next_ch;
+		ch = next_ch;
+		cout << int(ch) << endl;
 		//what it is?
 		if (ch < 0)
 		{
-			//temp
-			Glue* glue = new Glue(settings::space_width_, settings::stretchability_, settings::shrinkability_);
+			continue;
+		}
+
+		//new line margin
+		if (new_paragraph)
+		{
+			new_paragraph = false;
+			Box* box = new Box(nullptr, NULL);
+			box->set_geometry(x_cursor, 0, 0, 0);
+			x_cursor += box->width();
+			paragraph_.push_back(box);
+			box->sum_y_ = sum_y;
+			box->sum_z_ = sum_z;
+			box->set_prev(last_item);
+			last_item = box;
+		}
+
+		//backspace
+		if (ch == '\n' || fin.eof())
+		{
+			if (word != nullptr)
+			{
+				word->hyphenate(&hyphenator);
+				insert_hyphen(word->hyphenated());
+			}
+			word = nullptr;
+			//must break
+			Glue* glue = new Glue(0, 100000000, 0);
 			glue->set_geometry(x_cursor, 0, 0, 0);
-			items_.push_back(glue);
-			glue->sum_w_ = x_cursor;
+			paragraph_.push_back(glue);
 			glue->sum_y_ = sum_y;
 			glue->sum_z_ = sum_z;
 			sum_y += glue->stretchability();
-			sum_z += glue->stretchability();
+			sum_z += glue->shrinkability();
 			glue->set_prev(last_item);
-			last_item = glue;
-		}
-		//backspace
-		else if (ch == '\n')
-		{
-			//must break
 			Penalty* penalty = new Penalty(-1000);
-			penalty->set_geometry(0, 0, 0, 0);
-			items_.push_back(penalty);
-			penalty->sum_w_ = x_cursor;
+			penalty->set_geometry(x_cursor, 0, 0, 0);
+			paragraph_.push_back(penalty);
 			penalty->sum_y_ = sum_y;
 			penalty->sum_z_ = sum_z;
-			penalty->set_prev(last_item);
+			penalty->set_prev(glue);
 			last_ch = ch;
 			last_item = penalty;
+			if (optimum_fit() != 0)
+				return;
+			sum_y = 0; 
+			sum_z = 0;
+			new_paragraph = true;
+			if (fin.eof())
+				break;
 			continue;
 		}
 		//new space
 		else if (ch == ' ')
 		{
+			if (word != nullptr)
+			{
+				word->hyphenate(&hyphenator);
+				insert_hyphen(word->hyphenated());
+			}
+			word = nullptr;
 			Glue* glue = new Glue(settings::space_width_, settings::stretchability_, settings::shrinkability_);
-			glue->set_geometry(x_cursor, 0, 0, 0);
-			items_.push_back(glue);
-			glue->sum_w_ = x_cursor;
+			glue->set_geometry(x_cursor, 0, settings::space_width_, 0);
+			paragraph_.push_back(glue);
 			glue->sum_y_ = sum_y;
 			glue->sum_z_ = sum_z;
 			sum_y += glue->stretchability();
-			sum_z += glue->stretchability();
+			sum_z += glue->shrinkability();
 			glue->set_prev(last_item);
 			last_item = glue;
 		}
 		//new char
 		else
 		{
+			if (word == nullptr)
+			{
+				word = new Word;
+			}
+			word->content()->append(1, ch);
+
 			auto cache_index = glyph_cache_.find(ch);
 			//seach cache
 			if (cache_index == glyph_cache_.end())
@@ -192,9 +284,8 @@ void Typesetter::Typeset()
 			}
 
 			Box* box = new Box(glyph, NULL);
-			box->set_geometry(x_cursor, box->glyph()->hori_bearing_y(), box->glyph()->width(), -box->glyph()->height());
-			items_.push_back(box);
-			box->sum_w_ = x_cursor;
+			box->set_geometry(x_cursor, box->glyph()->hori_bearing_y(), glyph->advance().x(), -box->glyph()->height());
+			paragraph_.push_back(box);
 			box->sum_y_ = sum_y;
 			box->sum_z_ = sum_z;
 			box->set_prev(last_item);
@@ -223,8 +314,6 @@ void Typesetter::Typeset()
 
 
 	//cout << "cache size: " << glyph_cache_.size() << endl;
-	Progress("Typesetting");
-	optimum_fit();
 	Progress("Breaking paragraphs");
 	break_lines();
 	Progress("Justify lines");
@@ -314,16 +403,26 @@ void Typesetter::detect_river()
 	*/
 }
 
-void Typesetter::optimum_fit()
+int Typesetter::optimum_fit()
 {
 	//line width 
+	active_list_.clear();
 	long l = settings::content_width_point();
+	Box* box = new Box(nullptr, nullptr);
+	box->set_geometry(paragraph_.front()->x(), 0, 0, 0);
+	paragraph_.front()->set_prev(box);
+	paragraph_.push_front(box);
+	active_list_.push_back(new Breakpoint(box));
+	auto iter = paragraph_.begin();
+	iter++;
 
-	start_ = new Breakpoint(items_[0]);
-	active_list_.push_back(start_);
-	for (Item* b : items_)
+	while (iter != paragraph_.end())
 	{
-		//cout << "b " << b << endl;
+		Item* b = *iter;
+		//cout << b << " : " << b->content() << endl;
+		iter++;
+		//if (b->x() != b->sum_w_)
+		//	cout << b->content() << "  " << b->x() << " " << b->sum_w_ << endl;
 		Breakpoint* breakpoint = nullptr;
 		int pb = b->p(); //penalty
 		if (b->type() == Item::BOX)
@@ -346,12 +445,11 @@ void Typesetter::optimum_fit()
 		//iterare the active list
 		while (a != end)
 		{
-			//cout << "a " << *a << endl;
 			//calculate r
 			bool forced_break = false;
 			Item* after = (*a)->item()->after();
 			float r;
-			long L = b->sum_w_ - after->sum_w_;
+			long L = b->x() - after->x();
 			if (b->type() == Item::PENALITY)
 			{
 				L += b->width();
@@ -361,7 +459,7 @@ void Typesetter::optimum_fit()
 			{
 				long Y = b->sum_y_ - after->sum_y_;
 				if (Y > 0)
-					r = (l - L) / Y;
+					r = 1.0f * (l - L) / Y;
 				else
 					r = 1000;
 			}
@@ -369,7 +467,7 @@ void Typesetter::optimum_fit()
 			{
 				long Z = b->sum_z_ - after->sum_z_;
 				if (Z > 0)
-					r = (l - L) / Z;
+					r = 1.0f * (l - L) / Z;
 				else
 					r = 1000;
 			}
@@ -378,10 +476,21 @@ void Typesetter::optimum_fit()
 				//prefect!
 				r = 0;
 			}
-			
+
+			//if (L == 0)
+			//{
+			//	for (Item* item : paragraph_)
+			//	{
+			//		//cout << item << " : " << item->content() << endl;
+			//	}
+			//	cout << after->content() << " ----> " << b->content() << " L: " << L << " r: " << r << " a: " << after->sum_y_ << " b: " << b->sum_y_ << endl;
+			//	cout << (*a)->item()->content() << " ----> " << b->content() << endl << endl;
+			//}
+			//cout << "r " << r << endl;
 			//rho here
-			if (r >= -1 && r < 30)
+			if (r >= -1 && r < 3)
 			{
+				//cout << (*a)->item()->content() << " ----> " << b->content() << " L: " << L << " r: " << r << endl;
 				float d;
 				if (pb >= 0)
 				{
@@ -403,12 +512,18 @@ void Typesetter::optimum_fit()
 				if (breakpoint == nullptr)
 				{
 					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits() + d, r, (*a));
+					breakpoint->L = L;
+					breakpoint->a = after->x();
+					breakpoint->b = b->x();
 				}
 				//better breakpoint
 				else if ((*a)->demerits() + d < breakpoint->demerits())
 				{
 					delete breakpoint;
 					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits() + d, r, (*a));
+					breakpoint->L = L;
+					breakpoint->a = after->x();
+					breakpoint->b = b->x();
 				}
 			}
 
@@ -432,8 +547,24 @@ void Typesetter::optimum_fit()
 	}
 	if (active_list_.empty())
 	{
-		cout << "ERROR: Unable to preform optimum fit" << endl;
+		Message("ERROR: Unable to preform optimum fit");
+		return 1;
 	}
+
+	//reverse list
+	Breakpoint* bp = active_list_.front();
+	auto pos = breakpoints.rbegin();
+	while (bp->prev() != nullptr)
+	{
+		//cout << bp->item()->after()->content() << endl;
+		breakpoints.insert(pos.base(), bp);
+		bp = bp->prev();
+		pos++;
+	}
+	//merge paragraph
+	items_.splice(items_.end(), paragraph_);
+
+	return 0;
 }
 
 void Typesetter::break_lines()
@@ -443,28 +574,28 @@ void Typesetter::break_lines()
 	Page* current_page = new Page();
 	current_page->set_geometry(settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_), settings::content_width_point(), settings::content_height_point());
 	pages_.push_back(current_page);
-	Line* current_line = nullptr;
+	Line* current_line = new Line();
+	current_line->set_geometry(0, y_adjust, 0, settings::line_height_);
+	current_page->add_child(current_line);
+	lines_.push_back(current_line);
 
-	Breakpoint* breakpoint = start_;
 	Item* last = nullptr;
-
-	//check each box, first must be a breakpoint
+	auto iter = breakpoints.begin();
+	
+	//check each item
 	for (Item* child : items_)
 	{
-		//if (child->glyph() != NULL)
-		//{
-		//	cout << child->glyph()->content() << " " << child->x() << " " << child->EndAt() << " " << x_adjust << endl;
-		//}
-		//else
-		//{
-		//	cout << " " << " " << child->x() << " " << child->EndAt() << endl;
-		//}
+		//cout << child->content() << " " << child->x() << " " << child->end_at() << " " << x_adjust << endl;
 
 		child->translate(x_adjust, 0);
-		if (breakpoint != nullptr && child == breakpoint->item())
+		if (child->type() == Item::BOX || child->type() == Item::GLUE)
+			current_line->add_child(child);
+		if (iter != breakpoints.end() && child == (*iter)->item())
 		{
 			//need newline
 			//new page
+			//cout << "Breaking at: " << (*iter) << " " << (*iter)->item()->after()->content() << endl;
+			//cout << "L: " << (*iter)->L << " a: " << (*iter)->a << " b: " << (*iter)->b << endl << endl;
 			if (y_adjust + settings::line_height_ > settings::content_height_point())
 			{
 				y_adjust = 0;
@@ -473,32 +604,27 @@ void Typesetter::break_lines()
 				pages_.push_back(current_page);
 			}
 
-			x_adjust += -child->x();
 			if (child->type() == Item::PENALITY)
 			{
-				/*
-				auto hyphen_index = glyph_cache_.find('-');
-				Box* hyphen = new Box(hyphen_index->second, current_line, Box::BoxType::CHAR);
-				hyphen->Translate(x_adjust, 0);
-				x_adjust += -child->EndAt();
-				hyphen->set_geometry(child->EndAt() + hyphen->glyph()->hori_bearing_x(), hyphen->glyph()->hori_bearing_y(), hyphen->glyph()->width(), -hyphen->glyph()->height());
-				*/
+				current_line->add_child(child);
 			}
+			x_adjust = -child->after()->x();
 
 			if (current_line != nullptr)
-				current_line->set_r(breakpoint->r());
+			{
+				current_line->set_r((*iter)->r());
+				//cout << breakpoint->r() << endl;
+			}
 			Line* new_line = new Line();
 			current_page->add_child(new_line);
 			new_line->set_prev(current_line);
 			current_line = new_line;
-			current_line->set_geometry(0, y_adjust, 0, settings::line_height_);
 			y_adjust += settings::line_height_;
+			current_line->set_geometry(0, y_adjust, 0, settings::line_height_);
 			lines_.push_back(current_line);
 			last = nullptr;
-			breakpoint = breakpoint->next();
+			iter++;
 		}
-		if (child->type() == Item::BOX || child->type() == Item::GLUE)
-			current_line->add_child(child);
 		child->set_prev(last);
 		current_line->expand_box(child);
 		last = child;
@@ -511,19 +637,22 @@ void Typesetter::justify()
 	//check eack box
 	for (int i = 0; i < lines_.size(); i++)
 	{
+		//cout << "line: " << i << endl;
 		Line* line = lines_[i];
 
 		const vector<Item*>* children = line->children();		
 
 		//move everything
 		double adjustment = 0;
-		for (Item* Item : *children)
+
+		for (Item* item : *children)
 		{
-			Item->translate(adjustment, 0);
-			if (Item->type() == Item::GLUE)
+			//cout << item->content() << " " << item->x() << " " << item->end_at() << " " << adjustment << endl;
+			item->translate(adjustment, 0);
+			if (item->type() == Item::GLUE)
 			{
-				double delta = Item->width() * line->r();
-				Item->set_width(Item->width() + delta);
+				double delta = line->r() * (line->r() < 0 ? item->shrinkability() : item->stretchability());
+				item->set_width(item->width() + delta);
 				adjustment += delta;
 			}
 		}

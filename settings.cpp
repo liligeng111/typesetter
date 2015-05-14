@@ -20,7 +20,7 @@ namespace settings
 	long descender_ = 0;
 
 	//sapce, char, word, line, page
-	bool border_[] = { false, false, false, false, false };
+	bool border_[] = { true, true, true, true, true };
 	std::string border_color[] = { "(25, 50, 150)", "(250, 15, 200)", "(250, 150, 0)", "(120, 120, 0)", "(0, 150, 200)" };
 
 	bool show_river_ = false;

@@ -53,9 +53,6 @@
     <ClCompile Include="typesetter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="viewport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="path.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -121,9 +118,6 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="typesetter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viewport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="path.h">

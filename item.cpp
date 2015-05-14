@@ -4,7 +4,7 @@
 #include "box.h"
 
 
-Item::Item(ItemType type) : type_(type), p_(0)
+Item::Item(ItemType type) : type_(type), p_(0), stretchability_(0), shrinkability_(0), glyph_(nullptr)
 {
 	prev_ = nullptr;
 	next_ = nullptr;
@@ -13,6 +13,20 @@ Item::Item(ItemType type) : type_(type), p_(0)
 
 Item::~Item()
 {
+}
+
+void Item::set_prev(Item* prev)
+{
+	prev_ = prev; 
+	if (prev_ == nullptr)
+		return;
+	if (prev->next_ != nullptr)
+	{
+		//insertion
+		next_ = prev->next_;
+		prev->next_->prev_ = this;
+	}
+	prev->next_ = this;
 }
 
 Item* Item::after()
@@ -28,7 +42,7 @@ Item* Item::after()
 	}
 	else if (next_->type() == PENALITY)
 	{
-		if (next_->p() < -1000)
+		if (next_->p() <= -1000)
 			return next_;
 	}
 	return next_->after();
@@ -44,13 +58,12 @@ void Item::SVG(ofstream& file) const
 		file << "<path fill='none' class='border" << type_ << "' d='M 0 0 L 0 " << height_ << " " << width_ << " " << height_ << " " << width_ << " 0 0 0'/>";
 	}
 
-	if (type_ == BOX)
+	if (glyph_ != nullptr)
 	{
-		Glyph* glyph = static_cast<const Box*>(this)->glyph();
 		//a char
-		file << "<g transform='translate(" << -glyph->hori_bearing_x() << ", " << -glyph->hori_bearing_y() << ")'>\n";
+		file << "<g transform='translate(" << 0 << ", " << -glyph_->hori_bearing_y() << ")'>\n";
 
-		file << "<use xlink:href='#char" << int(glyph->content()) << "' fill='rgb(0,0,0)'";
+		file << "<use xlink:href='#char" << int(glyph_->content()) << "' fill='rgb(0,0,0)'";
 		file << "/>";
 
 		file << "</g>";

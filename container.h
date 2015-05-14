@@ -1,7 +1,9 @@
 #pragma once
 
 #include "item.h"
+#include <list>
 #include <vector>
+#include "lib\libhyphenate\Hyphenator.h"
 
 class Box;
 class Container : public Item
@@ -27,6 +29,14 @@ class Word: public Container
 public:
 	Word();
 	~Word();
+	string* content() const { return content_; }
+	string hyphenated() const { return hyphenated_; }
+
+	void hyphenate(Hyphenate::Hyphenator* hyphenator);
+
+private:
+	string* content_;
+	string hyphenated_;
 };
 
 class Line : public Container

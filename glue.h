@@ -8,11 +8,8 @@ public:
 	Glue(long w, long y, long z);
 	~Glue();
 
-	long stretchability() { return stretchability_; }
-	long shrinkability() { return shrinkability_; }
+	string content() { return "__"; }
 
 private:
-	long stretchability_;
-	long shrinkability_; 
 };
 

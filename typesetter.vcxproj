@@ -177,7 +177,6 @@
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="typesetter.cpp" />
     <ClCompile Include="viewer.cpp" />
-    <ClCompile Include="viewport.cpp" />
     <ClCompile Include="container.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -238,7 +237,6 @@
     <ClInclude Include="river.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="typesetter.h" />
-    <ClInclude Include="viewport.h" />
     <ClInclude Include="container.h" />
   </ItemGroup>
   <ItemGroup>

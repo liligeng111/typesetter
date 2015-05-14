@@ -46,24 +46,27 @@ private:
 	FT_Face face_;
 	map<char, Glyph*> glyph_cache_;
 	long hyphen_width_;
+	Glyph* hyphen_glyph_;
 
 	//input sequence
-	vector<Item*> items_;
+	list<Item*> items_;
+	list<Item*> paragraph_;
 
 	vector<Box*> words_;
 	vector<Line*> lines_;
 	vector<Page*> pages_;
+	list<Breakpoint*> breakpoints;
 	list<Breakpoint*> active_list_;
 	list<Breakpoint*> passive_list_;
 	vector<vector<River*>> rivers_;
 	chrono::high_resolution_clock::time_point start_time_;
-	Breakpoint* start_; //first breakpoint
 
 	void Progress(string msg);
 	
 	void clean();
 
-	void optimum_fit();
+	void insert_hyphen(string hyphenated);
+	int optimum_fit();
 	void break_lines();
 	void justify();
 

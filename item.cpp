@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "item.h"
 #include "penalty.h"
 #include "settings.h"
@@ -62,10 +63,7 @@ void Item::SVG(ofstream& file) const
 	{
 		//a char
 		file << "<g transform='translate(" << 0 << ", " << -glyph_->hori_bearing_y() << ")'>\n";
-
-		file << "<use xlink:href='#char" << int(glyph_->content()) << "' fill='rgb(0,0,0)'";
-		file << "/>";
-
+		file << "<use xlink:href='#char" << int(glyph_->content()) << "' fill='rgb(0,0,0)'/>";
 		file << "</g>";
 	}
 	else
@@ -73,9 +71,12 @@ void Item::SVG(ofstream& file) const
 		//reverse for line
 		if (type_ == LINE)
 		{
+			const Line* line = static_cast<const Line*>(this);
+			file << fixed << setprecision(4);
+			file << "<text x='" << settings::content_width_point() + settings::em_size_ << "' y='" << settings::line_height_ << "' fill='red' font-size='" << settings::em_size_ / 3 << "px'>" << line->r() << "</text>";
 			file << "<g transform = 'scale(1, -1) translate(0, " << -settings::descender_ - height_ << ")'>\n";
 		}
-		//a recurse
+		//a ->
 		if (type_ == PAGE || type_ == LINE)
 		{
 			const vector<Item*>* children = static_cast<const Container*>(this)->children();

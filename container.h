@@ -45,7 +45,7 @@ public:
 	Line();
 	~Line();
 	void set_r(float r) { r_ = r; }
-	float r() { return r_; }
+	float r() const { return r_; }
 
 private:
 	float r_;

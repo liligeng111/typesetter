@@ -169,20 +169,20 @@ void Typesetter::Typeset()
 	unsigned long long sum_y = 0;
 	unsigned long long sum_z = 0;
 
-	unsigned char last_ch = 0;
+	char last_ch = 0;
 	Item* last_item = nullptr;
 	Word* word = nullptr;
-	unsigned char ch = 0;
+	char ch = 0;
 	fstream fin(file_, fstream::in);
 	bool new_paragraph = true;
-	unsigned char next_ch;
+	char next_ch;
 
 	while (true)
 	{
 		fin >> noskipws >> next_ch;
 		ch = next_ch;
-		cout << int(ch) << endl;
-		//what it is?
+		//cout << int(ch) << endl;
+		//TODO::unrecognized char
 		if (ch < 0)
 		{
 			continue;
@@ -212,7 +212,7 @@ void Typesetter::Typeset()
 			}
 			word = nullptr;
 			//must break
-			Glue* glue = new Glue(0, 100000000, 0);
+			Glue* glue = new Glue(0, 1147483647, 0);
 			glue->set_geometry(x_cursor, 0, 0, 0);
 			paragraph_.push_back(glue);
 			glue->sum_y_ = sum_y;

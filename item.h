@@ -26,19 +26,19 @@ public:
 	};
 
 	ItemType type() { return type_; }
-	long x() const { return x_; }
-	long y() const { return y_; }
+	unsigned long long x() const { return x_; }
+	unsigned long long y() const { return y_; }
 	int p() const { return p_; }
-	void set_x(long x) { x_ = x; }
-	void set_y(long y) { y_ = y; }
+	void set_x(unsigned long long x) { x_ = x; }
+	void set_y(unsigned long long y) { y_ = y; }
 	long width() const { return width_; }
 	long height() const { return height_; }
 	void set_width(long width) { width_ = width; }
 	void set_height(long height) { height_ = height; }
-	void set_geometry(long x, long y, long width, long height) { x_ = x; y_ = y; width_ = width; height_ = height; }
+	void set_geometry(unsigned long long x, unsigned long long y, long width, long height) { x_ = x; y_ = y; width_ = width; height_ = height; }
 	void translate(long x, long y) { x_ += x; y_ += y; }
 	Vector3l mid_point() const { return Vector3l(x_ + width_ / 2, y_ + height_ / 2); }
-	long end_at() const { return width_ + x_; }
+	unsigned long long end_at() const { return width_ + x_; }
 	long stretchability() { return stretchability_; }
 	long shrinkability() { return shrinkability_; }
 	Glyph* glyph() const { return glyph_; }
@@ -57,6 +57,7 @@ public:
 
 	//for debug
 	virtual string content() { return "item_type: " + to_string(type_); }
+	virtual string word_content() { return content(); }
 
 protected:
 	Item(ItemType type);
@@ -64,8 +65,7 @@ protected:
 
 	long width_;
 	long height_;
-	long x_;
-	long y_;
+	unsigned long long x_, y_;
 	int p_; //penalty
 	long stretchability_;
 	long shrinkability_;

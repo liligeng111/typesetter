@@ -8,7 +8,10 @@ Container::Container(Item::ItemType type) : Item(type)
 
 Container::~Container()
 {
-	//TODO::delete
+	for (Item* item : children_)
+	{
+		delete item;
+	}
 }
 
 void Container::expand_box(Item* item)

@@ -5,6 +5,7 @@
 #include <map> 
 #include <vector>
 #include <list>
+#include <map>
 #include <chrono>
 #include FT_FREETYPE_H
 #include "box.h"
@@ -12,6 +13,7 @@
 #include "penalty.h"
 #include "river.h"
 #include "breakpoint.h"
+#include "typesetter.h"
 
 using namespace std;
 
@@ -21,6 +23,7 @@ class Glyph;
 class Viewer;
 class Typesetter
 {
+friend class Algorithm;
 
 public:
 	enum RenderTarget
@@ -65,10 +68,18 @@ private:
 	
 	void clean();
 
+	void break_paragraph();
+
+	void optimum_fit();
+	void reverse_optimum_fit();
 	void insert_hyphen(string hyphenated);
-	int optimum_fit();
-	void break_lines();
+	void fill_lines();
+
 	void justify();
 
 	void detect_river();
+
+
+	void A_star();
+	map<pair<Item*, Item*>, Breakpoint::Demerit> local_cost_;
 };

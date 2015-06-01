@@ -26,4 +26,6 @@ namespace settings
 	bool show_river_ = false;
 	float river_threshold_ = 2.0f;
 
+	float rho_ = 5.0f;
+
 };

@@ -72,7 +72,6 @@ void Item::SVG(ofstream& file) const
 		if (type_ == LINE)
 		{
 			const Line* line = static_cast<const Line*>(this);
-			file << fixed << setprecision(4);
 			file << "<text x='" << settings::content_width_point() + settings::em_size_ << "' y='" << settings::line_height_ << "' fill='red' font-size='" << settings::em_size_ / 3 << "px'>" << line->r() << "</text>";
 			file << "<g transform = 'scale(1, -1) translate(0, " << -settings::descender_ - height_ << ")'>\n";
 		}

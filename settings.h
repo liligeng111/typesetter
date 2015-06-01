@@ -40,5 +40,8 @@ namespace settings
 
 	extern bool show_river_;
 	extern float river_threshold_;
+
+	//algorithm related
+	extern float rho_; //max of stretchability allowed
 };
 

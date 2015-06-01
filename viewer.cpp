@@ -26,7 +26,7 @@ Viewer::~Viewer()
 
 void Viewer::Message(const string& msg)
 {
-	QMessageBox::critical(NULL, "Error", QString::fromLocal8Bit(msg.c_str()));
+	QMessageBox::critical(nullptr, "Error", QString::fromLocal8Bit(msg.c_str()));
 }
 
 void Viewer::Resize()

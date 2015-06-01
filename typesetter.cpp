@@ -116,6 +116,7 @@ void Typesetter::insert_hyphen(string hyphenated)
 		//TODO::is that the correct penalty?
 		if ((*last)->glyph() == hyphen_glyph_)
 		{
+			//TODO::Bug with BOOK SIX: 1808 - 10
 			Penalty* penalty = new Penalty(0);
 			penalty->set_geometry((*last)->end_at(), 0, 0, 0);
 			penalty->sum_y_ = (*last)->sum_y_;
@@ -188,12 +189,12 @@ void Typesetter::Typeset()
 			continue;
 		}
 
-		//new line margin
+		//new line indent
 		if (new_paragraph)
 		{
 			new_paragraph = false;
-			Box* box = new Box(nullptr, NULL);
-			box->set_geometry(x_cursor, 0, 0, 0);
+			Box* box = new Box(nullptr, nullptr);
+			box->set_geometry(x_cursor, 0, 2 * settings::em_size_, 0);
 			x_cursor += box->width();
 			paragraph_.push_back(box);
 			box->sum_y_ = sum_y;
@@ -212,7 +213,7 @@ void Typesetter::Typeset()
 			}
 			word = nullptr;
 			//must break
-			Glue* glue = new Glue(0, 1147483647, 0);
+			Glue* glue = new Glue(0, 1000000, 0);
 			glue->set_geometry(x_cursor, 0, 0, 0);
 			paragraph_.push_back(glue);
 			glue->sum_y_ = sum_y;
@@ -228,8 +229,7 @@ void Typesetter::Typeset()
 			penalty->set_prev(glue);
 			last_ch = ch;
 			last_item = penalty;
-			if (optimum_fit() != 0)
-				return;
+			break_paragraph();
 			sum_y = 0; 
 			sum_z = 0;
 			new_paragraph = true;
@@ -283,7 +283,7 @@ void Typesetter::Typeset()
 				glyph = cache_index->second;
 			}
 
-			Box* box = new Box(glyph, NULL);
+			Box* box = new Box(glyph, word);
 			box->set_geometry(x_cursor, box->glyph()->hori_bearing_y(), glyph->advance().x(), -box->glyph()->height());
 			paragraph_.push_back(box);
 			box->sum_y_ = sum_y;
@@ -315,7 +315,7 @@ void Typesetter::Typeset()
 
 	//cout << "cache size: " << glyph_cache_.size() << endl;
 	Progress("Breaking paragraphs");
-	break_lines();
+	fill_lines();
 	Progress("Justify lines");
 	justify();
 
@@ -348,7 +348,7 @@ void Typesetter::detect_river()
 					continue;	
 				
 				//check up for duplicate
-				Box* up = NULL;
+				Box* up = nullptr;
 				for (int t = 0; i > 0 && t < lines->at(i - 1)->ChildrenSize(); t++)
 				{
 					Box* temp = lines->at(i - 1)->child(t);
@@ -362,7 +362,7 @@ void Typesetter::detect_river()
 					}
 				}
 
-				if (up != NULL)
+				if (up != nullptr)
 					continue;
 				
 				River* river = new River(p);
@@ -403,171 +403,9 @@ void Typesetter::detect_river()
 	*/
 }
 
-int Typesetter::optimum_fit()
-{
-	//line width 
-	active_list_.clear();
-	long l = settings::content_width_point();
-	Box* box = new Box(nullptr, nullptr);
-	box->set_geometry(paragraph_.front()->x(), 0, 0, 0);
-	paragraph_.front()->set_prev(box);
-	paragraph_.push_front(box);
-	active_list_.push_back(new Breakpoint(box));
-	auto iter = paragraph_.begin();
-	iter++;
 
-	while (iter != paragraph_.end())
-	{
-		Item* b = *iter;
-		//cout << b << " : " << b->content() << endl;
-		iter++;
-		//if (b->x() != b->sum_w_)
-		//	cout << b->content() << "  " << b->x() << " " << b->sum_w_ << endl;
-		Breakpoint* breakpoint = nullptr;
-		int pb = b->p(); //penalty
-		if (b->type() == Item::BOX)
-		{
-			continue;
-		}
-		else if (b->type() == Item::PENALITY)
-		{
-			// must not break
-			if (b->p() > 999)
-			{
-				continue;
-			}
-		}
 
-		//potential break
-		auto a = active_list_.begin();
-		auto end = active_list_.end();
-
-		//iterare the active list
-		while (a != end)
-		{
-			//calculate r
-			bool forced_break = false;
-			Item* after = (*a)->item()->after();
-			float r;
-			long L = b->x() - after->x();
-			if (b->type() == Item::PENALITY)
-			{
-				L += b->width();
-				forced_break = pb < -999;
-			}
-			if (L < l)
-			{
-				long Y = b->sum_y_ - after->sum_y_;
-				if (Y > 0)
-					r = 1.0f * (l - L) / Y;
-				else
-					r = 1000;
-			}
-			else if (L > l)
-			{
-				long Z = b->sum_z_ - after->sum_z_;
-				if (Z > 0)
-					r = 1.0f * (l - L) / Z;
-				else
-					r = 1000;
-			}
-			else
-			{
-				//prefect!
-				r = 0;
-			}
-
-			//if (L == 0)
-			//{
-			//	for (Item* item : paragraph_)
-			//	{
-			//		//cout << item << " : " << item->content() << endl;
-			//	}
-			//	cout << after->content() << " ----> " << b->content() << " L: " << L << " r: " << r << " a: " << after->sum_y_ << " b: " << b->sum_y_ << endl;
-			//	cout << (*a)->item()->content() << " ----> " << b->content() << endl << endl;
-			//}
-			//cout << "r " << r << endl;
-			//rho here
-			if (r >= -1 && r < 3)
-			{
-				//cout << (*a)->item()->content() << " ----> " << b->content() << " L: " << L << " r: " << r << endl;
-				float d;
-				if (pb >= 0)
-				{
-					d = 1 + 100 * r * r * abs(r) + pb;
-					d = d * d;
-				}
-				else if (pb > -1000)
-				{
-					d = 1 + 100 * r * r * abs(r);
-					d = d * d - pb * pb;
-				}
-				else
-				{
-					d = 1 + 100 * r * r * abs(r);
-					d = d * d;
-				}
-				//TODO::f(a) and c
-				//new breakpoint
-				if (breakpoint == nullptr)
-				{
-					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits() + d, r, (*a));
-					breakpoint->L = L;
-					breakpoint->a = after->x();
-					breakpoint->b = b->x();
-				}
-				//better breakpoint
-				else if ((*a)->demerits() + d < breakpoint->demerits())
-				{
-					delete breakpoint;
-					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits() + d, r, (*a));
-					breakpoint->L = L;
-					breakpoint->a = after->x();
-					breakpoint->b = b->x();
-				}
-			}
-
-			if (r < -1 || forced_break)
-			{
-				//cout << "deletefrom active list: " << *a << endl;
-				passive_list_.push_back(*a);
-				a = active_list_.erase(a);
-			}
-			else
-			{
-				a++;
-			}
-		}
-		//TODO::what is q?
-		if (breakpoint != nullptr)
-		{
-			active_list_.push_back(breakpoint);
-		}
-
-	}
-	if (active_list_.empty())
-	{
-		Message("ERROR: Unable to preform optimum fit");
-		return 1;
-	}
-
-	//reverse list
-	Breakpoint* bp = active_list_.front();
-	auto pos = breakpoints.rbegin();
-	while (bp->prev() != nullptr)
-	{
-		//cout << bp->item()->after()->content() << endl;
-		breakpoints.insert(pos.base(), bp);
-		bp = bp->prev();
-		pos++;
-	}
-	//merge paragraph
-	items_.splice(items_.end(), paragraph_);
-
-	return 0;
-}
-
-void Typesetter::break_lines()
+void Typesetter::fill_lines()
 {
 	long x_adjust = 0;
 	long y_adjust = 0;
@@ -669,6 +507,7 @@ void Typesetter::Render(RenderTarget target)
 		{
 			ofstream file;
 			file.open("output/svg/page" + to_string(i) + ".svg");
+			file << fixed << setprecision(4);
 			file << "<?xml version=\"1.0\" standalone=\"no\"?>\n";
 			file << "<svg\n";
 			file << "	xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n";

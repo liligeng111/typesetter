@@ -30,6 +30,7 @@ public:
 	Word();
 	~Word();
 	string* content() const { return content_; }
+	string word_content() { return *content_; }
 	string hyphenated() const { return hyphenated_; }
 
 	void hyphenate(Hyphenate::Hyphenator* hyphenator);

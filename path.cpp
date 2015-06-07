@@ -60,7 +60,7 @@ Path::Path(FT_Outline outline)
 	FT_Error error = FT_Outline_Decompose(&outline, &funcs, &svg_);
 	if (error)
 	{
-		Typesetter::Message("Error decomposing outline: " + to_string(error));
+		Typesetter::message("Error decomposing outline: " + to_string(error));
 	}
 }
 

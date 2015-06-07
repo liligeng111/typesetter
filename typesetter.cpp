@@ -1,6 +1,8 @@
 #include "typesetter.h"
 #include <iostream>
 #include <fstream>
+#include <locale>
+#include <codecvt>
 #include <iomanip>
 #include "viewer.h"
 #include "settings.h"
@@ -21,23 +23,23 @@ void Typesetter::LoadFace()
 	FT_Error error = FT_Init_FreeType(&library_);
 	if (error)
 	{
-		Message("An error occurred during FT library initialization.");
+		message("An error occurred during FT library initialization.");
 	}
 
 	error = FT_New_Face(library_, "./fonts/MinionPro-Regular.otf", 0, &face_);
 	if (error == FT_Err_Unknown_File_Format)
 	{
-		Message("This font format is unsupported.");
+		message("This font format is unsupported.");
 	}
 	else if (error)
 	{
-		Message("Unable to read the font file or it is broken.");
+		message("Unable to read the font file or it is broken.");
 	}
 
 	error = FT_Set_Char_Size(face_, 0, settings::font_size_ * 64, 0, 72);
 	if (error)
 	{
-		Message("Cannot set char size");
+		message("Cannot set char size");
 	}
 	// according to http://www.freetype.org/freetype2/docs/glyphs/glyphs-2.html
 	//error = FT_Set_Pixel_Sizes(face_, 0, settings::font_size_ * settings::dpi_ / 72);
@@ -54,7 +56,7 @@ void Typesetter::LoadFace()
 	error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
 	if (error)
 	{
-		Message("Error loading character");
+		message("Error loading character");
 	}
 
 	settings::space_width_ = face_->glyph->advance.x;
@@ -66,7 +68,7 @@ Typesetter::~Typesetter()
 {
 }
 
-void Typesetter::Message(const string& msg)
+void Typesetter::message(const string& msg)
 { 
 	Viewer::Message(msg); 
 }
@@ -150,7 +152,7 @@ void Typesetter::Typeset()
 	FT_Error error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
 	if (error)
 	{
-		Message("Error loading character");
+		message("Error loading character");
 	}
 
 	//load hyphen glyph
@@ -170,22 +172,26 @@ void Typesetter::Typeset()
 	unsigned long long sum_y = 0;
 	unsigned long long sum_z = 0;
 
-	char last_ch = 0;
 	Item* last_item = nullptr;
 	Word* word = nullptr;
-	char ch = 0;
-	fstream fin(file_, fstream::in);
+	wchar_t last_ch = 0;
+	wchar_t ch = 0;
+	wchar_t next_ch;
+	//fstream fin(file_, fstream::in);
+	//TODO::Understand it....
+	std::wifstream fin(file_, std::ios::binary);
+	fin.imbue(std::locale(fin.getloc(),
+		new std::codecvt_utf16<wchar_t, 0x10ffff, std::consume_header>));
 	bool new_paragraph = true;
-	char next_ch;
 
 	while (true)
 	{
-		fin >> noskipws >> next_ch;
+		fin.get(next_ch);
 		ch = next_ch;
-		//cout << int(ch) << endl;
-		//TODO::unrecognized char
-		if (ch < 0)
-		{
+		//cout << char(ch) << " - " << int(ch) << endl;
+		//TODO::What is this...
+		if (int(ch) == 13)
+		{			
 			continue;
 		}
 
@@ -272,7 +278,7 @@ void Typesetter::Typeset()
 				FT_Error error = FT_Load_Char(face_, ch, FT_LOAD_NO_SCALE);
 				if (error)
 				{
-					Message("Error loading character");
+					message("Error loading character");
 				}
 
 				glyph = new Glyph(face_->glyph, ch);
@@ -495,62 +501,72 @@ void Typesetter::justify()
 			}
 		}
 	}
+
 }
 
+void Typesetter::render_page(RenderTarget target, int page)
+{
+	if (page < 0 || page >= pages_.size())
+	{
+		message("Error: Illegal page number " + to_string(page));
+		return;
+	}
+	ofstream file;
+	file.open("output/svg/page" + to_string(page) + ".svg");
+	file << fixed << setprecision(4);
+	file << "<?xml version=\"1.0\" standalone=\"no\"?>\n";
+	file << "<svg\n";
+	file << "	xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n";
+	file << "	xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n";
+	file << "	xmlns:cc=\"http://creativecommons.org/ns#\"\n";
+	file << "	xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n";
+	file << "	xmlns:svg=\"http://www.w3.org/2000/svg\"\n";
+	file << "	xmlns=\"http://www.w3.org/2000/svg\"\n";
+	file << "	version=\"1.1\"\n";
+	file << "	viewBox=\"0 0 " << settings::mm_to_point(settings::page_width_) << " " << settings::mm_to_point(settings::page_height_) << "\">\n";
+	file << "<defs>\n";
 
-void Typesetter::Render(RenderTarget target)
+	//output cache
+	for (auto& kv : glyph_cache_)
+	{
+		file << "<path fill='rgb(0,0,0)' id='char" << int(kv.first) << "' class='char' ";
+		file << "d='" << kv.second->path()->SVG() << "'";
+		file << "/>\n";
+	}
+
+	file << "</defs>\n";
+	file << "<g transform = \"scale(1, 1)\">\n";
+
+
+	//print all the boxes
+	//cout << target << " " << (target == RenderTarget::SVG_CACHE) << endl;
+	pages_[page]->SVG(file);
+	file << "\n";
+
+	if (settings::show_river_)
+	{
+		file << "<g transform='translate(" << pages_[page]->x() << ", " << pages_[page]->y() << ")'>\n";
+		for (River* river : rivers_[page])
+		{
+			river->Analyse();
+			river->SVG(file);
+		}
+		file << "</g>\n";
+	}
+
+	file << "</g>\n";
+	file << "</svg>\n";
+	file.close();
+}
+
+void Typesetter::render(RenderTarget target)
 {
 	Progress("Generating optput files");
 	if (target == RenderTarget::SVG)
 	{
 		for ( int i = 0; i < pages_.size(); i++)
 		{
-			ofstream file;
-			file.open("output/svg/page" + to_string(i) + ".svg");
-			file << fixed << setprecision(4);
-			file << "<?xml version=\"1.0\" standalone=\"no\"?>\n";
-			file << "<svg\n";
-			file << "	xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n";
-			file << "	xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n";
-			file << "	xmlns:cc=\"http://creativecommons.org/ns#\"\n";
-			file << "	xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n";
-			file << "	xmlns:svg=\"http://www.w3.org/2000/svg\"\n";
-			file << "	xmlns=\"http://www.w3.org/2000/svg\"\n";
-			file << "	version=\"1.1\"\n";
-			file << "	viewBox=\"0 0 " << settings::mm_to_point(settings::page_width_) << " " << settings::mm_to_point(settings::page_height_) << "\">\n";
-			file << "<defs>\n";
-
-			//output cache
-			for (auto& kv : glyph_cache_)
-			{
-				file << "<path fill='rgb(0,0,0)' id='char" << int(kv.first) << "' class='char' ";
-				file << "d='" << kv.second->path()->SVG() << "'";
-				file << "/>\n";
-			}
-
-			file << "</defs>\n";
-			file << "<g transform = \"scale(1, 1)\">\n";
-
-
-			//print all the boxes
-			//cout << target << " " << (target == RenderTarget::SVG_CACHE) << endl;
-			pages_[i]->SVG(file);
-			file << "\n";
-
-			if (settings::show_river_)
-			{
-				file << "<g transform='translate(" << pages_[i]->x() << ", " << pages_[i]->y() << ")'>\n";
-				for (River* river : rivers_[i])
-				{
-					river->Analyse();
-					river->SVG(file);
-				}
-				file << "</g>\n";
-			}
-
-			file << "</g>\n";
-			file << "</svg>\n";
-			file.close();
+			render_page(target, i);
 		}
 
 		//output river xml
@@ -582,6 +598,4 @@ void Typesetter::Render(RenderTarget target)
 		}
 	}
 
-
-	Progress("Done");
 }

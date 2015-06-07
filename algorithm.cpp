@@ -159,7 +159,7 @@ void Typesetter::optimum_fit()
 	}
 	if (active_list_.empty())
 	{
-		Message("ERROR: Unable to preform optimum fit");
+		message("ERROR: Unable to preform optimum fit");
 		exit(EXIT_FAILURE);
 	}
 
@@ -208,6 +208,18 @@ void Typesetter::A_star()
 				//cout << (*next)->item()->after()->word_content() << " " << last->item()->after()->word_content() << endl;
 				demerites += 2500;
 			}
+			auto iter = node.path->rbegin();
+			iter++;
+			if (iter != node.path->rend())
+			{
+				float r1 = local_cost_[make_pair(last->item(), (*next)->item())].r;
+				float r2 = local_cost_[make_pair((*iter)->item(), last->item())].r;
+				float dr = (r1 - r2) / 2;
+				dr = dr * dr;
+				demerites += 10000 * dr * dr * dr;
+				//cout << (*next)->item()->after()->word_content() << "  " << last->item()->after()->word_content() << "  " << endl;
+				//cout << r1 << "  " << r2 << "  " << 1000 * dr << "  " << demerites << endl << endl;
+			}
 			queue.push({ path, demerites });
 			if (queue.size() > max_size)
 				max_size = queue.size();
@@ -215,8 +227,8 @@ void Typesetter::A_star()
 
 		delete node.path;
 		node = queue.top();
-		if (max_size > 350)
-			cout << "Max queue size: " << max_size << endl;
+		//if (max_size > 350)
+		//	cout << "Max queue size: " << max_size << endl;
 	}
 
 	//insert breakpoints (for A*)
@@ -269,7 +281,6 @@ void Typesetter::reverse_optimum_fit()
 		//if (b->x() != b->sum_w_)
 		//	cout << b->content() << "  " << b->x() << " " << b->sum_w_ << endl;
 		Breakpoint* breakpoint = nullptr;
-		int penalty = b->p(); //penalty
 		if (b->type() == Item::BOX)
 		{
 			continue;
@@ -298,9 +309,13 @@ void Typesetter::reverse_optimum_fit()
 			long L = -(b->after()->x() - after->x());
 			if (b->type() == Item::PENALITY)
 			{
-				L += b->width();
-				forced_break = penalty < -999;
+				forced_break = b->p() < -999;
 			}
+			if (after->type() == Item::PENALITY)
+			{
+				L += after->width();
+			}
+			int penalty = after->p(); //penalty
 			if (L < l)
 			{
 				long Y = -(b->after()->sum_y_ - after->sum_y_);
@@ -398,7 +413,7 @@ void Typesetter::reverse_optimum_fit()
 			cout << item->content() << endl;
 		}
 		cout << endl;
-		Message("ERROR: Unable to preform optimum fit");
+		message("ERROR: Unable to preform optimum fit");
 		exit(EXIT_FAILURE);
 	}
 
@@ -408,7 +423,7 @@ void Typesetter::reverse_optimum_fit()
 
 void Typesetter::break_paragraph()
 {
-	//reverse_optimum_fit();
+	reverse_optimum_fit();
 
 	//find heuristic
 	//TODO::test and delete pointers, local cost, push_next and stuff
@@ -429,19 +444,19 @@ void Typesetter::break_paragraph()
 	//	Item* item = (*breakpoint)->item();
 	//	cout << item->content() << " " << item->after()->content() << item->heuristic() << endl;
 	//}
-	//A_star();
+	A_star();
 
-	optimum_fit();
-	//insert breakpoints (for knuth original algorithm)
-	Breakpoint* bp = active_list_.front();
-	auto pos = breakpoints.rbegin();
-	while (bp->prev() != nullptr)
-	{
-		//cout << bp->item()->after()->content() << endl;
-		breakpoints.insert(pos.base(), bp);
-		bp = bp->prev();
-		pos++;
-	}
+	//optimum_fit();
+	////insert breakpoints (for knuth original algorithm)
+	//Breakpoint* bp = active_list_.front();
+	//auto pos = breakpoints.rbegin();
+	//while (bp->prev() != nullptr)
+	//{
+	//	//cout << bp->item()->after()->content() << endl;
+	//	breakpoints.insert(pos.base(), bp);
+	//	bp = bp->prev();
+	//	pos++;
+	//}
 
 
 	passive_list_.push_back(active_list_.front());

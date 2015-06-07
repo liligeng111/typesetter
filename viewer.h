@@ -30,6 +30,8 @@ private slots:
 	void on_fontSizeBox_valueChanged(int arg1);
 	void on_riverThresholdSpinBox_valueChanged(double arg1);
 	void on_paperBox_currentIndexChanged(QString page);
+	void on_pageSlider_valueChanged(int value);
+
 
     void on_actionOpen_File_triggered();
 

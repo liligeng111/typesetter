@@ -39,7 +39,16 @@ void Viewer::on_renderButton_clicked()
 	Resize();
 	typesetter.set_content(content);
 	typesetter.Typeset();
-	typesetter.Render(Typesetter::SVG);
+
+	ui.pageSlider->setMaximum(typesetter.page_count());
+	ui.pageSlider->setValue(0);
+	on_pageSlider_valueChanged(0);
+}
+
+
+void Viewer::on_pageSlider_valueChanged(int value)
+{
+	typesetter.render_page(Typesetter::SVG, value);
 
 	QSvgRenderer renderer(QString("./output/svg/page0.svg"));
 	QImage image(settings::display_width(), settings::display_height(), QImage::Format_ARGB32);

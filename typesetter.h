@@ -23,7 +23,6 @@ class Glyph;
 class Viewer;
 class Typesetter
 {
-friend class Algorithm;
 
 public:
 	enum RenderTarget
@@ -36,8 +35,10 @@ public:
 
 	void set_content(string& content) { file_ = content; }
 
-	void Render(RenderTarget target);
-	static void Message(const string& msg);
+	void render(RenderTarget target);
+	void render_page(RenderTarget target, int page);
+	int page_count() const { return pages_.size(); }
+	static void message(const string& msg);
 	void Typeset();
 
 	void LoadFace();

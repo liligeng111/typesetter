@@ -2,96 +2,22 @@
 <!-- saved from url=(0062)http://www.flotcharts.org/flot/examples/basic-usage/index.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
-	<title>Rivers</title>
+	<title>Page Viewer</title>
 	<link href="./script/examples.css" rel="stylesheet" type="text/css">
 	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
 	<script language="javascript" type="text/javascript" src="./script/jquery.js"></script>
-	<script language="javascript" type="text/javascript" src="./script/jquery.flot.js"></script>
 	<script language="javascript" type="text/javascript" src="./script/rivers.js"></script>
+	<script language="javascript" type="text/javascript" src="./script/meta.js"></script>
+	<script language="javascript" type="text/javascript" src="./script/dat.gui.min.js"></script>
+
 	<script type="text/javascript">
 
-	function show_graph()
-	{
-		selected_id = 0;
-
-		var graph = [];
-		loading_svg = false;
-		var x = $('.x_cood:radio:checked').val();
-		var y = $('.y_cood:radio:checked').val();
-
-		for (var i = 0; i < rivers.length; i++) 
-		{
-			if (rivers[i].size < min_length || rivers[i].min_left_length < min_left || rivers[i].min_right_length < min_right || rivers[i].left_length_bar < avg_left || rivers[i].right_length_bar < avg_right || rivers[i].up_length > up_length || rivers[i].down_length > down_length || rivers[i].repeat_words < repeat_w)
-				continue;
-			var found = false;
-			for (var j = 0; j < graph.length; j++)
-			{
-				if (graph[j].label == rivers[i].size)
-				{
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{				
-				graph.push({label:rivers[i].size, data:[]});
-				j = graph.length - 1;
-			}
-			graph[j].data.push([rivers[i][x], rivers[i][y]]);
-		}
-		//console.log(graph);
-		$( "#placeholder" ).unbind();
-		$.plot("#placeholder", graph, {series:{points:{show:true}}, grid:{hoverable:true,clickable:true}, legend:{container:$("#legendContainer"), noColumns:0}});
-		$("<div id='tooltip'></div>").css({
-			position: "absolute",
-			display: "none",
-			border: "1px solid #fdd",
-			padding: "2px",
-			"background-color": "#fee",
-			opacity: 0.80
-		}).appendTo("body");
-
-		$("#placeholder").bind("plothover", function (event, pos, item)
-		{
-			if (item)
-			{
-					var x = item.datapoint[0].toFixed(2),
-						y = item.datapoint[1].toFixed(2);
-
-					$("#tooltip").html(item.datapoint[0] + " " + item.datapoint[1])
-						.css({top: item.pageY+5, left: item.pageX+5})
-						.fadeIn(200);
-				} else {
-					$("#tooltip").hide();
-			}
-		});
-
-		$("#placeholder").bind("plotclick", function (event, pos, item) 
-		{
-			console.log("click event")
-			if (item) 
-			{
-				//search for data
-				for (var i = 0; i < rivers.length; i++)
-				{
-					if (rivers[i][x] == item.datapoint[0] && rivers[i][y] == item.datapoint[1])
-					{
-						var page = "svg/page" + rivers[i].page + ".svg";
-						selected_id = rivers[i].id;
-						$("#svg").attr("data", page);
-						$("#page_num").text(page);
-						$('#svg').load(page, function() {change_width();});
-						console.log(rivers[i]);
-						$('#river_info').text(JSON.stringify(rivers[i]));
-					}
-				}
-			}
-		});
-	}
+	
 
 	function change_width()
 	{
 		var width = 72;
+		var selected_id = 0;
 
 		if ($('#show_all_river')[0].checked)
 		{
@@ -129,7 +55,7 @@
 			$('#regression' + selected_id).attr('stroke-width', 0);
 		}
 
-		if ($('#show_char')[0].checked)
+		if (params.show_char)
 		{
 			$('.char').attr('fill', 'rgb(0, 0, 0)');
 		}
@@ -138,7 +64,7 @@
 			$('.char').attr('fill', 'rgb(255, 255, 255)');
 		}
 
-		if ($('#show_space')[0].checked)
+		if (params.show_space)
 		{
 			$('.border0').attr('stroke-width', width);
 		}
@@ -147,7 +73,7 @@
 			$('.border0').attr('stroke-width', 0);
 		}
 
-		if ($('#show_char_box')[0].checked)
+		if (params.show_char_border)
 		{
 			$('.border1').attr('stroke-width', width);
 		}
@@ -165,7 +91,7 @@
 		// 	$('.border2').attr('stroke-width', 0);
 		// }
 
-		if ($('#show_line')[0].checked)
+		if (params.show_line_border)
 		{
 			$('.border3').attr('stroke-width', width);
 		}
@@ -174,7 +100,7 @@
 			$('.border3').attr('stroke-width', 0);
 		}
 
-		if ($('#show_page')[0].checked)
+		if (params.show_page_border)
 		{
 			$('.border4').attr('stroke-width', width);
 		}
@@ -220,41 +146,121 @@
 		$('.regression').attr('fill', 'none');
 	}
 
-	function min_click(e)
-	{     	
-		console.log('min')
-		min_length = $('#min_box')[0].value;
-		min_left = $('#min_left_box')[0].value;
-		min_right = $('#min_right_box')[0].value;
-		avg_left = $('#avg_left_box')[0].value;
-		avg_right = $('#avg_right_box')[0].value;
-		up_length = $('#up_box')[0].value;
-		down_length = $('#down_box')[0].value;
-		repeat_w = $('#repeat_words')[0].value;
-		show_graph();
-		if (e)
-     		e.preventDefault();
+	function visualize()
+	{
+		$('.line').each(function()
+		{
+			var color;
+			if (!params.visualize_r)
+			{
+				color = 'none'
+			}
+			else
+			{
+				var r = $(this).find('.markdown_r').text();
+				r = parseFloat(r);		
+				var ratio = r * params.visualize_r_intensity;
+				if (ratio > 1)
+					ratio = 1; 
+
+				if (ratio > 0)
+				{
+					color = 'rgb(';
+					for (var i = 0; i < 3; i++)
+					{
+						color += parseInt(255 - (255 - parseInt(params.stretch_color[2 * i + 1], 16) * 16 - parseInt(params.stretch_color[2 * i + 2], 16)) * ratio);
+						if (i != 2)
+							color += " ,"
+						else
+							color += ")"
+					}
+				}		
+				else
+				{
+					color = 'rgb(';
+					for (var i = 0; i < 3; i++)
+					{
+						color += parseInt(255 + (255 - parseInt(params.shrink_color[2 * i + 1], 16) * 16 - parseInt(params.shrink_color[2 * i + 2], 16)) * ratio);
+						if (i != 2)
+							color += " ,"
+						else
+							color += ")"
+					}
+				}		
+			}
+
+			$(this).find('.border3').attr('fill', color);
+		});
 	}
 
-	function load_click(e)
-	{     	
-		console.log('load')
-		var page = "svg/page" +  $('#load_page')[0].value + ".svg";
+	function select_markdown()
+	{
+		$('.markdown').hide();
+		$('.markdown_' + params.mrakdown_type).show();
+	}
+
+	//dat
+	var PARAMS = function() 
+	{
+		this.page_numer = "" + PAGE_COUNT;
+		this.font_size = "" + FONT_SIZE;
+		this.font = FONT;
+
+		this.page = 0;
+		this.show_page_border = false;
+		this.show_line_border = false;
+		this.show_char = true;
+		this.show_char_border = false;
+		this.show_space = false;
+
+		this.visualize_r = false;
+		this.visualize_r_intensity = 0.75;
+		this.shrink_color = "#ff0000";
+		this.stretch_color = "#0000ff";
+
+		this.mrakdown_type = 'r';
+	};
+
+	window.onload = function() 
+	{
+		params = new PARAMS();
+		var gui = new dat.GUI({width: 450});
+		var f0 = gui.addFolder('Information');
+		f0.add(params, 'page_numer').name("Total Page Number");
+		f0.add(params, 'font_size').name("Font Size");
+		f0.add(params, 'font').name("Font");
+		var f1 = gui.addFolder('Display');
+		f1.add(params, 'show_page_border').name("Show Page Border").onFinishChange(function(value){change_width();});
+		f1.add(params, 'show_line_border').name("Show Line Border").onFinishChange(function(value){change_width();});
+		f1.add(params, 'show_char').name("Show Characters").onFinishChange(function(value){change_width();});
+		f1.add(params, 'show_char_border').name("Show Character Border").onFinishChange(function(value){change_width();});
+		f1.add(params, 'show_space').name("Show Space").onFinishChange(function(value){change_width();});
+		var f2 = gui.addFolder('Visualize r');
+		f2.add(params, 'visualize_r').name("Visualize r").onFinishChange(function(value){visualize();});
+		f2.add(params, 'visualize_r_intensity', 0, 1).name("Intensity").onChange(function(value){visualize();});
+		f2.addColor(params, 'shrink_color').name("Shrink Color").onChange(function(value){visualize();});
+		f2.addColor(params, 'stretch_color').name("Stretch Color").onChange(function(value){visualize();});
+		var page_controller = gui.add(params, 'page', 0, PAGE_COUNT).step(1).name("Page");
+		gui.add(params, 'mrakdown_type', ['r', 'penalty', 'demerits', 'none'] ).name("Select Markdown").onChange(function(value){select_markdown();});
+
+
+		page_controller.onFinishChange(function(value) 
+		{
+			load_page(value);
+		});
+
+		load_page(0);
+	};
+
+	function load_page(value)
+	{
+		var page = "svg/page" +  value + ".svg";
 		$("#svg").attr("data", page);
 		$("#page_num").text(page);
 		$('#svg').load(page, function() {change_width();});
-		if (e)
-     		e.preventDefault();
 	}
 
-	$(document).ready(function()
-	{
-		min_click(null);
-		$('input#min').click(function(e) {min_click(e);});
-		$('input#load').click(function(e) {load_click(e);});
-		$(':checkbox').click(function() {change_width();});
-		$(':radio').click(function() {show_graph();});
-	});
+
 	</script>
 <style type="text/css"></style></head>
 <body>
@@ -262,74 +268,20 @@
 	<div id="header">
 	</div>
 	<div id='river_tooltip' style="position:absolute;"></div>
-	<div id="check_booxes" style='position:fixed; background-color:#eee; left:10px; top:10px;'>
-		<input id='show_page' type="checkbox" unchecked> Show Page Border<br>
-		<input id='show_line' type="checkbox" unchecked> Show Line<br>
+	<div id="check_booxes" style='position:fixed; background-color:#eee; left:10px; top:10px;' hidden>
 		<!-- <input id='show_word' type="checkbox" checked> Show Word<br> -->
-		<input id='show_char' type="checkbox" checked> Show Character<br>
-		<input id='show_char_box' type="checkbox" unchecked> Show Character Box<br>
-		<input id='show_space' type="checkbox" unchecked> Show Space Box<br>
 		<input id='show_river' type="checkbox" checked> Show Selected River<br>
 		<input id='show_regression' type="checkbox" unchecked> Show Selected River Regression<br>
 		<input id='show_all_river' type="checkbox" unchecked> Show All River<br>
 		<input id='show_all_regression' type="checkbox" unchecked> Show All River Regression<br>
-
-		<br>
-		X Coordinate
-		<form>
-			<input type="radio" class="x_cood" name="x_cood" value="local" /> Local Deviation <br>
-			<input type="radio" class="x_cood" name="x_cood" value="global" /> Global Deviation <br>
-			<input type="radio" class="x_cood" name="x_cood" value="width_std" /> Standard Variance of Space Width <br>
-			<input type="radio" class="x_cood" name="x_cood" value="volume" checked/> Volume <br>
-		</form>
-
-		<br>
-		Y Coordinate
-		<form>
-			<input type="radio" class="y_cood" name="y_cood" value="local"/> Local Deviation <br>
-			<input type="radio" class="y_cood" name="y_cood" value="global" /> Global Deviation <br>
-			<input type="radio" class="y_cood" name="y_cood" value="width_std" /> Standard Variance of Space Width <br>
-			<input type="radio" class="y_cood" name="y_cood" value="volume" /> Volume <br>
-			<input type="radio" class="y_cood" name="y_cood" value="repeats" checked/> Repeat Characters <br>
-			<input type="radio" class="y_cood" name="y_cood" value="repeat_words" checked/> Repeats Words<br>
-		</form>
 	</div>
 	
 
 	<div id="content">
-
-		<div class="demo-container">
-    		<div id="legendContainer"></div>    
-			<div id="placeholder" class="demo-placeholder" style="padding: 0px; position: relative;"></div>
-		</div>
-
-
-	<div>
-	<p2 id="page_num"></p2>
-	</div>
-	<form>
-	Min Length: <input id='min_box' type="number" name="length" min="1" value='3' max="100" /> <br>
-	<!-- Min Left Word Length:  --><input id='min_left_box' type="number" name="left" value='0' min="1" max="10000" hidden/>
-	<!-- Min right Word Length:  --><input id='min_right_box' type="number" name="right" value='0' min="1" max="10000" hidden/>
-	<!-- Avg Left Word Length:  --><input id='avg_left_box' type="number" name="left" value='0' min="1" max="10000" hidden/> 
-	<!-- Avg right Word Length:  --><input id='avg_right_box' type="number" name="right" value='0' min="1" max="10000" hidden/> 
-	<!-- Up Length: --> <input id='up_box' type="number" name="right" value='1' min="0" max="1" hidden/>
-	<!-- Down Length: --> <input id='down_box' type="number" name="right" value='1' min="0" max="1" hidden/>
-	Repeat Words: <input id='repeat_words' type="number" name="right" value='1' min="0" max="50" /> <br>
-	<input id="min" type="submit" />
-	</form>
-	<br>
-	<form>
-	Load Page: <input id='load_page' type="number" name="length" min="0" value='0'/> <br>
-	<input id="load" type="submit" />
-	</form>
 	</div>
 	<p3 id="river_info"></p3>
 	<object id="svg" data="000" type="image/svg+xml">
 	</object>
-	<div id="footer">Flot 0.8.3 – 
-		Copyright © 2007 - 2014 IOLA and Ole Laursen
-	</div>
 
 
 

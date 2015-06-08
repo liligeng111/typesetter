@@ -1,6 +1,7 @@
 #pragma once
 
 #include "item.h"
+#include "breakpoint.h"
 #include <list>
 #include <vector>
 #include "lib\libhyphenate\Hyphenator.h"
@@ -45,11 +46,11 @@ class Line : public Container
 public:
 	Line();
 	~Line();
-	void set_r(float r) { r_ = r; }
-	float r() const { return r_; }
+	void set_demerits(Breakpoint::Demerits demerits) { demerits_ = demerits; }
+	Breakpoint::Demerits demerits() const { return demerits_; }
 
 private:
-	float r_;
+	Breakpoint::Demerits demerits_;
 };
 
 class Page : public Container

@@ -43,6 +43,7 @@ public:
 	long shrinkability() { return shrinkability_; }
 	Glyph* glyph() const { return glyph_; }
 	void set_glyph(Glyph* glyph) { glyph_ = glyph; }
+	void set_expansion(float expansion) { expansion_ = expansion; }
 
 	void set_parent(Container* parent) { parent_ = parent; }
 	void set_prev(Item* prev);
@@ -74,5 +75,7 @@ protected:
 	Container* parent_;
 	Item* prev_;
 	Item* next_;
+
+	float expansion_;// for font expansion
 };
 

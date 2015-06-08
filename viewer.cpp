@@ -39,10 +39,11 @@ void Viewer::on_renderButton_clicked()
 	Resize();
 	typesetter.set_content(content);
 	typesetter.Typeset();
+	typesetter.render(Typesetter::SVG);
 
 	ui.pageSlider->setMaximum(typesetter.page_count());
 	ui.pageSlider->setValue(0);
-	on_pageSlider_valueChanged(0);
+	//on_pageSlider_valueChanged(0);
 }
 
 

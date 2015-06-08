@@ -82,5 +82,5 @@ private:
 
 
 	void A_star();
-	map<pair<Item*, Item*>, Breakpoint::Demerit> local_cost_;
+	map<pair<Item*, Item*>, Breakpoint::Demerits> local_cost_;
 };

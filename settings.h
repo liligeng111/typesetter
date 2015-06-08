@@ -12,6 +12,7 @@ namespace settings
 	extern float margin_right_;
 	extern float margin_bottom_;
 
+	extern std::string font_;
 	extern int font_size_;
 
 	extern long em_size_;

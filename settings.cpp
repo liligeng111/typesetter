@@ -11,6 +11,7 @@ namespace settings
 	
 	int dpi_ = 72; 
 
+	std::string font_ = "MinionPro-Regular.otf";
 	int font_size_ = 12;
 	long em_size_ = 2048;
 	long line_height_ = 2048;

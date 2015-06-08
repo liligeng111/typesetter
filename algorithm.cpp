@@ -119,22 +119,27 @@ void Typesetter::optimum_fit()
 				//TODO::f(a) and c
 				//new breakpoint
 
+				Breakpoint::Demerits demerit;
+				demerit.penalty = penalty;
+				demerit.r = r;
+				demerit.result = d;
+
 				if (breakpoint == nullptr)
 				{
-					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits() + d, r, (*a));
+					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
 					breakpoint->L = L;
 					breakpoint->a = after->x();
 					breakpoint->b = b->x();
 				}
 				//better breakpoint
-				else if ((*a)->demerits() + d < breakpoint->demerits())
+				else if ((*a)->demerits_sum() + d < breakpoint->demerits_sum())
 				{
-					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits() + d, r, (*a));
+					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
 					breakpoint->L = L;
 					breakpoint->a = after->x();
 					breakpoint->b = b->x();
 				}
-				Breakpoint::Demerit deme = { r, penalty, d };
+				Breakpoint::Demerits deme = { r, penalty, d };
 				local_cost_.insert(make_pair(make_pair((*a)->item(), b), deme));
 				(*a)->push_next(breakpoint);
 			}
@@ -238,7 +243,7 @@ void Typesetter::A_star()
 	{
 		//cout << bp->item()->after()->content() << endl;
 		breakpoints.push_back(*bp);
-		(*bp)->set_r(local_cost_[make_pair(prev->item(), (*bp)->item())].r);
+		(*bp)->set_demerits(local_cost_[make_pair(prev->item(), (*bp)->item())]);
 		prev = *bp;
 	}
 
@@ -365,24 +370,27 @@ void Typesetter::reverse_optimum_fit()
 				//TODO::f(a) and c
 				//new breakpoint
 
+				Breakpoint::Demerits demerit;
+				demerit.penalty = penalty;
+				demerit.r = r;
+				demerit.result = d;
+
 				if (breakpoint == nullptr)
 				{
-					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits() + d, r, (*a));
+					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
 					breakpoint->L = L;
 					breakpoint->a = after->x();
-					breakpoint->b = b->after()->x();
-					breakpoint->set_heuristic((*a)->demerits() + d);
+					breakpoint->b = b->x();
 				}
 				//better breakpoint
-				else if ((*a)->demerits() + d < breakpoint->demerits())
+				else if ((*a)->demerits_sum() + d < breakpoint->demerits_sum())
 				{
-					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits() + d, r, (*a));
+					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
 					breakpoint->L = L;
 					breakpoint->a = after->x();
-					breakpoint->b = b->after()->x();
-					breakpoint->set_heuristic((*a)->demerits() + d);
+					breakpoint->b = b->x();
 				}
-				Breakpoint::Demerit deme = { r, penalty, d };
+				Breakpoint::Demerits deme = { r, penalty, d };
 				local_cost_.insert(make_pair(make_pair(b, (*a)->item()), deme));
 				breakpoint->push_next((*a));
 			}

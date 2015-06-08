@@ -9,6 +9,7 @@ Item::Item(ItemType type) : type_(type), p_(0), stretchability_(0), shrinkabilit
 {
 	prev_ = nullptr;
 	next_ = nullptr;
+	expansion_ = 1;
 }
 
 
@@ -51,7 +52,10 @@ Item* Item::after()
 
 void Item::SVG(ofstream& file) const
 {
-	file << "<g transform='translate(" << x_ << ", " << y_ << ")'>";
+	if (type_ == LINE)
+		file << "<g class='line' transform='translate(" << x_ << ", " << y_ << ")'>";
+	else
+		file << "<g transform='translate(" << x_ << ", " << y_ << ")'>";
 
 	//all kinds of borders
 	if (settings::border_[type_])
@@ -63,7 +67,7 @@ void Item::SVG(ofstream& file) const
 	{
 		//a char
 		file << "<g transform='translate(" << 0 << ", " << -glyph_->hori_bearing_y() << ")'>\n";
-		file << "<use xlink:href='#char" << int(glyph_->content()) << "' fill='rgb(0,0,0)'/>";
+		file << "<use g transform = 'scale(" << expansion_ << ", 1)' xlink:href='#char" << int(glyph_->content()) << "' fill='rgb(0,0,0)'/>";
 		file << "</g>";
 	}
 	else
@@ -72,7 +76,9 @@ void Item::SVG(ofstream& file) const
 		if (type_ == LINE)
 		{
 			const Line* line = static_cast<const Line*>(this);
-			file << "<text x='" << settings::content_width_point() + settings::em_size_ << "' y='" << settings::line_height_ << "' fill='red' font-size='" << settings::em_size_ / 3 << "px'>" << line->r() << "</text>";
+			file << "<text class='markdown markdown_r' x='" << settings::content_width_point() + settings::em_size_ << "' y='" << settings::line_height_ << "' fill='red' font-size='" << settings::em_size_ / 3 << "px'>" << line->demerits().r << "</text>";
+			file << "<text style='display:none;' class='markdown markdown_penalty' x='" << settings::content_width_point() + settings::em_size_ << "' y='" << settings::line_height_ << "' fill='red' font-size='" << settings::em_size_ / 3 << "px'>" << line->demerits().penalty << "</text>";
+			file << "<text style='display:none;' class='markdown markdown_demerits' x='" << settings::content_width_point() + settings::em_size_ << "' y='" << settings::line_height_ << "' fill='red' font-size='" << settings::em_size_ / 3 << "px'>" << line->demerits().result << "</text>";
 			file << "<g transform = 'scale(1, -1) translate(0, " << -settings::descender_ - height_ << ")'>\n";
 		}
 		//a ->

@@ -26,7 +26,9 @@ void Typesetter::LoadFace()
 		message("An error occurred during FT library initialization.");
 	}
 
-	error = FT_New_Face(library_, "./fonts/MinionPro-Regular.otf", 0, &face_);
+	std::string font_pos = "./Fonts/" + settings::font_;
+	const char* font_pos_c = font_pos.c_str();
+	error = FT_New_Face(library_, font_pos_c, 0, &face_);
 	if (error == FT_Err_Unknown_File_Format)
 	{
 		message("This font format is unsupported.");
@@ -419,7 +421,7 @@ void Typesetter::fill_lines()
 	current_page->set_geometry(settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_), settings::content_width_point(), settings::content_height_point());
 	pages_.push_back(current_page);
 	Line* current_line = new Line();
-	current_line->set_geometry(0, y_adjust, 0, settings::line_height_);
+	current_line->set_geometry(0, y_adjust, settings::content_width_point(), settings::line_height_);
 	current_page->add_child(current_line);
 	lines_.push_back(current_line);
 
@@ -456,7 +458,7 @@ void Typesetter::fill_lines()
 
 			if (current_line != nullptr)
 			{
-				current_line->set_r((*iter)->r());
+				current_line->set_demerits((*iter)->demerits());
 				//cout << breakpoint->r() << endl;
 			}
 			Line* new_line = new Line();
@@ -464,13 +466,12 @@ void Typesetter::fill_lines()
 			new_line->set_prev(current_line);
 			current_line = new_line;
 			y_adjust += settings::line_height_;
-			current_line->set_geometry(0, y_adjust, 0, settings::line_height_);
+			current_line->set_geometry(0, y_adjust, settings::content_width_point(), settings::line_height_);
 			lines_.push_back(current_line);
 			last = nullptr;
 			iter++;
 		}
 		child->set_prev(last);
-		current_line->expand_box(child);
 		last = child;
 	}
 	//cout << lines_.size() << endl;
@@ -495,7 +496,7 @@ void Typesetter::justify()
 			item->translate(adjustment, 0);
 			if (item->type() == Item::GLUE)
 			{
-				double delta = line->r() * (line->r() < 0 ? item->shrinkability() : item->stretchability());
+				double delta = line->demerits().r * (line->demerits().r < 0 ? item->shrinkability() : item->stretchability());
 				item->set_width(item->width() + delta);
 				adjustment += delta;
 			}
@@ -568,8 +569,15 @@ void Typesetter::render(RenderTarget target)
 		{
 			render_page(target, i);
 		}
+		//meta data
+		ofstream file;
+		file.open("output/script/meta.js");
+		file << "PAGE_COUNT = " << pages_.size() << ";\n";
+		file << "FONT_SIZE = '" << settings::font_size_ << "';\n";
+		file << "FONT = '" << settings::font_ << "';\n";
+		file.close();
 
-		//output river xml
+		//output river 
 		if (settings::show_river_)
 		{
 			ofstream file;
@@ -597,5 +605,5 @@ void Typesetter::render(RenderTarget target)
 			file.close();
 		}
 	}
-
+	Progress("Done");
 }

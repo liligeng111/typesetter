@@ -16,7 +16,7 @@
 
 	function change_width()
 	{
-		var width = 72;
+		var width = 8;
 		var selected_id = 0;
 
 		if ($('#show_all_river')[0].checked)
@@ -151,15 +151,15 @@
 		$('.line').each(function()
 		{
 			var color;
-			if (!params.visualize_r)
+			if (!params.visualize_markdown)
 			{
 				color = 'none'
 			}
 			else
 			{
-				var r = $(this).find('.markdown_r').text();
+				var r = $(this).find('.markdown_' + params.markdown_type).text();
 				r = parseFloat(r);		
-				var ratio = r * params.visualize_r_intensity;
+				var ratio = r * params.visualize_markdown_intensity;
 				if (ratio > 1)
 					ratio = 1; 
 
@@ -196,7 +196,8 @@
 	function select_markdown()
 	{
 		$('.markdown').hide();
-		$('.markdown_' + params.mrakdown_type).show();
+		$('.markdown_' + params.markdown_type).show();
+		visualize();
 	}
 
 	//dat
@@ -213,12 +214,12 @@
 		this.show_char_border = false;
 		this.show_space = false;
 
-		this.visualize_r = false;
-		this.visualize_r_intensity = 0.75;
+		this.visualize_markdown = false;
+		this.visualize_markdown_intensity = 0.75;
 		this.shrink_color = "#ff0000";
 		this.stretch_color = "#0000ff";
 
-		this.mrakdown_type = 'r';
+		this.markdown_type = 'total_r';
 	};
 
 	window.onload = function() 
@@ -235,13 +236,13 @@
 		f1.add(params, 'show_char').name("Show Characters").onFinishChange(function(value){change_width();});
 		f1.add(params, 'show_char_border').name("Show Character Border").onFinishChange(function(value){change_width();});
 		f1.add(params, 'show_space').name("Show Space").onFinishChange(function(value){change_width();});
-		var f2 = gui.addFolder('Visualize r');
-		f2.add(params, 'visualize_r').name("Visualize r").onFinishChange(function(value){visualize();});
-		f2.add(params, 'visualize_r_intensity', 0, 1).name("Intensity").onChange(function(value){visualize();});
+		var f2 = gui.addFolder('Visualize Markdown');
+		f2.add(params, 'visualize_markdown').name("Visualize Markdown").onFinishChange(function(value){visualize();});
+		f2.add(params, 'visualize_markdown_intensity', 0, 1).name("Intensity").onChange(function(value){visualize();});
 		f2.addColor(params, 'shrink_color').name("Shrink Color").onChange(function(value){visualize();});
 		f2.addColor(params, 'stretch_color').name("Stretch Color").onChange(function(value){visualize();});
-		var page_controller = gui.add(params, 'page', 0, PAGE_COUNT).step(1).name("Page");
-		gui.add(params, 'mrakdown_type', ['r', 'penalty', 'demerits', 'none'] ).name("Select Markdown").onChange(function(value){select_markdown();});
+		var page_controller = gui.add(params, 'page', 0, PAGE_COUNT - 1).step(1).name("Page");
+		gui.add(params, 'markdown_type', ['total_r', 'space_r', 'font_r', 'penalty', 'demerits', 'none'] ).name("Select Markdown").onChange(function(value){select_markdown();});
 
 
 		page_controller.onFinishChange(function(value) 
@@ -257,7 +258,8 @@
 		var page = "svg/page" +  value + ".svg";
 		$("#svg").attr("data", page);
 		$("#page_num").text(page);
-		$('#svg').load(page, function() {change_width();});
+		$('#svg').load(page, function() {change_width();});		
+		visualize();
 	}
 
 
@@ -280,8 +282,10 @@
 	<div id="content">
 	</div>
 	<p3 id="river_info"></p3>
+	<div  style="width: 1080px; margin:0 400">
 	<object id="svg" data="000" type="image/svg+xml">
 	</object>
+	</div>
 
 
 

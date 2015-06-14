@@ -53,6 +53,7 @@ public:
 
 	//used by optimum fit algorithm
 	unsigned long long sum_y_, sum_z_;
+	unsigned long long sum_y_font_, sum_z_font_;
 
 	void SVG(ofstream& file) const;
 

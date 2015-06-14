@@ -12,7 +12,7 @@ namespace settings
 	int dpi_ = 72; 
 
 	std::string font_ = "MinionPro-Regular.otf";
-	int font_size_ = 12;
+	int font_size_ = 24;
 	long em_size_ = 2048;
 	long line_height_ = 2048;
 	long space_width_ = 0;
@@ -28,5 +28,7 @@ namespace settings
 	float river_threshold_ = 2.0f;
 
 	float rho_ = 5.0f;
+	float max_expansion_ = 0.02;
+	int expansion_mode_ = 0;
 
 };

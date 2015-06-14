@@ -73,7 +73,7 @@ private:
 
 	void optimum_fit();
 	void reverse_optimum_fit();
-	void insert_hyphen(string hyphenated);
+	Item* insert_hyphen(string hyphenated, Item* last);
 	void fill_lines();
 
 	void justify();

@@ -10,6 +10,7 @@ public:
 	struct Demerits
 	{
 		float r;
+		long length;
 		int penalty;
 		float result;
 	};
@@ -32,7 +33,6 @@ public:
 	float heuristic() const { return heuristic_; }
 	void set_heuristic(float heuristic) { heuristic_ = heuristic; }
 
-	long L, a, b; //for debug
 private:
 	Item* item_;
 	int line_; //# of line end at here

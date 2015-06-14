@@ -17,6 +17,7 @@ Viewer::Viewer(QWidget *parent)
 	showMaximized();
 	// for some reason, you cannot get screen size in constructor, so go with 1920.
 	ui.label->setGeometry((1920 - settings::display_width()) / 2, 20, settings::display_width(), settings::display_height());
+	update_UI();
 }
 
 Viewer::~Viewer()
@@ -24,19 +25,26 @@ Viewer::~Viewer()
 
 }
 
+void Viewer::update_UI()
+{
+	ui.fontSizeBox->setValue(settings::font_size_);
+	ui.expansionBox->setCurrentIndex(settings::expansion_mode_);
+	ui.expansionSpinBox->setValue(settings::max_expansion_);
+}
+
 void Viewer::Message(const string& msg)
 {
 	QMessageBox::critical(nullptr, "Error", QString::fromLocal8Bit(msg.c_str()));
 }
 
-void Viewer::Resize()
+void Viewer::resize()
 {
 	ui.label->setGeometry((geometry().width() - settings::display_width()) / 2, 20, settings::display_width(), settings::display_height());
 }
 
 void Viewer::on_renderButton_clicked()
 {
-	Resize();
+	resize();
 	typesetter.set_content(content);
 	typesetter.Typeset();
 	typesetter.render(Typesetter::SVG);
@@ -180,4 +188,14 @@ void Viewer::on_paperBox_currentIndexChanged(QString page)
 		settings::page_width_ = 500;
 		settings::page_height_ = 707;
 	}
+}
+
+void Viewer::on_expansionBox_currentIndexChanged(int index)
+{
+	settings::expansion_mode_ = index;
+}
+
+void Viewer::on_expansionSpinBox_valueChanged(double arg1)
+{
+	settings::max_expansion_ = arg1;
 }

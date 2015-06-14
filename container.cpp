@@ -40,6 +40,8 @@ void Word::hyphenate(Hyphenate::Hyphenator* hyphenator)
 
 Line::Line() : Container(Item::LINE)
 {
+	font_r_ = 0;
+	space_r_ = 0;
 }
 
 

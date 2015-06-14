@@ -48,9 +48,13 @@ public:
 	~Line();
 	void set_demerits(Breakpoint::Demerits demerits) { demerits_ = demerits; }
 	Breakpoint::Demerits demerits() const { return demerits_; }
+	void set_r(float space, float font) { font_r_ = font; space_r_ = space; }
+	float space_r() const { return space_r_; }
+	float font_r() const { return font_r_; }
 
 private:
 	Breakpoint::Demerits demerits_;
+	float font_r_, space_r_;
 };
 
 class Page : public Container

@@ -19,6 +19,8 @@ void Typesetter::optimum_fit()
 	box->set_geometry(paragraph_.front()->x(), 0, 0, 0);
 	box->sum_y_ = 0;
 	box->sum_z_ = 0;
+	box->sum_y_font_ = 0;
+	box->sum_z_font_ = 0;
 	paragraph_.front()->set_prev(box);
 	paragraph_.push_front(box);
 	active_list_.push_back(new Breakpoint(box));
@@ -30,8 +32,7 @@ void Typesetter::optimum_fit()
 		Item* b = *iter;
 		//cout << b << " : " << b->content() << endl;
 		iter++;
-		//if (b->x() != b->sum_w_)
-		//	cout << b->content() << "  " << b->x() << " " << b->sum_w_ << endl;
+		//cout << b->content() << "  " << b->x() << " " << b->sum_y_ << " " << b->sum_z_ << endl;
 		Breakpoint* breakpoint = nullptr;
 		int penalty = b->p(); //penalty
 		if (b->type() == Item::BOX)
@@ -99,7 +100,8 @@ void Typesetter::optimum_fit()
 			//rho here
 			if (r >= -1 && r < settings::rho_)
 			{
-				//cout << (*a)->item()->content() << " ----> " << b->content() << " L: " << L << " r: " << r << endl;
+				//if (r > 5)
+				//	cout << (*a)->item()->content() << " ----> " << b->content() << " L: " << L << " r: " << r << endl;
 				float d;
 				if (penalty >= 0)
 				{
@@ -122,24 +124,19 @@ void Typesetter::optimum_fit()
 				Breakpoint::Demerits demerit;
 				demerit.penalty = penalty;
 				demerit.r = r;
+				demerit.length = L;
 				demerit.result = d;
 
 				if (breakpoint == nullptr)
 				{
 					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
-					breakpoint->L = L;
-					breakpoint->a = after->x();
-					breakpoint->b = b->x();
 				}
 				//better breakpoint
 				else if ((*a)->demerits_sum() + d < breakpoint->demerits_sum())
 				{
 					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
-					breakpoint->L = L;
-					breakpoint->a = after->x();
-					breakpoint->b = b->x();
 				}
-				Breakpoint::Demerits deme = { r, penalty, d };
+				Breakpoint::Demerits deme = { r, L, penalty, d };
 				local_cost_.insert(make_pair(make_pair((*a)->item(), b), deme));
 				(*a)->push_next(breakpoint);
 			}
@@ -162,8 +159,16 @@ void Typesetter::optimum_fit()
 		}
 
 	}
-	if (active_list_.empty())
+
+	if (active_list_.size() != 1)
 	{
+		cout << "Content:: " << endl;
+		for (Item* item : paragraph_)
+		{
+			cout << item->content() << endl;
+		}
+		cout << endl;
+		cout << "active_list size: " << active_list_.size() << endl;
 		message("ERROR: Unable to preform optimum fit");
 		exit(EXIT_FAILURE);
 	}
@@ -271,6 +276,8 @@ void Typesetter::reverse_optimum_fit()
 	box->set_geometry(paragraph_.front()->x(), 0, 0, 0);
 	box->sum_y_ = 0;
 	box->sum_z_ = 0;
+	box->sum_y_font_ = 0;
+	box->sum_z_font_ = 0;
 	paragraph_.front()->set_prev(box);
 	paragraph_.push_front(box);
 	active_list_.push_back(new Breakpoint(paragraph_.back()));
@@ -373,24 +380,19 @@ void Typesetter::reverse_optimum_fit()
 				Breakpoint::Demerits demerit;
 				demerit.penalty = penalty;
 				demerit.r = r;
+				demerit.length = L;
 				demerit.result = d;
 
 				if (breakpoint == nullptr)
 				{
 					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
-					breakpoint->L = L;
-					breakpoint->a = after->x();
-					breakpoint->b = b->x();
 				}
 				//better breakpoint
 				else if ((*a)->demerits_sum() + d < breakpoint->demerits_sum())
 				{
 					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
-					breakpoint->L = L;
-					breakpoint->a = after->x();
-					breakpoint->b = b->x();
 				}
-				Breakpoint::Demerits deme = { r, penalty, d };
+				Breakpoint::Demerits deme = { r, L, penalty, d };
 				local_cost_.insert(make_pair(make_pair(b, (*a)->item()), deme));
 				breakpoint->push_next((*a));
 			}

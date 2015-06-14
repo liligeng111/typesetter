@@ -31,6 +31,8 @@ private slots:
 	void on_riverThresholdSpinBox_valueChanged(double arg1);
 	void on_paperBox_currentIndexChanged(QString page);
 	void on_pageSlider_valueChanged(int value);
+	void on_expansionBox_currentIndexChanged(int index);
+	void on_expansionSpinBox_valueChanged(double arg1);
 
 
     void on_actionOpen_File_triggered();
@@ -40,7 +42,8 @@ private:
 	Typesetter typesetter;
 	string content;
 
-	void Resize();
+	void resize();
+	void update_UI();
 };
 
 #endif // VIEWER_H

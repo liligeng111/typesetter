@@ -43,6 +43,8 @@ namespace settings
 	extern float river_threshold_;
 
 	//algorithm related
-	extern float rho_; //max of stretchability allowed
+	extern float rho_;
+	extern float max_expansion_; //max of font expansion allowed
+	extern int expansion_mode_;
 };
 

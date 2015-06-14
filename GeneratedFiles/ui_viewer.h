@@ -49,6 +49,9 @@ public:
     QDoubleSpinBox *riverThresholdSpinBox;
     QLabel *label_3;
     QSlider *pageSlider;
+    QComboBox *expansionBox;
+    QDoubleSpinBox *expansionSpinBox;
+    QLabel *label_4;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QToolBar *mainToolBar;
@@ -91,32 +94,41 @@ public:
         lineBorderButton->setChecked(true);
         riverButton = new QCheckBox(centralWidget);
         riverButton->setObjectName(QStringLiteral("riverButton"));
-        riverButton->setGeometry(QRect(30, 150, 82, 17));
+        riverButton->setGeometry(QRect(30, 150, 0, 17));
         fontSizeBox = new QSpinBox(centralWidget);
         fontSizeBox->setObjectName(QStringLiteral("fontSizeBox"));
-        fontSizeBox->setGeometry(QRect(90, 250, 60, 20));
+        fontSizeBox->setGeometry(QRect(90, 210, 60, 20));
         fontSizeBox->setMaximum(32);
         fontSizeBox->setValue(12);
         label_2 = new QLabel(centralWidget);
         label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setGeometry(QRect(30, 250, 50, 20));
+        label_2->setGeometry(QRect(30, 210, 50, 20));
         paperBox = new QComboBox(centralWidget);
         paperBox->setObjectName(QStringLiteral("paperBox"));
-        paperBox->setGeometry(QRect(30, 210, 69, 22));
+        paperBox->setGeometry(QRect(30, 170, 69, 22));
         riverThresholdSpinBox = new QDoubleSpinBox(centralWidget);
         riverThresholdSpinBox->setObjectName(QStringLiteral("riverThresholdSpinBox"));
-        riverThresholdSpinBox->setGeometry(QRect(90, 180, 60, 20));
+        riverThresholdSpinBox->setGeometry(QRect(90, 140, 0, 20));
         riverThresholdSpinBox->setValue(2);
         label_3 = new QLabel(centralWidget);
         label_3->setObjectName(QStringLiteral("label_3"));
-        label_3->setGeometry(QRect(30, 180, 50, 20));
+        label_3->setGeometry(QRect(30, 140, 0, 20));
         pageSlider = new QSlider(centralWidget);
         pageSlider->setObjectName(QStringLiteral("pageSlider"));
-        pageSlider->setGeometry(QRect(160, 20, 30, 900));
+        pageSlider->setGeometry(QRect(160, 20, 30, 0));
         pageSlider->setPageStep(10);
         pageSlider->setValue(0);
         pageSlider->setOrientation(Qt::Vertical);
         pageSlider->setInvertedAppearance(true);
+        expansionBox = new QComboBox(centralWidget);
+        expansionBox->setObjectName(QStringLiteral("expansionBox"));
+        expansionBox->setGeometry(QRect(30, 280, 69, 22));
+        expansionSpinBox = new QDoubleSpinBox(centralWidget);
+        expansionSpinBox->setObjectName(QStringLiteral("expansionSpinBox"));
+        expansionSpinBox->setGeometry(QRect(90, 330, 62, 22));
+        label_4 = new QLabel(centralWidget);
+        label_4->setObjectName(QStringLiteral("label_4"));
+        label_4->setGeometry(QRect(30, 310, 100, 16));
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -137,6 +149,7 @@ public:
         retranslateUi(viewerClass);
 
         paperBox->setCurrentIndex(2);
+        expansionBox->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(viewerClass);
@@ -171,6 +184,12 @@ public:
          << QApplication::translate("viewerClass", "B7", 0)
         );
         label_3->setText(QApplication::translate("viewerClass", "Threshold:", 0));
+        expansionBox->clear();
+        expansionBox->insertItems(0, QStringList()
+         << QApplication::translate("viewerClass", "Font First", 0)
+         << QApplication::translate("viewerClass", "Uniform", 0)
+        );
+        label_4->setText(QApplication::translate("viewerClass", "Max Expansion:", 0));
         menuFile->setTitle(QApplication::translate("viewerClass", "File", 0));
     } // retranslateUi
 

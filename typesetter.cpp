@@ -211,7 +211,8 @@ void Typesetter::Typeset()
 		glyph_index = FT_Get_Char_Index(face_, ch);
 		FT_Vector* kern = new FT_Vector();
 		FT_Get_Kerning(face_, last_glyph, glyph_index, FT_KERNING_UNSCALED, kern);
-		//cout << last_glyph << " " << glyph_index << " " << kern->x << endl;
+		//if (kern->x != 0)
+		//	cout << last_glyph << " " << glyph_index << " " << ch << " " << kern->x << endl;
 		x_cursor += kern->x;
 
 		//backspace

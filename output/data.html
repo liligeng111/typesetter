@@ -2,7 +2,7 @@
 <!-- saved from url=(0062)http://www.flotcharts.org/flot/examples/basic-usage/index.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
-	<title>Page Viewer</title>
+	<title>all-0.05</title>
 	<link href="./script/examples.css" rel="stylesheet" type="text/css">
 	<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
 	<script language="javascript" type="text/javascript" src="./script/jquery.js"></script>
@@ -108,7 +108,16 @@
 		{
 			$('.border4').attr('stroke-width', 0);
 		}
-						
+		
+		if (params.show_letter_space)
+		{
+			$('.border5').attr('stroke-width', width);
+		}
+		else
+		{
+			$('.border5').attr('stroke-width', 0);
+		}
+
 		$('.river').hover(function(event) 
 		{					
 			var x = $('.x_cood:radio:checked').val();
@@ -136,14 +145,16 @@
 
 
 		$('.border0').attr('stroke', '#12c');
-		$('.border1').attr('stroke', '#f1e');
+		$('.border1').attr('stroke', '#41e');
 		$('.border2').attr('stroke', '#45d');
 		$('.border3').attr('stroke', '#72f');
 		$('.border4').attr('stroke', '#36f');
+		$('.border5').attr('stroke', '#f78');
 		$('.river').attr('stroke', '#e01');
 		$('.river').attr('fill', 'none');
 		$('.regression').attr('stroke', '#10e');
 		$('.regression').attr('fill', 'none');
+		select_markdown();
 	}
 
 	function visualize()
@@ -195,6 +206,15 @@
 
 	function select_markdown()
 	{
+		if (params.show_line_number)
+		{			
+			$('.line_number').show();
+		}
+		else
+		{
+			$('.line_number').hide();			
+		}
+
 		$('.markdown').hide();
 		$('.markdown_' + params.markdown_type).show();
 		visualize();
@@ -213,12 +233,14 @@
 		this.show_char = true;
 		this.show_char_border = false;
 		this.show_space = false;
+		this.show_letter_space = false;
 
 		this.visualize_markdown = false;
 		this.visualize_markdown_intensity = 0.75;
 		this.shrink_color = "#ff0000";
 		this.stretch_color = "#0000ff";
 
+		this.show_line_number = true;
 		this.markdown_type = 'total_r';
 	};
 
@@ -236,13 +258,15 @@
 		f1.add(params, 'show_char').name("Show Characters").onFinishChange(function(value){change_width();});
 		f1.add(params, 'show_char_border').name("Show Character Border").onFinishChange(function(value){change_width();});
 		f1.add(params, 'show_space').name("Show Space").onFinishChange(function(value){change_width();});
+		f1.add(params, 'show_letter_space').name("Show Letter Spacing").onFinishChange(function(value){change_width();});
 		var f2 = gui.addFolder('Visualize Markdown');
 		f2.add(params, 'visualize_markdown').name("Visualize Markdown").onFinishChange(function(value){visualize();});
 		f2.add(params, 'visualize_markdown_intensity', 0, 1).name("Intensity").onChange(function(value){visualize();});
 		f2.addColor(params, 'shrink_color').name("Shrink Color").onChange(function(value){visualize();});
 		f2.addColor(params, 'stretch_color').name("Stretch Color").onChange(function(value){visualize();});
 		var page_controller = gui.add(params, 'page', 0, PAGE_COUNT - 1).step(1).name("Page");
-		gui.add(params, 'markdown_type', ['total_r', 'space_r', 'font_r', 'penalty', 'demerits', 'none'] ).name("Select Markdown").onChange(function(value){select_markdown();});
+		gui.add(params, 'markdown_type', ['total_r', 'space_r', 'font_r', 'letter_space_r', 'penalty', 'demerits', 'none'] ).name("Select Markdown").onChange(function(value){select_markdown();});
+		gui.add(params, 'show_line_number').name("Show Line Number").onFinishChange(function(value){select_markdown();});
 
 
 		page_controller.onFinishChange(function(value) 

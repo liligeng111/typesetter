@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "box.h"
+#include "item.h"
 
 using namespace std;
 
@@ -10,7 +10,7 @@ class River
 public:
 	River(int page);
 	~River();
-	void AddBox(Box* box) { list_.push_back(box); }
+	void AddBox(Item* box) { list_.push_back(box); }
 	void Analyse();
 	int size() const { return list_.size(); }
 	int id() const { return id_; }
@@ -41,7 +41,7 @@ public:
 	string repeat_word_;
 
 private:
-	vector<Box*> list_;
+	vector<Item*> list_;
 	//regression x = a + by
 	int id_;
 	int page_;

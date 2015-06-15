@@ -37,7 +37,6 @@ namespace settings
 	
 	//borders
 	extern bool border_[];
-	extern std::string border_color[];
 
 	extern bool show_river_;
 	extern float river_threshold_;
@@ -45,6 +44,16 @@ namespace settings
 	//algorithm related
 	extern float rho_;
 	extern float max_expansion_; //max of font expansion allowed
+	extern float letter_space_stretch_ratio_;
+	extern float letter_space_shrink_ratio_;
+	extern float stretch_ratio_;
+	extern float shrink_ratio_;
 	extern int expansion_mode_;
+
+	const int item_priority_size_ = 5; //number of possible priorities + 1
+	const int end_paragraph_glue_priority_ = 1;
+	const int box_priority_ = 2;
+	const int letter_space_priority_ = 3;
+	const int glue_priority_ = 4;
 };
 

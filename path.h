@@ -2,7 +2,7 @@
 
 #include <string>
 #include <ftoutln.h>
-#include "algebra.h"
+#include "point.h"
 
 using namespace std;
 
@@ -17,7 +17,7 @@ public:
 private:
 	int n_contours_;
 	int n_points_;
-	Vector3l* points_;
+	Point* points_;
 	char* tags_;
 	int* contours_;
 	int flags_;

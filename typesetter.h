@@ -8,19 +8,16 @@
 #include <map>
 #include <chrono>
 #include FT_FREETYPE_H
-#include "box.h"
-#include "glue.h"
-#include "penalty.h"
 #include "river.h"
 #include "breakpoint.h"
 #include "typesetter.h"
+#include "container.h"
 
 using namespace std;
 
-class Box;
 class Glyph;
-
 class Viewer;
+
 class Typesetter
 {
 
@@ -48,7 +45,7 @@ private:
 	string file_;
 	FT_Library  library_;
 	FT_Face face_;
-	map<char, Glyph*> glyph_cache_;
+	map<wchar_t, Glyph*> glyph_cache_;
 	long hyphen_width_;
 	Glyph* hyphen_glyph_;
 
@@ -56,7 +53,6 @@ private:
 	list<Item*> items_;
 	list<Item*> paragraph_;
 
-	vector<Box*> words_;
 	vector<Line*> lines_;
 	vector<Page*> pages_;
 	list<Breakpoint*> breakpoints;
@@ -73,7 +69,6 @@ private:
 
 	void optimum_fit();
 	void reverse_optimum_fit();
-	Item* insert_hyphen(string hyphenated, Item* last);
 	void fill_lines();
 
 	void justify();
@@ -83,4 +78,21 @@ private:
 
 	void A_star();
 	map<pair<Item*, Item*>, Breakpoint::Demerits> local_cost_;
+
+
+	unsigned long sum_stretchability_[settings::item_priority_size_];
+	unsigned long sum_shrinkability_[settings::item_priority_size_];
+	void reset_changeability() 
+	{
+		std::fill(sum_shrinkability_, sum_shrinkability_ + settings::item_priority_size_, 0);
+		std::fill(sum_stretchability_, sum_stretchability_ + settings::item_priority_size_, 0);
+	};
+
+	void set_changeability(int priority, unsigned long stretchability, unsigned long shrinkability)
+	{
+		sum_stretchability_[0] += stretchability;
+		sum_shrinkability_[0] += shrinkability;
+		sum_stretchability_[priority] += stretchability;
+		sum_shrinkability_[priority] += shrinkability;
+	};
 };

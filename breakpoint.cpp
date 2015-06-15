@@ -3,7 +3,7 @@
 
 Breakpoint::Breakpoint(Item* item)
 {
-	init(item, 0, 0, { 0, 0, 0, 0 }, nullptr);
+	init(item, 0, 0, Demerits(0, 0, 0, 0, 0), nullptr);
 }
 
 Breakpoint::Breakpoint(Item* item, int line, float demerits_sum, Demerits demerits, Breakpoint* prev)

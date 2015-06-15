@@ -9,10 +9,27 @@ public:
 	//TODO::merge
 	struct Demerits
 	{
+		Demerits(float my_r, long my_length, int my_penalty, float my_result, long my_l)
+		{
+			r = my_r;
+			length = my_length;
+			penalty = my_penalty;
+			result = my_result;
+			l = my_l;
+		}
+		Demerits()
+		{
+			r = 0;
+			length = 0;
+			penalty = 0;
+			result = 0;
+			l = 0;
+		}
 		float r;
 		long length;
 		int penalty;
 		float result;
+		long l; //length with margin kerning;
 	};
 
 	Breakpoint(Item* item);

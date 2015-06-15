@@ -14,16 +14,13 @@ void Typesetter::optimum_fit()
 	local_cost_.clear();
 
 	//line width 
-	long l = settings::content_width_point();
-	Glue* box = new Glue(0, 0, 0);
-	box->set_geometry(paragraph_.front()->x(), 0, 0, 0);
-	box->sum_y_ = 0;
-	box->sum_z_ = 0;
-	box->sum_y_font_ = 0;
-	box->sum_z_font_ = 0;
-	paragraph_.front()->set_prev(box);
-	paragraph_.push_front(box);
-	active_list_.push_back(new Breakpoint(box));
+	long l;
+	Item* item = new Item(Item::GLUE);
+	item->init_glue(0, 0, settings::item_priority_size_ - 1);
+	item->set_geometry(paragraph_.front()->x(), 0, 0, 0);
+	paragraph_.front()->set_prev(item);
+	paragraph_.push_front(item);
+	active_list_.push_back(new Breakpoint(item));
 	auto iter = paragraph_.begin();
 	iter++;
 
@@ -34,15 +31,15 @@ void Typesetter::optimum_fit()
 		iter++;
 		//cout << b->content() << "  " << b->x() << " " << b->sum_y_ << " " << b->sum_z_ << endl;
 		Breakpoint* breakpoint = nullptr;
-		int penalty = b->p(); //penalty
-		if (b->type() == Item::BOX)
+		int penalty = b->penalty(); //penalty
+		if (!b->breakable())
 		{
 			continue;
 		}
 		else if (b->type() == Item::PENALITY)
 		{
 			// must not break
-			if (b->p() > 999)
+			if (b->penalty() > 999)
 			{
 				continue;
 			}
@@ -58,16 +55,33 @@ void Typesetter::optimum_fit()
 			//calculate r
 			bool forced_break = false;
 			Item* after = (*a)->item()->after();
+			Item* before = b->before();
 			float r;
-			long L = b->x() - after->x();
+			//TODO::precision issue?
+			long L = before->end_at() - after->x();
+
+			long l = settings::content_width_point();
+			//margin kerning
+			if (after->glyph() != nullptr)
+				l += after->glyph()->left_protruding() * after->glyph()->width() / 1000;
+
+			if (b->break_glyph() != nullptr)
+			{
+				l += b->break_glyph()->right_protruding() * b->break_glyph()->width() / 1000;
+			}
+			else if (before->glyph() != nullptr)
+			{
+				l += before->glyph()->right_protruding() * before->glyph()->width() / 1000;
+			}
+
+			L += b->break_width();
 			if (b->type() == Item::PENALITY)
 			{
-				L += b->width();
 				forced_break = penalty < -999;
 			}
 			if (L < l)
 			{
-				long Y = b->sum_y_ - after->sum_y_;
+				long Y = b->sum_stretchability(0) - after->sum_stretchability(0);
 				if (Y > 0)
 					r = 1.0f * (l - L) / Y;
 				else
@@ -75,7 +89,7 @@ void Typesetter::optimum_fit()
 			}
 			else if (L > l)
 			{
-				long Z = b->sum_z_ - after->sum_z_;
+				long Z = b->sum_shrinkability(0) - after->sum_shrinkability(0);
 				if (Z > 0)
 					r = 1.0f * (l - L) / Z;
 				else
@@ -121,11 +135,7 @@ void Typesetter::optimum_fit()
 				//TODO::f(a) and c
 				//new breakpoint
 
-				Breakpoint::Demerits demerit;
-				demerit.penalty = penalty;
-				demerit.r = r;
-				demerit.length = L;
-				demerit.result = d;
+				Breakpoint::Demerits demerit(r, L, penalty, d, l);
 
 				if (breakpoint == nullptr)
 				{
@@ -136,8 +146,8 @@ void Typesetter::optimum_fit()
 				{
 					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
 				}
-				Breakpoint::Demerits deme = { r, L, penalty, d };
-				local_cost_.insert(make_pair(make_pair((*a)->item(), b), deme));
+
+				local_cost_.insert(make_pair(make_pair((*a)->item(), b), demerit));
 				(*a)->push_next(breakpoint);
 			}
 
@@ -261,7 +271,7 @@ void Typesetter::A_star()
 }
 
 void Typesetter::reverse_optimum_fit()
-{
+{/*
 	//erase pervious data
 	passive_list_.clear();
 	for (auto bp : passive_list_)
@@ -429,11 +439,12 @@ void Typesetter::reverse_optimum_fit()
 
 	//cout << "First: " << active_list_.front()->item()->after()->word_content() << endl;
 	//cout << "Size: " << active_list_.size() << endl;
+	*/
 }
 
 void Typesetter::break_paragraph()
 {
-	reverse_optimum_fit();
+	//reverse_optimum_fit();
 
 	//find heuristic
 	//TODO::test and delete pointers, local cost, push_next and stuff
@@ -454,19 +465,19 @@ void Typesetter::break_paragraph()
 	//	Item* item = (*breakpoint)->item();
 	//	cout << item->content() << " " << item->after()->content() << item->heuristic() << endl;
 	//}
-	A_star();
+	//A_star();
 
-	//optimum_fit();
-	////insert breakpoints (for knuth original algorithm)
-	//Breakpoint* bp = active_list_.front();
-	//auto pos = breakpoints.rbegin();
-	//while (bp->prev() != nullptr)
-	//{
-	//	//cout << bp->item()->after()->content() << endl;
-	//	breakpoints.insert(pos.base(), bp);
-	//	bp = bp->prev();
-	//	pos++;
-	//}
+	optimum_fit();
+	//insert breakpoints (for knuth original algorithm)
+	Breakpoint* bp = active_list_.front();
+	auto pos = breakpoints.rbegin();
+	while (bp->prev() != nullptr)
+	{
+		//cout << bp->item()->after()->content() << endl;
+		breakpoints.insert(pos.base(), bp);
+		bp = bp->prev();
+		pos++;
+	}
 
 
 	passive_list_.push_back(active_list_.front());

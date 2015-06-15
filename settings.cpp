@@ -3,7 +3,8 @@
 namespace settings
 {
 	float page_width_ = 210;
-	float page_height_ = 297;
+	//temp
+	float page_height_ = 1297;
 	float margin_top_ = 19;
 	float margin_left_ = 19;
 	float margin_right_ = 13.2;
@@ -21,14 +22,16 @@ namespace settings
 	long descender_ = 0;
 
 	//sapce, char, word, line, page
-	bool border_[] = { true, true, true, true, true };
-	std::string border_color[] = { "(25, 50, 150)", "(250, 15, 200)", "(250, 150, 0)", "(120, 120, 0)", "(0, 150, 200)" };
+	bool border_[] = { true, true, true, true, true, true };
 
 	bool show_river_ = false;
 	float river_threshold_ = 2.0f;
 
-	float rho_ = 5.0f;
-	float max_expansion_ = 0.02;
+	float rho_ = 10.0f;
+	float stretch_ratio_ = 1.0f / 3;
+	float shrink_ratio_ = 1.0f / 3;
+	float letter_space_stretch_ratio_ = 0.05;
+	float letter_space_shrink_ratio_ = 0.05;
+	float max_expansion_ = 0.05;
 	int expansion_mode_ = 0;
-
 };

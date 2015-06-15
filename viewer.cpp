@@ -6,6 +6,7 @@
 #include "settings.h"
 #include <fstream>
 #include <streambuf>
+#include "container.h"
 
 
 
@@ -82,17 +83,17 @@ void Viewer::on_charBorderButton_clicked(bool checked)
 
 void Viewer::on_wordBorderButton_clicked(bool checked)
 {
-	settings::border_[Item::WORD] = checked;
+	settings::border_[Container::WORD] = checked;
 }
 
 void Viewer::on_lineBorderButton_clicked(bool checked)
 {
-	settings::border_[Item::LINE] = checked;
+	settings::border_[Container::LINE] = checked;
 }
 
 void Viewer::on_pageBorderButton_clicked(bool checked)
 {
-	settings::border_[Item::PAGE] = checked;
+	settings::border_[Container::PAGE] = checked;
 }
 
 void Viewer::on_riverButton_clicked(bool checked)

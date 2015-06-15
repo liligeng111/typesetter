@@ -56,12 +56,6 @@
     <ClCompile Include="path.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="box.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="algebra.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="glyph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,12 +81,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="item.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="glue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="penalty.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="container.cpp">
@@ -126,12 +114,6 @@
     <ClInclude Include="path.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="box.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="algebra.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="glyph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -159,16 +141,13 @@
     <ClInclude Include="item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="glue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="penalty.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="container.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="breakpoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

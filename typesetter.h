@@ -67,6 +67,7 @@ private:
 
 	void break_paragraph();
 
+	void optimum_fit_magic_edge();
 	void optimum_fit();
 	void reverse_optimum_fit();
 	void fill_lines();

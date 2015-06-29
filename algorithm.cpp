@@ -3,6 +3,214 @@
 #include "settings.h"
 #include <queue>
 
+void Typesetter::optimum_fit_magic_edge()
+{
+	//erase pervious data
+	passive_list_.clear();
+	for (auto bp : passive_list_)
+	{
+		delete bp;
+	}
+	local_cost_.clear();
+
+	//line width 
+	long l;
+	Item* item = new Item(Item::GLUE);
+	item->init_glue(0, 0, settings::item_priority_size_ - 1);
+	item->set_geometry(paragraph_.front()->x(), 0, 0, 0);
+	paragraph_.front()->set_prev(item);
+	paragraph_.push_front(item);
+	active_list_.push_back(new Breakpoint(item));
+	auto iter = paragraph_.begin();
+	iter++;
+
+	while (iter != paragraph_.end())
+	{
+		Item* b = *iter;
+		//cout << b << " : " << b->content() << endl;
+		iter++;
+		//cout << b->content() << "  " << b->x() << " " << b->sum_y_ << " " << b->sum_z_ << endl;
+		Breakpoint* breakpoint = nullptr;
+		Breakpoint* magic_breakpoint = nullptr;
+		int penalty = b->penalty(); //penalty
+		if (!b->breakable())
+		{
+			continue;
+		}
+		else if (b->type() == Item::PENALITY)
+		{
+			// must not break
+			if (b->penalty() > 999)
+			{
+				continue;
+			}
+		}
+
+		//potential break
+		auto a = active_list_.begin();
+		auto end = active_list_.end();
+
+		//iterare the active list
+		while (a != end)
+		{
+			//calculate r
+			bool forced_break = false;
+			Item* after = (*a)->item()->after();
+			Item* before = b->before();
+			float r;
+			//TODO::precision issue?
+			long L = before->end_at() - after->x();
+
+			long l = settings::content_width_point();
+			//margin kerning
+			if (after->glyph() != nullptr)
+				l += after->glyph()->left_protruding() * after->glyph()->width() / 1000;
+
+			if (b->break_glyph() != nullptr)
+			{
+				l += b->break_glyph()->right_protruding() * b->break_glyph()->width() / 1000;
+			}
+			else if (before->glyph() != nullptr)
+			{
+				l += before->glyph()->right_protruding() * before->glyph()->width() / 1000;
+			}
+
+			L += b->break_width();
+			if (b->type() == Item::PENALITY)
+			{
+				forced_break = penalty < -999;
+			}
+			if (L < l)
+			{
+				long Y = b->sum_stretchability(0) - after->sum_stretchability(0);
+				if (Y > 0)
+					r = 1.0f * (l - L) / Y;
+				else
+					r = 1000;
+			}
+			else if (L > l)
+			{
+				long Z = b->sum_shrinkability(0) - after->sum_shrinkability(0);
+				if (Z > 0)
+					r = 1.0f * (l - L) / Z;
+				else
+					r = 1000;
+			}
+			else
+			{
+				//prefect!
+				r = 0;
+			}
+
+			//rho here
+			if (r >= -1 && r < settings::rho_)
+			{
+				//if (r > 5)
+				//	cout << (*a)->item()->content() << " ----> " << b->content() << " L: " << L << " r: " << r << endl;
+				float d;
+				if (penalty >= 0)
+				{
+					d = 1 + 100 * r * r * abs(r) + penalty;
+					d = d * d;
+				}
+				else if (penalty > -1000)
+				{
+					d = 1 + 100 * r * r * abs(r);
+					d = d * d - penalty * penalty;
+				}
+				else
+				{
+					d = 1 + 100 * r * r * abs(r);
+					d = d * d;
+				}
+				//TODO::f(a) and c
+				//new breakpoint
+
+				Breakpoint::Demerits demerit(r, L, penalty, d, l);
+
+				if ((*a)->magic_count() == 0)
+				{
+
+					if (breakpoint == nullptr)
+					{
+						breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+						(*a)->push_next(breakpoint);
+					}
+					//better breakpoint
+					else if ((*a)->demerits_sum() + d < breakpoint->demerits_sum())
+					{
+						breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+					}
+
+					local_cost_.insert(make_pair(make_pair((*a)->item(), b), demerit));
+				}
+				else
+				{
+
+					if (magic_breakpoint == nullptr)
+					{
+						magic_breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+						(*a)->push_next(magic_breakpoint);
+						magic_breakpoint->set_magic_count(1);
+					}
+					//better breakpoint
+					else if ((*a)->demerits_sum() + d < magic_breakpoint->demerits_sum())
+					{
+						magic_breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+					}
+
+				}
+				
+			}
+			else if ((*a)->magic_count() == 0 && r >= -5 && r < 5 * settings::rho_ && (!forced_break))
+			{
+				//magic edge
+				Breakpoint::Demerits demerit(r, L, penalty, 0, l);
+
+				Breakpoint* magic_edge = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum(), demerit, (*a));
+				magic_edge->set_is_magic(true);
+				magic_edge->set_magic_count(1);
+
+				active_list_.push_back(magic_edge);
+			}
+
+			if ((r < -5 || forced_break))
+			{
+				//cout << "deletefrom active list: " << r << endl;
+				//cout << "active_list size: " << active_list_.size() << endl;
+				passive_list_.push_back(*a);
+				a = active_list_.erase(a);
+			}
+			else
+			{
+				a++;
+			}
+		}
+
+		//if (a == end)
+		//{
+		//	cout << "active_list size: " << active_list_.size() << endl;
+		//}
+		//TODO::what is q?
+		if (breakpoint != nullptr)
+		{
+			active_list_.push_back(breakpoint);
+		}
+		if (magic_breakpoint != nullptr)
+		{
+			active_list_.push_back(magic_breakpoint);
+		}
+
+	}
+
+	if (active_list_.size() != 2 && active_list_.size() != 1)
+	{
+		cout << "active_list size: " << active_list_.size() << endl;
+		message("ERROR: Unable to preform optimum fit");
+		exit(EXIT_FAILURE);
+	}
+
+}
 void Typesetter::optimum_fit()
 {
 	//erase pervious data
@@ -140,6 +348,7 @@ void Typesetter::optimum_fit()
 				if (breakpoint == nullptr)
 				{
 					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+					(*a)->push_next(breakpoint);
 				}
 				//better breakpoint
 				else if ((*a)->demerits_sum() + d < breakpoint->demerits_sum())
@@ -148,7 +357,6 @@ void Typesetter::optimum_fit()
 				}
 
 				local_cost_.insert(make_pair(make_pair((*a)->item(), b), demerit));
-				(*a)->push_next(breakpoint);
 			}
 
 			if (r < -1 || forced_break)
@@ -467,7 +675,7 @@ void Typesetter::break_paragraph()
 	//}
 	//A_star();
 
-	optimum_fit();
+	optimum_fit_magic_edge();
 	//insert breakpoints (for knuth original algorithm)
 	Breakpoint* bp = active_list_.front();
 	auto pos = breakpoints.rbegin();
@@ -479,6 +687,21 @@ void Typesetter::break_paragraph()
 		pos++;
 	}
 
+	//magic edge
+	if (active_list_.front() != active_list_.back())
+	{
+		cout << "magic demerites: " << active_list_.back()->demerits_sum();
+		cout << " normal demerites: " << active_list_.front()->demerits_sum() << endl;
+		Breakpoint* bp = active_list_.back();
+		while (bp->prev() != nullptr)
+		{
+			if (bp->is_magic())
+			{
+				cout << "magic r: " << bp->demerits().r << endl;
+			}
+			bp = bp->prev();
+		}
+	}
 
 	passive_list_.push_back(active_list_.front());
 	active_list_.pop_front();

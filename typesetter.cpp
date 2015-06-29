@@ -289,7 +289,7 @@ void Typesetter::Typeset()
 				}
 				if (glyph_index == 0)
 				{
-					cout << "Unrecognized character" << endl;
+					cout << "Unrecognized character:" << ch << endl;
 				}
 
 				glyph = new Glyph(face_->glyph, ch);

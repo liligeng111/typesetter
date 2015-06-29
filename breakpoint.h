@@ -49,6 +49,10 @@ public:
 	void push_next(Breakpoint* next) { next_.push_back(next); }
 	float heuristic() const { return heuristic_; }
 	void set_heuristic(float heuristic) { heuristic_ = heuristic; }
+	bool is_magic() const { return is_magic_; }
+	void set_is_magic(bool is_magic) { is_magic_ = is_magic; }
+	int magic_count() const { return magic_count_; }
+	void set_magic_count(int magic_count) { magic_count_ = magic_count; }
 
 private:
 	Item* item_;
@@ -60,5 +64,9 @@ private:
 	//for A* search
 	vector<Breakpoint*> next_;
 	float heuristic_;
+
+	//magic edge
+	bool is_magic_;
+	int magic_count_;
 };
 

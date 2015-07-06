@@ -144,25 +144,26 @@ void Typesetter::optimum_fit_magic_edge()
 
 					local_cost_.insert(make_pair(make_pair((*a)->item(), b), demerit));
 				}
-				else
+
+
+
+				//magic breakpoint
+				if (magic_breakpoint == nullptr)
 				{
-
-					if (magic_breakpoint == nullptr)
-					{
-						magic_breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
-						(*a)->push_next(magic_breakpoint);
-						magic_breakpoint->set_magic_count(1);
-					}
-					//better breakpoint
-					else if ((*a)->demerits_sum() + d < magic_breakpoint->demerits_sum())
-					{
-						magic_breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
-					}
-
+					magic_breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+					(*a)->push_next(magic_breakpoint);
+					magic_breakpoint->set_magic_count((*a)->magic_count());
 				}
+				//better breakpoint
+				else if ((*a)->demerits_sum() + d < magic_breakpoint->demerits_sum())
+				{
+					magic_breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+					magic_breakpoint->set_magic_count((*a)->magic_count());
+				}
+
 				
 			}
-			else if ((*a)->magic_count() == 0 && r >= -5 && r < 5 * settings::rho_ && (!forced_break))
+			else if ((*a)->magic_count() == 0 && r >= -settings::max_magic_amount_ && r < settings::max_magic_amount_ * settings::rho_ && (!forced_break))
 			{
 				//magic edge
 				Breakpoint::Demerits demerit(r, L, penalty, 0, l);
@@ -174,7 +175,7 @@ void Typesetter::optimum_fit_magic_edge()
 				active_list_.push_back(magic_edge);
 			}
 
-			if ((r < -5 || forced_break))
+			if ((r < -settings::max_magic_amount_ || forced_break))
 			{
 				//cout << "deletefrom active list: " << r << endl;
 				//cout << "active_list size: " << active_list_.size() << endl;
@@ -677,7 +678,22 @@ void Typesetter::break_paragraph()
 
 	optimum_fit_magic_edge();
 	//insert breakpoints (for knuth original algorithm)
-	Breakpoint* bp = active_list_.front();
+
+	Breakpoint* bp;
+	if (active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum() > settings::min_magic_gain_)
+	{
+		//worth suggesting a magic edge
+		if (settings::use_magic_)
+			bp = active_list_.back();
+		else
+			bp = active_list_.front();
+	}
+	else
+	{
+		bp = active_list_.front();
+	}
+
+
 	auto pos = breakpoints.rbegin();
 	while (bp->prev() != nullptr)
 	{
@@ -688,23 +704,33 @@ void Typesetter::break_paragraph()
 	}
 
 	//magic edge
-	if (active_list_.front() != active_list_.back())
+	if (active_list_.front() != active_list_.back() && active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum() > settings::min_magic_gain_)
 	{
-		cout << "magic demerites: " << active_list_.back()->demerits_sum();
-		cout << " normal demerites: " << active_list_.front()->demerits_sum() << endl;
+		//cout << "magic demerites: " << active_list_.back()->demerits_sum();
+		//cout << " normal demerites: " << active_list_.front()->demerits_sum() << endl;
 		Breakpoint* bp = active_list_.back();
 		while (bp->prev() != nullptr)
 		{
 			if (bp->is_magic())
 			{
-				cout << "magic r: " << bp->demerits().r << endl;
+				Item* end = bp->prev()->item();
+				Item* current = bp->item();
+				while (current != end)
+				{
+					current->set_is_magic(true);
+					current = current->prev();
+				}
+				//cout << "magic r: " << bp->demerits().r << endl;
 			}
 			bp = bp->prev();
 		}
 	}
 
-	passive_list_.push_back(active_list_.front());
-	active_list_.pop_front();
+	while (!active_list_.empty())
+	{
+		passive_list_.push_back(active_list_.front());
+		active_list_.pop_front();
+	}
 	//merge paragraph
 	items_.splice(items_.end(), paragraph_);
 }

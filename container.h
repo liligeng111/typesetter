@@ -15,6 +15,7 @@ public:
 	virtual void add_child(Item* item) { children_.push_back(item); item->set_parent(this); }
 
 	Item* child(int i) const { return children_[i]; }
+	int children_size() const { return children_.size(); }
 	const vector<Item*>* children() const { return (&children_); }
 	Item* first() const { return children_[0]; }
 	Item* last() const { return children_[children_.size() - 1]; }

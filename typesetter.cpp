@@ -162,6 +162,8 @@ void Typesetter::Typeset()
 		if (fin.eof())
 			look_ahead[1] = 0;
 		int move_forward = 0;
+		//TODO::check for availbility78
+		/*
 		if (ch == 'f' && look_ahead[0] == 'f')
 		{
 			ch = 64256;
@@ -184,7 +186,7 @@ void Typesetter::Typeset()
 			fin.get(look_ahead[1]);
 			if (fin.eof())
 				look_ahead[1] = 0;
-		}
+		}*/
 
 		//cout << char(ch) << " - " << int(ch) << endl;
 		//TODO::What is this...
@@ -457,13 +459,14 @@ void Typesetter::fill_lines()
 	//check each item
 	for (Item* child : items_)
 	{
-		//cout << child->content() << " " << child->x() << " " << child->end_at() << " " << x_adjust << endl;
+		//cout << child->content() << " " << child->x() << " " << child->end_at() << " " << x_adjust << " " << child->is_magic() << endl;
 
 		child->translate(x_adjust, 0);
 		if (child->type() == Item::BOX || child->type() == Item::GLUE || child->type() == Item::LETTER_SPACE )
 			current_line->add_child(child);
 		if (iter != breakpoints.end() && child == (*iter)->item())
 		{
+
 			child->set_is_break(true);
 			//need newline
 			//new page
@@ -567,7 +570,8 @@ void Typesetter::justify()
 
 		for (Item* item : *children)
 		{
-			//cout << item->content() << " " << item->x() << " " << item->end_at() << " " << adjustment << endl;
+
+			//cout << item->content() << " " << item->x() << " " << item->end_at() << " " << adjustment << " " << item->is_magic() << endl;
 			item->translate(adjustment, 0);
 
 			//font expansion

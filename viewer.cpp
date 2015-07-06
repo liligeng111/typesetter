@@ -15,7 +15,7 @@ Viewer::Viewer(QWidget *parent)
 {
 	ui.setupUi(this);
 	content = "input/sample.txt";
-	showMaximized();
+	//showMaximized();
 	// for some reason, you cannot get screen size in constructor, so go with 1920.
 	ui.label->setGeometry((1920 - settings::display_width()) / 2, 20, settings::display_width(), settings::display_height());
 	update_UI();
@@ -31,6 +31,9 @@ void Viewer::update_UI()
 	ui.fontSizeBox->setValue(settings::font_size_);
 	ui.expansionBox->setCurrentIndex(settings::expansion_mode_);
 	ui.expansionSpinBox->setValue(settings::max_expansion_);
+
+	ui.magicSpinBox->setValue(settings::max_magic_amount_);
+	ui.magicGainSpinBox->setValue(settings::min_magic_gain_);
 }
 
 void Viewer::Message(const string& msg)
@@ -50,25 +53,18 @@ void Viewer::on_renderButton_clicked()
 	typesetter.Typeset();
 	typesetter.render(Typesetter::SVG);
 
-	ui.pageSlider->setMaximum(typesetter.page_count());
+	cout << "Total Page Count:" << typesetter.page_count() << endl;
+	ui.pageSlider->setMaximum(typesetter.page_count() - 1);
 	ui.pageSlider->setValue(0);
 	//on_pageSlider_valueChanged(0);
+	nvpr_renderer.render_page(typesetter.page(0), 0);
+	nvpr_renderer.start_main_loop();
 }
 
 
 void Viewer::on_pageSlider_valueChanged(int value)
 {
-	typesetter.render_page(Typesetter::SVG, value);
-
-	QSvgRenderer renderer(QString("./output/svg/page0.svg"));
-	QImage image(settings::display_width(), settings::display_height(), QImage::Format_ARGB32);
-	//background
-	image.fill(0xffffffff);
-	//paint svg
-	QPainter painter(&image);
-	renderer.render(&painter);
-	ui.label->setPixmap(QPixmap::fromImage(image));
-	ui.label->update();
+	nvpr_renderer.render_page(typesetter.page(value), value);
 }
 
 void Viewer::on_spaceBorderButton_clicked(bool checked)
@@ -199,4 +195,20 @@ void Viewer::on_expansionBox_currentIndexChanged(int index)
 void Viewer::on_expansionSpinBox_valueChanged(double arg1)
 {
 	settings::max_expansion_ = arg1;
+}
+
+
+void Viewer::on_useMagicBox_clicked(bool checked)
+{
+	settings::use_magic_ = checked;
+}
+
+void Viewer::on_magicSpinBox_valueChanged(double arg1)
+{
+	settings::max_magic_amount_ = arg1;
+}
+
+void Viewer::on_magicGainSpinBox_valueChanged(double arg1)
+{
+	settings::min_magic_gain_ = arg1;
 }

@@ -34,6 +34,7 @@ public:
 
 	void render(RenderTarget target);
 	void render_page(RenderTarget target, int page);
+	Page* page(int i) { return pages_[i]; }
 	int page_count() const { return pages_.size(); }
 	static void message(const string& msg);
 	void Typeset();

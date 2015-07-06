@@ -100,14 +100,14 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <AdditionalIncludeDirectories>.\lib\libglib;.\lib\libiconv;.\GeneratedFiles;.\lib\freetype;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\lib\nvpr;.\lib\libglib;.\lib\libiconv;.\GeneratedFiles;.\lib\freetype;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>.\lib\libglib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;.\lib\freetype\freetype255d.lib;Qt5Svgd.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Debug\dynamic\glib-2.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>.\lib\freetype\freetype255d.lib;.\lib\nvpr\freeglutd.lib;.\lib\nvpr\glew32s.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5Svgd.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Debug\dynamic\glib-2.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,7 +129,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;QT_SVG_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;.\lib\freetype;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\lib\nvpr;.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;.\lib\freetype;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtSvg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -139,7 +139,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;.\lib\freetype\freetype255.lib;Qt5Svg.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Release\dynamic\glib-2.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;.\lib\freetype\freetype255.lib;.\lib\nvpr\freeglut.lib;.\lib\nvpr\glew32s.lib;Qt5Svg.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Release\dynamic\glib-2.0.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -170,7 +170,10 @@
     <ClCompile Include="lib\libhyphenate\HyphenationTree.cpp" />
     <ClCompile Include="lib\libhyphenate\Hyphenator.cpp" />
     <ClCompile Include="lib\libhyphenate\Language.cpp" />
+    <ClCompile Include="lib\nvpr\nvpr_init.c" />
+    <ClCompile Include="lib\nvpr\xform.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="nvpr_page.cpp" />
     <ClCompile Include="path.cpp" />
     <ClCompile Include="river.cpp" />
     <ClCompile Include="settings.cpp" />
@@ -222,6 +225,9 @@
     <ClInclude Include="breakpoint.h" />
     <ClInclude Include="GeneratedFiles\ui_viewer.h" />
     <ClInclude Include="glyph.h" />
+    <ClInclude Include="lib\nvpr\nvpr_init.h" />
+    <ClInclude Include="lib\nvpr\xform.h" />
+    <ClInclude Include="nvpr_page.h" />
     <ClInclude Include="point.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="lib\libhyphenate\hyphenate.h" />

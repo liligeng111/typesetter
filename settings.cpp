@@ -4,7 +4,7 @@ namespace settings
 {
 	float page_width_ = 210;
 	//temp
-	float page_height_ = 1297;
+	float page_height_ = 297;
 	float margin_top_ = 19;
 	float margin_left_ = 19;
 	float margin_right_ = 13.2;
@@ -34,4 +34,11 @@ namespace settings
 	float letter_space_shrink_ratio_ = 0.05;
 	float max_expansion_ = 0.05;
 	int expansion_mode_ = 0;
+
+
+
+	//magic
+	bool use_magic_ = false;
+	float min_magic_gain_ = 200;
+	float max_magic_amount_= 5;
 };

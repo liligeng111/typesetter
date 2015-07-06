@@ -12,6 +12,8 @@ Item::Item(ItemType type) : type_(type)
 	x_ = 0;
 	y_ = 0;
 
+	is_magic_ = false;
+
 	//penalty
 	is_break_ = false;
 	penalty_ = 0;
@@ -205,4 +207,14 @@ void Item::SVG(ofstream& file) const
 	}
 
 	file << "</g>";
+}
+
+
+string Item::content() 
+{
+	if (word_ != nullptr)
+	{
+		return *word_->content();
+	}
+	return "item_type: " + to_string(type_); 
 }

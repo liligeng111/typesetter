@@ -5,6 +5,7 @@
 #include "ui_viewer.h"
 #include "typesetter.h"
 #include "settings.h"
+#include "nvpr_page.h"
 
 using namespace std;
 
@@ -34,6 +35,10 @@ private slots:
 	void on_expansionBox_currentIndexChanged(int index);
 	void on_expansionSpinBox_valueChanged(double arg1);
 
+	void on_useMagicBox_clicked(bool checked);
+	void on_magicSpinBox_valueChanged(double arg1);
+	void on_magicGainSpinBox_valueChanged(double arg1);
+
 
     void on_actionOpen_File_triggered();
 
@@ -41,6 +46,7 @@ private:
 	Ui::viewerClass ui;
 	Typesetter typesetter;
 	string content;
+	NVPR_Page nvpr_renderer;
 
 	void resize();
 	void update_UI();

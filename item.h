@@ -58,6 +58,7 @@ public:
 
 	void set_changeability(unsigned long* sum_stretchability, unsigned long* sum_shrinkability_);
 	void set_expansion(float expansion) { expansion_ = expansion; }
+	float expansion() { return expansion_; }
 	float stretch_ratio() const { return stretch_ratio_; }
 	float shrink_ratio() const { return shrink_ratio_; }
 	int priority() const {return priority_; }
@@ -84,8 +85,12 @@ public:
 	void SVG(ofstream& file) const;
 
 	//for debug
-	virtual string content() { return "item_type: " + to_string(type_); }
+	string content();
 	virtual string word_content() { return content(); }
+
+
+	bool is_magic() const { return is_magic_; }
+	void set_is_magic(bool is_magic) { is_magic_ = is_magic; }
 
 protected:
 	const ItemType type_;
@@ -118,5 +123,7 @@ protected:
 	Item* prev_;
 	Item* next_;
 
+
+	bool is_magic_;
 };
 

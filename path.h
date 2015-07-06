@@ -13,6 +13,7 @@ public:
 	~Path();
 
 	string SVG() const { return svg_; }
+	const char* c_str() const const { return svg_.c_str(); }
 
 private:
 	int n_contours_;

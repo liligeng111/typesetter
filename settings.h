@@ -55,5 +55,10 @@ namespace settings
 	const int box_priority_ = 2;
 	const int letter_space_priority_ = 3;
 	const int glue_priority_ = 4;
+
+	//magic related
+	extern bool use_magic_;
+	extern float min_magic_gain_;
+	extern float max_magic_amount_;
 };
 

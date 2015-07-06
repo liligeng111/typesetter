@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
-    <height>642</height>
+    <width>258</width>
+    <height>595</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="renderButton">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>380</y>
+      <x>20</x>
+      <y>500</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -44,7 +44,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>30</y>
+      <y>10</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -60,7 +60,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>70</y>
+      <y>50</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -76,7 +76,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>50</y>
+      <y>30</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -92,7 +92,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>110</y>
+      <y>90</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -108,7 +108,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>90</y>
+      <y>70</y>
       <width>82</width>
       <height>17</height>
      </rect>
@@ -124,9 +124,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>150</y>
+      <y>110</y>
       <width>0</width>
-      <height>17</height>
+      <height>0</height>
      </rect>
     </property>
     <property name="text">
@@ -137,13 +137,13 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>210</y>
+      <y>170</y>
       <width>60</width>
       <height>20</height>
      </rect>
     </property>
     <property name="maximum">
-     <number>32</number>
+     <number>1000</number>
     </property>
     <property name="value">
      <number>12</number>
@@ -153,7 +153,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>210</y>
+      <y>170</y>
       <width>50</width>
       <height>20</height>
      </rect>
@@ -166,7 +166,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>170</y>
+      <y>130</y>
       <width>69</width>
       <height>22</height>
      </rect>
@@ -238,10 +238,10 @@
    <widget class="QDoubleSpinBox" name="riverThresholdSpinBox">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>140</y>
+      <x>110</x>
+      <y>150</y>
       <width>0</width>
-      <height>20</height>
+      <height>0</height>
      </rect>
     </property>
     <property name="value">
@@ -251,10 +251,10 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>140</y>
+      <x>50</x>
+      <y>150</y>
       <width>0</width>
-      <height>20</height>
+      <height>0</height>
      </rect>
     </property>
     <property name="text">
@@ -264,10 +264,10 @@
    <widget class="QSlider" name="pageSlider">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>20</y>
+      <x>180</x>
+      <y>10</y>
       <width>30</width>
-      <height>0</height>
+      <height>391</height>
      </rect>
     </property>
     <property name="pageStep">
@@ -287,7 +287,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>280</y>
+      <y>240</y>
       <width>69</width>
       <height>22</height>
      </rect>
@@ -310,7 +310,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>330</y>
+      <y>290</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -320,7 +320,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>310</y>
+      <y>270</y>
       <width>100</width>
       <height>16</height>
      </rect>
@@ -329,13 +329,90 @@
      <string>Max Expansion:</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>350</y>
+      <width>191</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>show Magic Edge with gain &gt;</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="magicGainSpinBox">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>380</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>10000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="value">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="useMagicBox">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>470</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Use Magic!</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="magicSpinBox">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>440</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <double>20.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+    <property name="value">
+     <double>0.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>410</y>
+      <width>191</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Max amount magic allowed:</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>897</width>
+     <width>258</width>
      <height>21</height>
     </rect>
    </property>

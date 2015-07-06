@@ -33,6 +33,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="NVPR">
+      <UniqueIdentifier>{cf0b9f1d-3666-474f-81a1-286f45c1a5bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -92,6 +95,15 @@
     <ClCompile Include="algorithm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lib\nvpr\nvpr_init.c">
+      <Filter>NVPR</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\nvpr\xform.c">
+      <Filter>NVPR</Filter>
+    </ClCompile>
+    <ClCompile Include="nvpr_page.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="viewer.h">
@@ -148,6 +160,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nvpr\nvpr_init.h">
+      <Filter>NVPR</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\nvpr\xform.h">
+      <Filter>NVPR</Filter>
+    </ClInclude>
+    <ClInclude Include="nvpr_page.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -102,15 +102,14 @@ void NVPR_Page::initGraphics()
 	/* Before rendering to a window with a stencil buffer, clear the stencil
 	buffer to zero and the color buffer to blue: */
 	glClearStencil(0);
-	glClearColor(1, 1, 1, 0.0);
+	glClearColor(0.9, 0.9, 0.9, 0.0);
 
 	const int numChars = 256; // ISO/IEC 8859-1 8-bit character range
 	GLuint templatePathObject = ~0; // Non-existant path object
-	const GLfloat emScale = 2048; // match TrueType convention
+	const GLfloat emScale = 1024; // match TrueType convention
 	font_base_ = glGenPathsNV(numChars);
 	glPathGlyphRangeNV(font_base_, GL_SYSTEM_FONT_NAME_NV, "Helvetica", GL_BOLD_BIT_NV, 0, numChars, GL_SKIP_MISSING_GLYPH_NV, templatePathObject, emScale);
 
-	unsigned int i;
 	vector<const char*> paths;
 	line_num_.clear();
 	char_num_.clear();
@@ -141,10 +140,12 @@ void NVPR_Page::initGraphics()
 		}
 	}
 
+	unsigned int i;
 	path_count_ = paths.size();
-	path_base_ = glGenPathsNV(path_count_);
+	//extra one for make the paper white
+	path_base_ = glGenPathsNV(path_count_ + 1);
 
-	for (i = 0; i < path_count_; i++) 
+	for (i = 0; i < paths.size(); i++)
 	{
 		const char *svg_str = paths[i];
 		size_t svg_len = strlen(paths[i]);
@@ -153,6 +154,11 @@ void NVPR_Page::initGraphics()
 		glPathStringNV(path_base_ + i, GL_PATH_FORMAT_SVG_NV, (GLsizei)svg_len, svg_str);
 		glPathParameterfNV(path_base_ + i, GL_PATH_STROKE_WIDTH_NV, stroke_width);
 	}
+
+	string border = "M 0 0 L 0 " + to_string(settings::content_height_point()) + " L " + to_string(settings::content_width_point()) + " " + to_string(settings::content_height_point()) + " L " + to_string(settings::content_width_point()) + " 0 L 0 0";
+	const char* svg_str = border.c_str();
+	glPathStringNV(path_base_ + i, GL_PATH_FORMAT_SVG_NV, (GLsizei)strlen(svg_str), svg_str);
+	glPathParameterfNV(path_base_ + i, GL_PATH_STROKE_WIDTH_NV, 1);
 
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_NOTEQUAL, 0, 0x1F);
@@ -174,6 +180,21 @@ void NVPR_Page::display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glMatrixPushEXT(GL_MODELVIEW); 
 	{
+		//borders
+		{
+			Transform3x2 mat;
+			mul(mat, instance_->view, instance_->model);
+
+			MatrixLoadToGL(mat);
+
+			glColor3f(1, 1, 1);
+			//GLuint stroke_color = 0x000000;
+			//GLfloat stroke_width = 1;
+
+			glStencilFillPathNV(instance_->path_base_ + instance_->path_count_, GL_COUNT_UP_NV, 0x1F);
+			glCoverFillPathNV(instance_->path_base_ + instance_->path_count_, GL_BOUNDING_BOX_NV);
+		}
+
 		for (int i = 0; i < instance_->path_count_; i++)
 		{
 			Transform3x2 mat;
@@ -231,21 +252,64 @@ void NVPR_Page::display()
 			{
 				glColor3f(0, 0, 0);
 			}
-			GLuint stroke_color = 0x000000;
-			GLfloat stroke_width = 1;
+
+			//GLuint stroke_color = 0x000000;
+			//GLfloat stroke_width = 1;
 
 			glStencilFillPathNV(instance_->path_base_ + i, GL_COUNT_UP_NV, 0x1F);
 			glCoverFillPathNV(instance_->path_base_ + i, GL_BOUNDING_BOX_NV);
 
-			GLfloat kerning[6 + 1]; 
-			for (int i = 0; i < 7; i++)
-				kerning[i] = 0;
-			//glStencilFillPathInstancedNV(6, GL_UNSIGNED_BYTE, "\000\001\002\003\004\005", instance_->font_base_, GL_PATH_FILL_MODE_NV, 0xFF, GL_TRANSLATE_X_NV, kerning);
-			//glCoverFillPathInstancedNV(6, GL_UNSIGNED_BYTE, "\000\001\002\003\004\005", instance_->font_base_, GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_X_NV, kerning);
-			//glStencilFillPathInstancedNV(6, instance_->font_base_, GL_UNSIGNED_BYTE, "OpenGL", GL_PATH_FILL_MODE_NV, 0xFF, GL_TRANSLATE_X_NV, kerning);
-			//glCoverFillPathInstancedNV(6, instance_->font_base_, GL_UNSIGNED_BYTE, "OpenGL", GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_X_NV, kerning);
-
 		}
+
+		//markdowns
+		for (int i = 0; i < instance_->page_->children_size(); i++)
+		{
+
+			Transform3x2 mat;
+			mul(mat, instance_->view, instance_->model);
+
+			Transform3x2 result;
+
+			Line* line = static_cast<Line*>(instance_->page_->child(i));
+			Transform3x2 line_trans;
+			translate(line_trans, line->x(), line->y());
+			Transform3x2 temp;
+			scale(temp, 1, -1);
+			mul(line_trans, line_trans, temp);
+			mul(mat, mat, line_trans);
+
+			//why bother the kernings
+			GLfloat kerning[20];
+			for (int j = 0; j < 20; j++)
+				kerning[j] = 512 * j;
+
+			//left
+			string left_text = to_string(line->line_number());
+			const char * left_str = left_text.c_str();
+
+			translate(temp, -1.25 * settings::em_size_, 0);
+			mul(result, mat, temp);
+			MatrixLoadToGL(result);
+			glColor3f(0, 0.2, 0.6);
+			glStencilFillPathInstancedNV(left_text.length(), GL_UNSIGNED_BYTE, left_str, instance_->font_base_, GL_PATH_FILL_MODE_NV, 0xFF, GL_TRANSLATE_X_NV, kerning);
+			glCoverFillPathInstancedNV(left_text.length(), GL_UNSIGNED_BYTE, left_str, instance_->font_base_, GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_X_NV, kerning);
+
+			//right
+			string right_text;
+			if (settings::markdown_type_ == 0)
+				right_text = to_string(line->demerits().result);
+			else
+				right_text = to_string(line->demerits().r);
+
+			const char * right_str = right_text.c_str();
+			translate(temp, settings::content_width_point() + settings::em_size_ / 2, 0);
+			mul(result, mat, temp);
+			MatrixLoadToGL(result);
+			glColor3f(0.6, 0.2, 0);
+			glStencilFillPathInstancedNV(right_text.length(), GL_UNSIGNED_BYTE, right_str, instance_->font_base_, GL_PATH_FILL_MODE_NV, 0xFF, GL_TRANSLATE_X_NV, kerning);
+			glCoverFillPathInstancedNV(right_text.length(), GL_UNSIGNED_BYTE, right_str, instance_->font_base_, GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_X_NV, kerning);
+		}
+
 	} 
 	glMatrixPopEXT(GL_MODELVIEW);
 	glutSwapBuffers();

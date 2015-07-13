@@ -57,6 +57,7 @@ public:
     QCheckBox *useMagicBox;
     QDoubleSpinBox *magicSpinBox;
     QLabel *label_6;
+    QComboBox *markdownBox;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QToolBar *mainToolBar;
@@ -73,7 +74,7 @@ public:
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         renderButton = new QPushButton(centralWidget);
         renderButton->setObjectName(QStringLiteral("renderButton"));
-        renderButton->setGeometry(QRect(20, 500, 75, 23));
+        renderButton->setGeometry(QRect(20, 520, 75, 23));
         label = new QLabel(centralWidget);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(200, 0, 47, 13));
@@ -102,15 +103,15 @@ public:
         riverButton->setGeometry(QRect(30, 110, 0, 0));
         fontSizeBox = new QSpinBox(centralWidget);
         fontSizeBox->setObjectName(QStringLiteral("fontSizeBox"));
-        fontSizeBox->setGeometry(QRect(90, 170, 60, 20));
+        fontSizeBox->setGeometry(QRect(90, 190, 60, 20));
         fontSizeBox->setMaximum(1000);
         fontSizeBox->setValue(12);
         label_2 = new QLabel(centralWidget);
         label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setGeometry(QRect(30, 170, 50, 20));
+        label_2->setGeometry(QRect(30, 190, 50, 20));
         paperBox = new QComboBox(centralWidget);
         paperBox->setObjectName(QStringLiteral("paperBox"));
-        paperBox->setGeometry(QRect(30, 130, 69, 22));
+        paperBox->setGeometry(QRect(30, 150, 69, 22));
         riverThresholdSpinBox = new QDoubleSpinBox(centralWidget);
         riverThresholdSpinBox->setObjectName(QStringLiteral("riverThresholdSpinBox"));
         riverThresholdSpinBox->setGeometry(QRect(110, 150, 0, 0));
@@ -127,34 +128,37 @@ public:
         pageSlider->setInvertedAppearance(true);
         expansionBox = new QComboBox(centralWidget);
         expansionBox->setObjectName(QStringLiteral("expansionBox"));
-        expansionBox->setGeometry(QRect(30, 240, 69, 22));
+        expansionBox->setGeometry(QRect(30, 260, 69, 22));
         expansionSpinBox = new QDoubleSpinBox(centralWidget);
         expansionSpinBox->setObjectName(QStringLiteral("expansionSpinBox"));
-        expansionSpinBox->setGeometry(QRect(90, 290, 62, 22));
+        expansionSpinBox->setGeometry(QRect(90, 310, 62, 22));
         label_4 = new QLabel(centralWidget);
         label_4->setObjectName(QStringLiteral("label_4"));
-        label_4->setGeometry(QRect(30, 270, 100, 16));
+        label_4->setGeometry(QRect(30, 290, 100, 16));
         label_5 = new QLabel(centralWidget);
         label_5->setObjectName(QStringLiteral("label_5"));
-        label_5->setGeometry(QRect(10, 350, 191, 21));
+        label_5->setGeometry(QRect(10, 370, 191, 21));
         magicGainSpinBox = new QDoubleSpinBox(centralWidget);
         magicGainSpinBox->setObjectName(QStringLiteral("magicGainSpinBox"));
-        magicGainSpinBox->setGeometry(QRect(90, 380, 62, 22));
+        magicGainSpinBox->setGeometry(QRect(90, 400, 62, 22));
         magicGainSpinBox->setMaximum(10000);
         magicGainSpinBox->setSingleStep(10);
         magicGainSpinBox->setValue(0);
         useMagicBox = new QCheckBox(centralWidget);
         useMagicBox->setObjectName(QStringLiteral("useMagicBox"));
-        useMagicBox->setGeometry(QRect(20, 470, 70, 17));
+        useMagicBox->setGeometry(QRect(20, 490, 70, 17));
         magicSpinBox = new QDoubleSpinBox(centralWidget);
         magicSpinBox->setObjectName(QStringLiteral("magicSpinBox"));
-        magicSpinBox->setGeometry(QRect(90, 440, 62, 22));
+        magicSpinBox->setGeometry(QRect(90, 460, 62, 22));
         magicSpinBox->setMaximum(20);
         magicSpinBox->setSingleStep(0.1);
         magicSpinBox->setValue(0);
         label_6 = new QLabel(centralWidget);
         label_6->setObjectName(QStringLiteral("label_6"));
-        label_6->setGeometry(QRect(10, 410, 191, 21));
+        label_6->setGeometry(QRect(10, 430, 191, 21));
+        markdownBox = new QComboBox(centralWidget);
+        markdownBox->setObjectName(QStringLiteral("markdownBox"));
+        markdownBox->setGeometry(QRect(30, 110, 69, 22));
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -219,6 +223,11 @@ public:
         label_5->setText(QApplication::translate("viewerClass", "show Magic Edge with gain >", 0));
         useMagicBox->setText(QApplication::translate("viewerClass", "Use Magic!", 0));
         label_6->setText(QApplication::translate("viewerClass", "Max amount magic allowed:", 0));
+        markdownBox->clear();
+        markdownBox->insertItems(0, QStringList()
+         << QApplication::translate("viewerClass", "Demerits", 0)
+         << QApplication::translate("viewerClass", "r", 0)
+        );
         menuFile->setTitle(QApplication::translate("viewerClass", "File", 0));
     } // retranslateUi
 

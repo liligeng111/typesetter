@@ -34,6 +34,12 @@ Word::~Word()
 
 void Word::hyphenate(Hyphenate::Hyphenator* hyphenator, Glyph* hyphen)
 {
+	if (content_ == nullptr)
+	{
+		cout << "Error hyphenating: Empty word" << endl;
+		return;
+	}
+
 	hyphenated_ = hyphenator->hyphenate(*content_);
 	const char *cstr = hyphenated_.c_str();
 	//cout << hyphenated_ << endl;

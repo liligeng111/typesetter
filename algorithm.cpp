@@ -163,7 +163,7 @@ void Typesetter::optimum_fit_magic_edge()
 
 				
 			}
-			else if ((*a)->magic_count() == 0 && r >= -settings::max_magic_amount_ && r < settings::max_magic_amount_ * settings::rho_ && (!forced_break))
+			else if ((*a)->magic_count() == 0 && abs(l - L) < settings::max_magic_amount_ * settings::em_size_ && (!forced_break))
 			{
 				//magic edge
 				Breakpoint::Demerits demerit(r, L, penalty, 0, l);
@@ -721,6 +721,7 @@ void Typesetter::break_paragraph()
 					current = current->prev();
 				}
 				//cout << "magic r: " << bp->demerits().r << endl;
+				//cout << " magic em: " << 1.0 * (bp->demerits().length - bp->demerits().l) / settings::em_size_ << endl;
 			}
 			bp = bp->prev();
 		}

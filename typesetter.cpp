@@ -441,7 +441,8 @@ void Typesetter::detect_river()
 void Typesetter::fill_lines()
 {
 	long x_adjust = 0;
-	long y_adjust = 0;
+	//because all chars in lines have negative orientation
+	long y_adjust = settings::em_size_;
 	long line_number = 0;
 	Page* current_page = new Page();
 	current_page->set_geometry(settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_), settings::content_width_point(), settings::content_height_point());

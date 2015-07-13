@@ -37,6 +37,7 @@ namespace settings
 	
 	//borders
 	extern bool border_[];
+	extern int markdown_type_;
 
 	extern bool show_river_;
 	extern float river_threshold_;

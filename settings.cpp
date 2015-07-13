@@ -23,6 +23,7 @@ namespace settings
 
 	//sapce, char, word, line, page
 	bool border_[] = { true, true, true, true, true, true };
+	int markdown_type_ = 0;
 
 	bool show_river_ = false;
 	float river_threshold_ = 2.0f;
@@ -32,7 +33,7 @@ namespace settings
 	float shrink_ratio_ = 1.0f / 3;
 	float letter_space_stretch_ratio_ = 0.05;
 	float letter_space_shrink_ratio_ = 0.05;
-	float max_expansion_ = 0.05;
+	float max_expansion_ = 0.00;
 	int expansion_mode_ = 0;
 
 
@@ -40,5 +41,5 @@ namespace settings
 	//magic
 	bool use_magic_ = false;
 	float min_magic_gain_ = 200;
-	float max_magic_amount_= 5;
+	float max_magic_amount_= 1;
 };

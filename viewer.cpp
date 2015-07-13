@@ -51,7 +51,7 @@ void Viewer::on_renderButton_clicked()
 	resize();
 	typesetter.set_content(content);
 	typesetter.Typeset();
-	typesetter.render(Typesetter::SVG);
+	//typesetter.render(Typesetter::SVG);
 
 	cout << "Total Page Count:" << typesetter.page_count() << endl;
 	ui.pageSlider->setMaximum(typesetter.page_count() - 1);
@@ -122,6 +122,11 @@ void Viewer::on_actionOpen_File_triggered()
 	content = file;
 }
 
+void Viewer::on_markdownBox_currentIndexChanged(int index)
+{
+	settings::markdown_type_ = index;
+	nvpr_renderer.render_page(typesetter.page(ui.pageSlider->tickPosition()), ui.pageSlider->tickPosition());
+}
 
 void Viewer::on_paperBox_currentIndexChanged(QString page)
 {

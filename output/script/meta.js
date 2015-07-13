@@ -1,3 +1,3 @@
-PAGE_COUNT = 17;
-FONT_SIZE = '36';
+PAGE_COUNT = 166;
+FONT_SIZE = '24';
 FONT = 'times.ttf';

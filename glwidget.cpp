@@ -1,12 +1,9 @@
-#include "nvpr_page.h"
-#include <vector>
-#include "settings.h"
+#include "glwidget.h"
+#include <iostream>
 
-NVPR_Page* NVPR_Page::instance_ = nullptr;
-
-NVPR_Page::NVPR_Page()
+GLWidget::GLWidget(QWidget *parent)
+	: QOpenGLWidget(parent)
 {
-	instance_ = this;
 	page_ = nullptr;
 
 	path_base_ = 0;
@@ -15,64 +12,28 @@ NVPR_Page::NVPR_Page()
 	width = 630;
 	height = 891;
 
-	GLenum status;
 	GLboolean hasDSA;
 
-	glutInitWindowSize(width, height);
-	int* argc = new int(0);
-	char** argv = {};
-	glutInit(argc, argv);
-	glutSetOption(GLUT_MULTISAMPLE, 8);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_STENCIL);
-	glEnable(GL_MULTISAMPLE);
-
-
-	glutCreateWindow("Page Viewer");
-	// detect current settings
-	printf("samples per pixel = %d\n", glutGet(GLUT_WINDOW_NUM_SAMPLES));
-
-	glutDisplayFunc(display);
-	glutReshapeFunc(reshape);
-	glutKeyboardFunc(keyboard);
-	glutMouseFunc(mouse);
-	glutMotionFunc(motion);
-	glutMouseWheelFunc(wheel);
+	QSurfaceFormat format;
+	format.setVersion(4, 3);
+	format.setProfile(QSurfaceFormat::CoreProfile);
+	format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+	format.setDepthBufferSize(24);
+	format.setStencilBufferSize(8);
+	format.setSamples(8);
+	setFormat(format);
 
 	initModelAndViewMatrices();
 
-	glutCreateMenu(menu);
-	glutAddMenuEntry("[r] Reset view", 'r');
-	glutAddMenuEntry("[Esc] Quit", 27);
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
-
-	status = glewInit();
-	if (status != GLEW_OK)
-	{
-		fatalError("OpenGL Extension Wrangler (GLEW) failed to initialize");
-	}
-	hasDSA = glewIsSupported("GL_EXT_direct_state_access");
-	if (!hasDSA)
-	{
-		fatalError("OpenGL implementation doesn't support GL_EXT_direct_state_access (you should be using NVIDIA GPUs...)");
-	}
-
-	initializeNVPR(programName);
-	if (!has_NV_path_rendering)
-	{
-		fatalError("required NV_path_rendering OpenGL extension is not present");
-	}
 }
 
-
-NVPR_Page::~NVPR_Page()
+GLWidget::~GLWidget()
 {
-	
+
 }
 
-void NVPR_Page::render_page(Page* page, int page_num)
+void GLWidget::render_page(Page* page, int page_num)
 {
-	string title = "Page: " + to_string(page_num);
-	glutSetWindowTitle(title.c_str());
 	page_ = page;
 	//delete previous page
 	if (path_count_ != 0)
@@ -80,17 +41,9 @@ void NVPR_Page::render_page(Page* page, int page_num)
 	path_count_ = 0;
 	path_base_ = 0;
 	initGraphics();
-	glutPostRedisplay();
-
 }
 
-void NVPR_Page::fatalError(const char *message)
-{
-	fprintf(stderr, "%s: %s\n", programName, message);
-	exit(1);
-}
-
-void NVPR_Page::initGraphics()
+void GLWidget::initGraphics()
 {
 	/* Use an orthographic path-to-clip-space transform to map the
 	[0..640]x[0..480] range of the star's path coordinates to the [-1..1]
@@ -165,25 +118,38 @@ void NVPR_Page::initGraphics()
 	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
 }
 
-void NVPR_Page::initModelAndViewMatrices()
+void GLWidget::initModelAndViewMatrices()
 {
 	float tmp[2][3];
-	
 	translate(tmp, settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_));
 	scale(model, 3 / settings::mm_to_point(1), 3 / settings::mm_to_point(1));
 	mul(model, model, tmp);
 	translate(view, 0, 0);
 }
 
-void NVPR_Page::display()
+void GLWidget::initializeGL()
+{
+	context_ = context();
+	initializeOpenGLFunctions();
+	extension_loader::load_extension(context_);
+}
+
+void GLWidget::paintGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glMatrixPushEXT(GL_MODELVIEW); 
+
+	//nothing to draw
+	if (page_ == nullptr)
+	{
+		return;
+	}
+
+	glMatrixPushEXT(GL_MODELVIEW);
 	{
 		//borders
 		{
 			Transform3x2 mat;
-			mul(mat, instance_->view, instance_->model);
+			mul(mat, view, model);
 
 			MatrixLoadToGL(mat);
 
@@ -191,26 +157,26 @@ void NVPR_Page::display()
 			//GLuint stroke_color = 0x000000;
 			//GLfloat stroke_width = 1;
 
-			glStencilFillPathNV(instance_->path_base_ + instance_->path_count_, GL_COUNT_UP_NV, 0x1F);
-			glCoverFillPathNV(instance_->path_base_ + instance_->path_count_, GL_BOUNDING_BOX_NV);
+			glStencilFillPathNV(path_base_ + path_count_, GL_COUNT_UP_NV, 0x1F);
+			glCoverFillPathNV(path_base_ + path_count_, GL_BOUNDING_BOX_NV);
 		}
 
-		for (int i = 0; i < instance_->path_count_; i++)
+		for (int i = 0; i < path_count_; i++)
 		{
 			Transform3x2 mat;
-			mul(mat, instance_->view, instance_->model);
+			mul(mat, view, model);
 
 			Transform3x2 result;
 
-			Line* line = static_cast<Line*>(instance_->page_->child(instance_->line_num_[i]));
+			Line* line = static_cast<Line*>(page_->child(line_num_[i]));
 			Transform3x2 line_trans;
 			translate(line_trans, line->x(), line->y());
 			Transform3x2 temp;
 			scale(temp, 1, -1);
 			mul(line_trans, line_trans, temp);
 			mul(result, mat, line_trans);
-			
-			Item* item = line->child(instance_->char_num_[i]);
+
+			Item* item = line->child(char_num_[i]);
 			Transform3x2 char_trans;
 			translate(char_trans, item->x(), item->y());
 			mul(result, result, char_trans);
@@ -256,21 +222,21 @@ void NVPR_Page::display()
 			//GLuint stroke_color = 0x000000;
 			//GLfloat stroke_width = 1;
 
-			glStencilFillPathNV(instance_->path_base_ + i, GL_COUNT_UP_NV, 0x1F);
-			glCoverFillPathNV(instance_->path_base_ + i, GL_BOUNDING_BOX_NV);
+			glStencilFillPathNV(path_base_ + i, GL_COUNT_UP_NV, 0x1F);
+			glCoverFillPathNV(path_base_ + i, GL_BOUNDING_BOX_NV);
 
 		}
 
 		//markdowns
-		for (int i = 0; i < instance_->page_->children_size(); i++)
+		for (int i = 0; i < page_->children_size(); i++)
 		{
 
 			Transform3x2 mat;
-			mul(mat, instance_->view, instance_->model);
+			mul(mat, view, model);
 
 			Transform3x2 result;
 
-			Line* line = static_cast<Line*>(instance_->page_->child(i));
+			Line* line = static_cast<Line*>(page_->child(i));
 			Transform3x2 line_trans;
 			translate(line_trans, line->x(), line->y());
 			Transform3x2 temp;
@@ -291,8 +257,8 @@ void NVPR_Page::display()
 			mul(result, mat, temp);
 			MatrixLoadToGL(result);
 			glColor3f(0, 0.2, 0.6);
-			glStencilFillPathInstancedNV(left_text.length(), GL_UNSIGNED_BYTE, left_str, instance_->font_base_, GL_PATH_FILL_MODE_NV, 0xFF, GL_TRANSLATE_X_NV, kerning);
-			glCoverFillPathInstancedNV(left_text.length(), GL_UNSIGNED_BYTE, left_str, instance_->font_base_, GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_X_NV, kerning);
+			glStencilFillPathInstancedNV(left_text.length(), GL_UNSIGNED_BYTE, left_str, font_base_, GL_PATH_FILL_MODE_NV, 0xFF, GL_TRANSLATE_X_NV, kerning);
+			glCoverFillPathInstancedNV(left_text.length(), GL_UNSIGNED_BYTE, left_str, font_base_, GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_X_NV, kerning);
 
 			//right
 			string right_text;
@@ -306,92 +272,150 @@ void NVPR_Page::display()
 			mul(result, mat, temp);
 			MatrixLoadToGL(result);
 			glColor3f(0.6, 0.2, 0);
-			glStencilFillPathInstancedNV(right_text.length(), GL_UNSIGNED_BYTE, right_str, instance_->font_base_, GL_PATH_FILL_MODE_NV, 0xFF, GL_TRANSLATE_X_NV, kerning);
-			glCoverFillPathInstancedNV(right_text.length(), GL_UNSIGNED_BYTE, right_str, instance_->font_base_, GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_X_NV, kerning);
+			glStencilFillPathInstancedNV(right_text.length(), GL_UNSIGNED_BYTE, right_str, font_base_, GL_PATH_FILL_MODE_NV, 0xFF, GL_TRANSLATE_X_NV, kerning);
+			glCoverFillPathInstancedNV(right_text.length(), GL_UNSIGNED_BYTE, right_str, font_base_, GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_X_NV, kerning);
 		}
 
-	} 
+	}
 	glMatrixPopEXT(GL_MODELVIEW);
-	glutSwapBuffers();
+	context_->swapBuffers(context_->surface());
 }
 
-void NVPR_Page::reshape(int w, int h)
+void GLWidget::resizeGL(int w, int h)
 {
-	glViewport(0, 0, w, h);
-	instance_->width = w;
-	instance_->height = h;
-	instance_->initGraphics();
 }
 
-void NVPR_Page::keyboard(unsigned char c, int x, int y)
+void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-	switch (c)
-	{
-	case 27:  /* Esc quits */
-		exit(0);
-		return;
-	case 13:  /* Enter redisplays */
-		break;
-	case 'r':
-		instance_->initModelAndViewMatrices();
-		break;
-	default:
-		return;
-	}
-	glutPostRedisplay();
 }
 
-void NVPR_Page::mouse(int button, int state, int mouse_space_x, int mouse_space_y)
+void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	if (button == GLUT_LEFT_BUTTON)
-	{
-		if (state == GLUT_DOWN)
-		{
-			instance_->slide_y = mouse_space_y;
-			instance_->slide_x = mouse_space_x;
-			instance_->sliding = 1;
-		}
-		else
-		{
-			instance_->sliding = 0;
-		}
-	}
 }
 
-void NVPR_Page::wheel(int wheel, int direction, int x, int y)
+void GLWidget::identity(Transform3x2 dst)
 {
-	Transform3x2 s;
-	float ratio;
-	if (direction < 0)
-	{
-		ratio = 1.1;
-	}
-	else
-	{
-		ratio = 1 / 1.1;
-	}
-	scale(s, ratio, ratio);
-	mul(instance_->view, s, instance_->view);
-	glutPostRedisplay();
+	dst[0][0] = 1;
+	dst[0][1] = 0;
+	dst[0][2] = 0;
+	dst[1][0] = 0;
+	dst[1][1] = 1;
+	dst[1][2] = 0;
 }
 
-void NVPR_Page::motion(int mouse_space_x, int mouse_space_y)
+void GLWidget::mul(Transform3x2 dst, Transform3x2 a, Transform3x2 b)
 {
-	if (instance_->sliding)
-	{
-		float m[2][3];
+	Transform3x2 result;
 
-		float x_offset = mouse_space_x - instance_->slide_x;
-		float y_offset = mouse_space_y - instance_->slide_y;
-		translate(m, x_offset, y_offset);
-		mul(instance_->view, m, instance_->view);
-		instance_->slide_y = mouse_space_y;
-		instance_->slide_x = mouse_space_x;
-		glutPostRedisplay();
-	}
+	result[0][0] = a[0][0] * b[0][0] + a[0][1] * b[1][0];
+	result[0][1] = a[0][0] * b[0][1] + a[0][1] * b[1][1];
+	result[0][2] = a[0][0] * b[0][2] + a[0][1] * b[1][2] + a[0][2];
+
+	result[1][0] = a[1][0] * b[0][0] + a[1][1] * b[1][0];
+	result[1][1] = a[1][0] * b[0][1] + a[1][1] * b[1][1];
+	result[1][2] = a[1][0] * b[0][2] + a[1][1] * b[1][2] + a[1][2];
+
+	dst[0][0] = result[0][0];
+	dst[0][1] = result[0][1];
+	dst[0][2] = result[0][2];
+	dst[1][0] = result[1][0];
+	dst[1][1] = result[1][1];
+	dst[1][2] = result[1][2];
 }
 
-void NVPR_Page::menu(int choice)
+void GLWidget::translate(Transform3x2 dst, float x, float y)
 {
-	keyboard(choice, 0, 0);
+	dst[0][0] = 1;
+	dst[0][1] = 0;
+	dst[0][2] = x;
+	dst[1][0] = 0;
+	dst[1][1] = 1;
+	dst[1][2] = y;
+}
+
+void GLWidget::scale(Transform3x2 dst, float x, float y)
+{
+	dst[0][0] = x;
+	dst[0][1] = 0;
+	dst[0][2] = 0;
+
+	dst[1][0] = 0;
+	dst[1][1] = y;
+	dst[1][2] = 0;
+}
+
+void GLWidget::rotate(Transform3x2 dst, float angle)
+{
+	float radians = angle*3.14159f / 180.0f,
+		s = (float)sin(radians),
+		c = (float)cos(radians);
+
+	dst[0][0] = c;
+	dst[0][1] = -s;
+	dst[0][2] = 0;
+	dst[1][0] = s;
+	dst[1][1] = c;
+	dst[1][2] = 0;
+}
+
+void GLWidget::ortho(Transform3x2 dst, float l, float r, float b, float t)
+{
+	dst[0][0] = 2 / (r - l);
+	dst[0][1] = 0;
+	dst[0][2] = -(r + l) / (r - l);
+	dst[1][0] = 0;
+	dst[1][1] = 2 / (t - b);
+	dst[1][2] = -(t + b) / (t - b);
+}
+
+void GLWidget::inverse_ortho(Transform3x2 dst, float l, float r, float b, float t)
+{
+	dst[0][0] = (r - l) / 2;
+	dst[0][1] = 0;
+	dst[0][2] = (r + l) / 2;
+	dst[1][0] = 0;
+	dst[1][1] = (t - b) / 2;
+	dst[1][2] = (t + b) / 2;
+}
+
+void GLWidget::xform(float dst[2], Transform3x2 a, const float v[2])
+{
+	float result[2];
+
+	result[0] = a[0][0] * v[0] + a[0][1] * v[1] + a[0][2];
+	result[1] = a[1][0] * v[0] + a[1][1] * v[1] + a[1][2];
+
+	dst[0] = result[0];
+	dst[1] = result[1];
+}
+
+void GLWidget::MatrixLoadToGL(Transform3x2 m)
+{
+	GLfloat mm[16];  /* Column-major OpenGL-style 4x4 matrix. */
+
+	/* First column. */
+	mm[0] = m[0][0];
+	mm[1] = m[1][0];
+	mm[2] = 0;
+	mm[3] = 0;
+
+	/* Second column. */
+	mm[4] = m[0][1];
+	mm[5] = m[1][1];
+	mm[6] = 0;
+	mm[7] = 0;
+
+	/* Third column. */
+	mm[8] = 0;
+	mm[9] = 0;
+	mm[10] = 1;
+	mm[11] = 0;
+
+	/* Fourth column. */
+	mm[12] = m[0][2];
+	mm[13] = m[1][2];
+	mm[14] = 0;
+	mm[15] = 1;
+
+	glMatrixLoadfEXT(GL_MODELVIEW, &mm[0]);
 }

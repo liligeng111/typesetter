@@ -40,6 +40,6 @@ namespace settings
 
 	//magic
 	bool use_magic_ = false;
-	float min_magic_gain_ = 200;
+	float min_magic_gain_ = 10000;
 	float max_magic_amount_= 1;
 };

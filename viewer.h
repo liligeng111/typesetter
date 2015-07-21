@@ -5,7 +5,7 @@
 #include "ui_viewer.h"
 #include "typesetter.h"
 #include "settings.h"
-#include "nvpr_page.h"
+#include "glwidget.h"
 
 using namespace std;
 
@@ -45,9 +45,9 @@ private slots:
 
 private:
 	Ui::viewerClass ui;
+	GLWidget* glwidget_;
 	Typesetter typesetter;
 	string content;
-	NVPR_Page nvpr_renderer;
 
 	void resize();
 	void update_UI();

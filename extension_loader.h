@@ -1,0 +1,124 @@
+#pragma once
+
+#include <qopenglcontext.h>
+
+typedef void(*FPglMatrixLoadIdentityEXT) (GLenum mode);
+typedef void(*FPglMatrixPushEXT) (GLenum mode);
+typedef void(*FPglMatrixPopEXT) (GLenum mode);
+typedef void(*FPglMatrixOrthoEXT) (GLenum mode, GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar);
+typedef void(*FPglMatrixLoadfEXT) (GLenum mode, const GLfloat* m);
+typedef GLuint(*FPglGenPathsNV) (GLsizei range);
+typedef void(*FPglDeletePathsNV) (GLuint path, GLsizei range);
+typedef GLboolean(*FPglIsPathNV) (GLuint path);
+typedef void(*FPglPathCommandsNV) (GLuint path, GLsizei numCommands, const GLubyte *commands, GLsizei numCoords, GLenum coordType, const GLvoid *coords);
+typedef void(*FPglPathCoordsNV) (GLuint path, GLsizei numCoords, GLenum coordType, const GLvoid *coords);
+typedef void(*FPglPathSubCommandsNV) (GLuint path, GLsizei commandStart, GLsizei commandsToDelete, GLsizei numCommands, const GLubyte *commands, GLsizei numCoords, GLenum coordType, const GLvoid *coords);
+typedef void(*FPglPathSubCoordsNV) (GLuint path, GLsizei coordStart, GLsizei numCoords, GLenum coordType, const GLvoid *coords);
+typedef void(*FPglPathStringNV) (GLuint path, GLenum format, GLsizei length, const GLvoid *pathString);
+typedef void(*FPglPathGlyphsNV) (GLuint firstPathName, GLenum fontTarget, const GLvoid *fontName, GLbitfield fontStyle, GLsizei numGlyphs, GLenum type, const GLvoid *charcodes, GLenum handleMissingGlyphs, GLuint pathParameterTemplate, GLfloat emScale);
+typedef void(*FPglPathGlyphRangeNV) (GLuint firstPathName, GLenum fontTarget, const GLvoid *fontName, GLbitfield fontStyle, GLuint firstGlyph, GLsizei numGlyphs, GLenum handleMissingGlyphs, GLuint pathParameterTemplate, GLfloat emScale);
+typedef void(*FPglWeightPathsNV) (GLuint resultPath, GLsizei numPaths, const GLuint *paths, const GLfloat *weights);
+typedef void(*FPglCopyPathNV) (GLuint resultPath, GLuint srcPath);
+typedef void(*FPglInterpolatePathsNV) (GLuint resultPath, GLuint pathA, GLuint pathB, GLfloat weight);
+typedef void(*FPglTransformPathNV) (GLuint resultPath, GLuint srcPath, GLenum transformType, const GLfloat *transformValues);
+typedef void(*FPglPathParameterivNV) (GLuint path, GLenum pname, const GLint *value);
+typedef void(*FPglPathParameteriNV) (GLuint path, GLenum pname, GLint value);
+typedef void(*FPglPathParameterfvNV) (GLuint path, GLenum pname, const GLfloat *value);
+typedef void(*FPglPathParameterfNV) (GLuint path, GLenum pname, GLfloat value);
+typedef void(*FPglPathDashArrayNV) (GLuint path, GLsizei dashCount, const GLfloat *dashArray);
+typedef void(*FPglPathStencilFuncNV) (GLenum func, GLint ref, GLuint mask);
+typedef void(*FPglPathStencilDepthOffsetNV) (GLfloat factor, GLfloat units);
+typedef void(*FPglStencilFillPathNV) (GLuint path, GLenum fillMode, GLuint mask);
+typedef void(*FPglStencilStrokePathNV) (GLuint path, GLint reference, GLuint mask);
+typedef void(*FPglStencilFillPathInstancedNV) (GLsizei numPaths, GLenum pathNameType, const GLvoid *paths, GLuint pathBase, GLenum fillMode, GLuint mask, GLenum transformType, const GLfloat *transformValues);
+typedef void(*FPglStencilStrokePathInstancedNV) (GLsizei numPaths, GLenum pathNameType, const GLvoid *paths, GLuint pathBase, GLint reference, GLuint mask, GLenum transformType, const GLfloat *transformValues);
+typedef void(*FPglPathCoverDepthFuncNV) (GLenum func);
+typedef void(*FPglPathColorGenNV) (GLenum color, GLenum genMode, GLenum colorFormat, const GLfloat *coeffs);
+typedef void(*FPglPathTexGenNV) (GLenum texCoordSet, GLenum genMode, GLint components, const GLfloat *coeffs);
+typedef void(*FPglPathFogGenNV) (GLenum genMode);
+typedef void(*FPglCoverFillPathNV) (GLuint path, GLenum coverMode);
+typedef void(*FPglCoverStrokePathNV) (GLuint path, GLenum coverMode);
+typedef void(*FPglCoverFillPathInstancedNV) (GLsizei numPaths, GLenum pathNameType, const GLvoid *paths, GLuint pathBase, GLenum coverMode, GLenum transformType, const GLfloat *transformValues);
+typedef void(*FPglCoverStrokePathInstancedNV) (GLsizei numPaths, GLenum pathNameType, const GLvoid *paths, GLuint pathBase, GLenum coverMode, GLenum transformType, const GLfloat *transformValues);
+typedef void(*FPglGetPathParameterivNV) (GLuint path, GLenum pname, GLint *value);
+typedef void(*FPglGetPathParameterfvNV) (GLuint path, GLenum pname, GLfloat *value);
+typedef void(*FPglGetPathCommandsNV) (GLuint path, GLubyte *commands);
+typedef void(*FPglGetPathCoordsNV) (GLuint path, GLfloat *coords);
+typedef void(*FPglGetPathDashArrayNV) (GLuint path, GLfloat *dashArray);
+typedef void(*FPglGetPathMetricsNV) (GLbitfield metricQueryMask, GLsizei numPaths, GLenum pathNameType, const GLvoid *paths, GLuint pathBase, GLsizei stride, GLfloat *metrics);
+typedef void(*FPglGetPathMetricRangeNV) (GLbitfield metricQueryMask, GLuint firstPathName, GLsizei numPaths, GLsizei stride, GLfloat *metrics);
+typedef void(*FPglGetPathSpacingNV) (GLenum pathListMode, GLsizei numPaths, GLenum pathNameType, const GLvoid *paths, GLuint pathBase, GLfloat advanceScale, GLfloat kerningScale, GLenum transformType, GLfloat *returnedSpacing);
+typedef void(*FPglGetPathColorGenivNV) (GLenum color, GLenum pname, GLint *value);
+typedef void(*FPglGetPathColorGenfvNV) (GLenum color, GLenum pname, GLfloat *value);
+typedef void(*FPglGetPathTexGenivNV) (GLenum texCoordSet, GLenum pname, GLint *value);
+typedef void(*FPglGetPathTexGenfvNV) (GLenum texCoordSet, GLenum pname, GLfloat *value);
+typedef GLboolean(*FPglIsPointInFillPathNV) (GLuint path, GLuint mask, GLfloat x, GLfloat y);
+typedef GLboolean(*FPglIsPointInStrokePathNV) (GLuint path, GLfloat x, GLfloat y);
+typedef GLfloat(*FPglGetPathLengthNV) (GLuint path, GLsizei startSegment, GLsizei numSegments);
+typedef GLboolean(*FPglPointAlongPathNV) (GLuint path, GLsizei startSegment, GLsizei numSegments, GLfloat distance, GLfloat *x, GLfloat *y, GLfloat *tangentX, GLfloat *tangentY);
+
+extern FPglMatrixLoadIdentityEXT glMatrixLoadIdentityEXT;
+extern FPglMatrixPushEXT glMatrixPushEXT;
+extern FPglMatrixPopEXT glMatrixPopEXT;
+extern FPglMatrixOrthoEXT glMatrixOrthoEXT;
+extern FPglMatrixLoadfEXT glMatrixLoadfEXT;
+extern FPglGenPathsNV glGenPathsNV;
+extern FPglDeletePathsNV glDeletePathsNV;
+extern FPglIsPathNV glIsPathNV;
+extern FPglPathCommandsNV glPathCommandsNV;
+extern FPglPathCoordsNV glPathCoordsNV;
+extern FPglPathSubCommandsNV glPathSubCommandsNV;
+extern FPglPathSubCoordsNV glPathSubCoordsNV;
+extern FPglPathStringNV glPathStringNV;
+extern FPglPathGlyphsNV glPathGlyphsNV;
+extern FPglPathGlyphRangeNV glPathGlyphRangeNV;
+extern FPglWeightPathsNV glWeightPathsNV;
+extern FPglCopyPathNV glCopyPathNV;
+extern FPglInterpolatePathsNV glInterpolatePathsNV;
+extern FPglTransformPathNV glTransformPathNV;
+extern FPglPathParameterivNV glPathParameterivNV;
+extern FPglPathParameteriNV glPathParameteriNV;
+extern FPglPathParameterfvNV glPathParameterfvNV;
+extern FPglPathParameterfNV glPathParameterfNV;
+extern FPglPathDashArrayNV glPathDashArrayNV;
+extern FPglPathStencilFuncNV glPathStencilFuncNV;
+extern FPglPathStencilDepthOffsetNV glPathStencilDepthOffsetNV;
+extern FPglStencilFillPathNV glStencilFillPathNV;
+extern FPglStencilStrokePathNV glStencilStrokePathNV;
+extern FPglStencilFillPathInstancedNV glStencilFillPathInstancedNV;
+extern FPglStencilStrokePathInstancedNV glStencilStrokePathInstancedNV;
+extern FPglPathCoverDepthFuncNV glPathCoverDepthFuncNV;
+extern FPglPathColorGenNV glPathColorGenNV;
+extern FPglPathTexGenNV glPathTexGenNV;
+extern FPglPathFogGenNV glPathFogGenNV;
+extern FPglCoverFillPathNV glCoverFillPathNV;
+extern FPglCoverStrokePathNV glCoverStrokePathNV;
+extern FPglCoverFillPathInstancedNV glCoverFillPathInstancedNV;
+extern FPglCoverStrokePathInstancedNV glCoverStrokePathInstancedNV;
+extern FPglGetPathParameterivNV glGetPathParameterivNV;
+extern FPglGetPathParameterfvNV glGetPathParameterfvNV;
+extern FPglGetPathCommandsNV glGetPathCommandsNV;
+extern FPglGetPathCoordsNV glGetPathCoordsNV;
+extern FPglGetPathDashArrayNV glGetPathDashArrayNV;
+extern FPglGetPathMetricsNV glGetPathMetricsNV;
+extern FPglGetPathMetricRangeNV glGetPathMetricRangeNV;
+extern FPglGetPathSpacingNV glGetPathSpacingNV;
+extern FPglGetPathColorGenivNV glGetPathColorGenivNV;
+extern FPglGetPathColorGenfvNV glGetPathColorGenfvNV;
+extern FPglGetPathTexGenivNV glGetPathTexGenivNV;
+extern FPglGetPathTexGenfvNV glGetPathTexGenfvNV;
+extern FPglIsPointInFillPathNV glIsPointInFillPathNV;
+extern FPglIsPointInStrokePathNV glIsPointInStrokePathNV;
+extern FPglGetPathLengthNV glGetPathLengthNV;
+extern FPglPointAlongPathNV glPointAlongPathNV;
+
+class extension_loader
+{
+public:
+	extension_loader();
+	~extension_loader();
+
+	static void load_extension(QOpenGLContext* context);
+	static QFunctionPointer load_func(QOpenGLContext* context, const QByteArray &fun_name);
+};
+

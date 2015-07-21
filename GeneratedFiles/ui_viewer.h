@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'viewer.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.1
+** Created by: Qt User Interface Compiler version 5.5.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -67,7 +67,7 @@ public:
     {
         if (viewerClass->objectName().isEmpty())
             viewerClass->setObjectName(QStringLiteral("viewerClass"));
-        viewerClass->resize(258, 595);
+        viewerClass->resize(1334, 762);
         actionOpen_File = new QAction(viewerClass);
         actionOpen_File->setObjectName(QStringLiteral("actionOpen_File"));
         centralWidget = new QWidget(viewerClass);
@@ -162,7 +162,7 @@ public:
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 258, 21));
+        menuBar->setGeometry(QRect(0, 0, 1334, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         viewerClass->setMenuBar(menuBar);

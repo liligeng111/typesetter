@@ -97,4 +97,7 @@ private:
 		sum_stretchability_[priority] += stretchability;
 		sum_shrinkability_[priority] += shrinkability;
 	};
+
+	//magic stuff
+	//priority_queue<Item*> magic_queue_;
 };

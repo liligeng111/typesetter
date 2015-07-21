@@ -95,14 +95,17 @@
     <ClCompile Include="algorithm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lib\nvpr\nvpr_init.c">
-      <Filter>NVPR</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\nvpr\xform.c">
-      <Filter>NVPR</Filter>
-    </ClCompile>
-    <ClCompile Include="nvpr_page.cpp">
+    <ClCompile Include="glwidget.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_glwidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_glwidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="extension_loader.cpp">
+      <Filter>NVPR</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +117,9 @@
     </CustomBuild>
     <CustomBuild Include="viewer.qrc">
       <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="glwidget.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -162,14 +168,11 @@
     <ClInclude Include="point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\nvpr\nvpr_init.h">
-      <Filter>NVPR</Filter>
-    </ClInclude>
     <ClInclude Include="lib\nvpr\xform.h">
       <Filter>NVPR</Filter>
     </ClInclude>
-    <ClInclude Include="nvpr_page.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="extension_loader.h">
+      <Filter>NVPR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

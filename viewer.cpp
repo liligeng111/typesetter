@@ -1,6 +1,5 @@
 #include "viewer.h"
 #include <qmessagebox.h>
-#include <QSvgRenderer>
 #include <qpainter>
 #include <qfiledialog.h>
 #include "settings.h"
@@ -19,6 +18,10 @@ Viewer::Viewer(QWidget *parent)
 	// for some reason, you cannot get screen size in constructor, so go with 1920.
 	ui.label->setGeometry((1920 - settings::display_width()) / 2, 20, settings::display_width(), settings::display_height());
 	update_UI();
+
+	glwidget_ = new GLWidget(0);
+	glwidget_->setGeometry(250, 50, 500, 720);
+	glwidget_->show();
 }
 
 Viewer::~Viewer()
@@ -57,14 +60,13 @@ void Viewer::on_renderButton_clicked()
 	ui.pageSlider->setMaximum(typesetter.page_count() - 1);
 	ui.pageSlider->setValue(0);
 	//on_pageSlider_valueChanged(0);
-	nvpr_renderer.render_page(typesetter.page(0), 0);
-	nvpr_renderer.start_main_loop();
+	glwidget_->render_page(typesetter.page(0), 0);
 }
 
 
 void Viewer::on_pageSlider_valueChanged(int value)
 {
-	nvpr_renderer.render_page(typesetter.page(value), value);
+	//nvpr_renderer.render_page(typesetter.page(value), value);
 }
 
 void Viewer::on_spaceBorderButton_clicked(bool checked)
@@ -125,7 +127,7 @@ void Viewer::on_actionOpen_File_triggered()
 void Viewer::on_markdownBox_currentIndexChanged(int index)
 {
 	settings::markdown_type_ = index;
-	nvpr_renderer.render_page(typesetter.page(ui.pageSlider->tickPosition()), ui.pageSlider->tickPosition());
+	//nvpr_renderer.render_page(typesetter.page(ui.pageSlider->value()), ui.pageSlider->value());
 }
 
 void Viewer::on_paperBox_currentIndexChanged(QString page)

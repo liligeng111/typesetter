@@ -1,7 +1,16 @@
 #include "viewer.h"
 #include <qmessagebox.h>
 #include <qpainter>
-#include <qfiledialog.h>
+#include <QCloseEvent>
+#include <QPoint>
+#include <QSettings>
+#include <QFile>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QSize>
+#include <QStatusBar>
+#include <QTextStream>
+#include <QToolBar>
 #include "settings.h"
 #include <fstream>
 #include <streambuf>
@@ -12,21 +21,177 @@
 Viewer::Viewer(QWidget *parent)
 	: QMainWindow(parent)
 {
+	textEdit = new QsciScintilla(this);
+	textEdit->setGeometry(250, 50, 630, 891); 
+	textEdit->show();
+	textEdit->SendScintilla(textEdit->SCI_SETHSCROLLBAR, 0);
+	
+	readSettings();
+	connect(textEdit, SIGNAL(textChanged()),
+		this, SLOT(documentWasModified()));
+	setCurrentFile("");
+
 	ui.setupUi(this);
 	content = "input/sample.txt";
-	//showMaximized();
-	// for some reason, you cannot get screen size in constructor, so go with 1920.
-	ui.label->setGeometry((1920 - settings::display_width()) / 2, 20, settings::display_width(), settings::display_height());
+	showMaximized();
+
 	update_UI();
 
-	glwidget_ = new GLWidget(0);
-	glwidget_->setGeometry(250, 50, 500, 720);
+	glwidget_ = new GLWidget(this);
+	glwidget_->setGeometry(1050, 50, 630, 891);
 	glwidget_->show();
 }
 
 Viewer::~Viewer()
 {
 
+}
+
+
+void Viewer::closeEvent(QCloseEvent *event)
+{
+	if (maybeSave()) {
+		writeSettings();
+		event->accept();
+	}
+	else {
+		event->ignore();
+	}
+}
+
+void Viewer::newFile()
+{
+	if (maybeSave()) {
+		textEdit->clear();
+		setCurrentFile("");
+	}
+}
+
+void Viewer::open()
+{
+	if (maybeSave()) {
+		QString fileName = QFileDialog::getOpenFileName(this);
+		if (!fileName.isEmpty())
+			loadFile(fileName);
+	}
+}
+
+bool Viewer::save()
+{
+	if (curFile.isEmpty()) {
+		return saveAs();
+	}
+	else {
+		return saveFile(curFile);
+	}
+}
+
+bool Viewer::saveAs()
+{
+	QString fileName = QFileDialog::getSaveFileName(this);
+	if (fileName.isEmpty())
+		return false;
+
+	return saveFile(fileName);
+}
+
+void Viewer::documentWasModified()
+{
+	setWindowModified(textEdit->isModified());
+}
+
+void Viewer::readSettings()
+{
+	QSettings settings("Trolltech", "Application Example");
+	QPoint pos = settings.value("pos", QPoint(200, 200)).toPoint();
+	QSize size = settings.value("size", QSize(400, 400)).toSize();
+	resize(size);
+	move(pos);
+}
+
+void Viewer::writeSettings()
+{
+	QSettings settings("Trolltech", "Application Example");
+	settings.setValue("pos", pos());
+	settings.setValue("size", size());
+}
+
+bool Viewer::maybeSave()
+{
+	if (textEdit->isModified()) {
+		int ret = QMessageBox::warning(this, tr("Application"),
+			tr("The document has been modified.\n"
+			"Do you want to save your changes?"),
+			QMessageBox::Yes | QMessageBox::Default,
+			QMessageBox::No,
+			QMessageBox::Cancel | QMessageBox::Escape);
+		if (ret == QMessageBox::Yes)
+			return save();
+		else if (ret == QMessageBox::Cancel)
+			return false;
+	}
+	return true;
+}
+
+void Viewer::loadFile(const QString &fileName)
+{
+	QFile file(fileName);
+	if (!file.open(QFile::ReadOnly)) {
+		QMessageBox::warning(this, tr("Application"),
+			tr("Cannot read file %1:\n%2.")
+			.arg(fileName)
+			.arg(file.errorString()));
+		return;
+	}
+
+	QTextStream in(&file);
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	textEdit->setText(in.readAll());
+	QApplication::restoreOverrideCursor();
+
+	setCurrentFile(fileName);
+	statusBar()->showMessage(tr("File loaded"), 2000);
+}
+
+bool Viewer::saveFile(const QString &fileName)
+{
+	QFile file(fileName);
+	if (!file.open(QFile::WriteOnly)) {
+		QMessageBox::warning(this, tr("Application"),
+			tr("Cannot write file %1:\n%2.")
+			.arg(fileName)
+			.arg(file.errorString()));
+		return false;
+	}
+
+	QTextStream out(&file);
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+	out << textEdit->text();
+	QApplication::restoreOverrideCursor();
+
+	setCurrentFile(fileName);
+	statusBar()->showMessage(tr("File saved"), 2000);
+	return true;
+}
+
+void Viewer::setCurrentFile(const QString &fileName)
+{
+	curFile = fileName;
+	textEdit->setModified(false);
+	setWindowModified(false);
+
+	QString shownName;
+	if (curFile.isEmpty())
+		shownName = "untitled.txt";
+	else
+		shownName = strippedName(curFile);
+
+	setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("Application")));
+}
+
+QString Viewer::strippedName(const QString &fullFileName)
+{
+	return QFileInfo(fullFileName).fileName();
 }
 
 void Viewer::update_UI()
@@ -44,14 +209,8 @@ void Viewer::Message(const string& msg)
 	QMessageBox::critical(nullptr, "Error", QString::fromLocal8Bit(msg.c_str()));
 }
 
-void Viewer::resize()
-{
-	ui.label->setGeometry((geometry().width() - settings::display_width()) / 2, 20, settings::display_width(), settings::display_height());
-}
-
 void Viewer::on_renderButton_clicked()
 {
-	resize();
 	typesetter.set_content(content);
 	typesetter.Typeset();
 	//typesetter.render(Typesetter::SVG);
@@ -66,7 +225,12 @@ void Viewer::on_renderButton_clicked()
 
 void Viewer::on_pageSlider_valueChanged(int value)
 {
-	//nvpr_renderer.render_page(typesetter.page(value), value);
+	if (typesetter.page_count() == 0)
+		return;
+	glwidget_->render_page(typesetter.page(value), value);
+	QString tip = "Page: ";
+	tip.append(QString::number(value, 10));
+	statusBar()->showMessage(tip);
 }
 
 void Viewer::on_spaceBorderButton_clicked(bool checked)

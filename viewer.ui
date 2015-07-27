@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1334</width>
-    <height>762</height>
+    <width>831</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Typesetter</string>
+  </property>
+  <property name="statusTip">
+   <string/>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QPushButton" name="renderButton">
@@ -265,7 +268,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>10</y>
+      <y>50</y>
       <width>30</width>
       <height>391</height>
      </rect>
@@ -432,7 +435,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1334</width>
+     <width>831</width>
      <height>21</height>
     </rect>
    </property>
@@ -449,8 +452,9 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
+   <addaction name="actionOpen_File"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen_File">

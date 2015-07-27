@@ -1,5 +1,4 @@
-#ifndef GLWIDGET_H
-#define GLWIDGET_H
+#pragma once
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -14,10 +13,16 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 	Q_OBJECT
 
 public:
-	GLWidget(QWidget *parent);
+	GLWidget(QWidget *parent = 0);
 	~GLWidget();
 
+	QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+	QSize sizeHint() const Q_DECL_OVERRIDE;
+
 	void render_page(Page* page, int page_num);
+
+public slots:
+	void cleanup();
 
 protected:
 	void initializeGL() Q_DECL_OVERRIDE;
@@ -25,20 +30,21 @@ protected:
 	void resizeGL(int width, int height) Q_DECL_OVERRIDE;
 	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+	void wheelEvent(QWheelEvent * event) Q_DECL_OVERRIDE;
 
 private:
+	GLuint pathObj;
+
+	void initGraphics();
+	void initModelAndViewMatrices();
+
 	QOpenGLContext* context_;
 	GLuint font_base_;
 	GLuint path_base_;
 	unsigned int path_count_;
 
 	int width, height;
-	static void display();
-	void initGraphics();
-	void initModelAndViewMatrices();
-
-	const char *programName = "nvpr_page_renderer";
-
+	
 	/* Scaling and rotation state. */
 	int anchor_x = 0, anchor_y = 0;  /* Anchor for rotation and scaling. */
 	int zoom = 0;
@@ -66,5 +72,3 @@ private:
 	void xform(float dst[2], Transform3x2 a, const float v[2]);
 	void MatrixLoadToGL(Transform3x2 m);
 };
-
-#endif // GLWIDGET_H

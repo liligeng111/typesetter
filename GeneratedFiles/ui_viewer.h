@@ -67,7 +67,7 @@ public:
     {
         if (viewerClass->objectName().isEmpty())
             viewerClass->setObjectName(QStringLiteral("viewerClass"));
-        viewerClass->resize(1334, 762);
+        viewerClass->resize(831, 750);
         actionOpen_File = new QAction(viewerClass);
         actionOpen_File->setObjectName(QStringLiteral("actionOpen_File"));
         centralWidget = new QWidget(viewerClass);
@@ -121,7 +121,7 @@ public:
         label_3->setGeometry(QRect(50, 150, 0, 0));
         pageSlider = new QSlider(centralWidget);
         pageSlider->setObjectName(QStringLiteral("pageSlider"));
-        pageSlider->setGeometry(QRect(180, 10, 30, 391));
+        pageSlider->setGeometry(QRect(180, 50, 30, 391));
         pageSlider->setPageStep(10);
         pageSlider->setValue(0);
         pageSlider->setOrientation(Qt::Vertical);
@@ -162,19 +162,21 @@ public:
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1334, 21));
+        menuBar->setGeometry(QRect(0, 0, 831, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         viewerClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(viewerClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
         viewerClass->addToolBar(Qt::TopToolBarArea, mainToolBar);
+        viewerClass->insertToolBarBreak(mainToolBar);
         statusBar = new QStatusBar(viewerClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         viewerClass->setStatusBar(statusBar);
 
         menuBar->addAction(menuFile->menuAction());
         menuFile->addAction(actionOpen_File);
+        mainToolBar->addAction(actionOpen_File);
 
         retranslateUi(viewerClass);
 
@@ -188,6 +190,9 @@ public:
     void retranslateUi(QMainWindow *viewerClass)
     {
         viewerClass->setWindowTitle(QApplication::translate("viewerClass", "Typesetter", 0));
+#ifndef QT_NO_STATUSTIP
+        viewerClass->setStatusTip(QString());
+#endif // QT_NO_STATUSTIP
         actionOpen_File->setText(QApplication::translate("viewerClass", "Open File", 0));
         renderButton->setText(QApplication::translate("viewerClass", "Render", 0));
         label->setText(QString());

@@ -1,8 +1,10 @@
 #include "glwidget.h"
-#include <iostream>
+#include <QMouseEvent>
+#include <QOpenGLShaderProgram>
+#include <QCoreApplication>
+#include <math.h>
 
-GLWidget::GLWidget(QWidget *parent)
-	: QOpenGLWidget(parent)
+GLWidget::GLWidget(QWidget *parent)	: QOpenGLWidget(parent)
 {
 	page_ = nullptr;
 
@@ -15,7 +17,8 @@ GLWidget::GLWidget(QWidget *parent)
 	GLboolean hasDSA;
 
 	QSurfaceFormat format;
-	format.setVersion(4, 3);
+	//TODO::what version should I use?
+	//format.setVersion(4, 5);
 	format.setProfile(QSurfaceFormat::CoreProfile);
 	format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 	format.setDepthBufferSize(24);
@@ -24,12 +27,36 @@ GLWidget::GLWidget(QWidget *parent)
 	setFormat(format);
 
 	initModelAndViewMatrices();
-
 }
 
 GLWidget::~GLWidget()
 {
+	cleanup();
+}
 
+QSize GLWidget::minimumSizeHint() const
+{
+	return QSize(50, 50);
+}
+
+QSize GLWidget::sizeHint() const
+{
+	return QSize(400, 400);
+}
+
+void GLWidget::initModelAndViewMatrices()
+{
+	float tmp[2][3];
+	translate(tmp, settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_));
+	scale(model, 3 / settings::mm_to_point(1), 3 / settings::mm_to_point(1));
+	mul(model, model, tmp);
+	translate(view, 0, 0);
+}
+
+void GLWidget::cleanup()
+{
+	makeCurrent();
+	doneCurrent();
 }
 
 void GLWidget::render_page(Page* page, int page_num)
@@ -41,21 +68,17 @@ void GLWidget::render_page(Page* page, int page_num)
 	path_count_ = 0;
 	path_base_ = 0;
 	initGraphics();
+	update();
 }
 
 void GLWidget::initGraphics()
 {
-	/* Use an orthographic path-to-clip-space transform to map the
-	[0..640]x[0..480] range of the star's path coordinates to the [-1..1]
-	clip space cube: */
 	glMatrixLoadIdentityEXT(GL_PROJECTION);
 	glMatrixOrthoEXT(GL_PROJECTION, 0, width, height, 0, -1, 1);
-	glMatrixLoadIdentityEXT(GL_MODELVIEW);
-
-	/* Before rendering to a window with a stencil buffer, clear the stencil
-	buffer to zero and the color buffer to blue: */
-	glClearStencil(0);
-	glClearColor(0.9, 0.9, 0.9, 0.0);
+	if (page_ == nullptr)
+	{
+		return;
+	}
 
 	const int numChars = 256; // ISO/IEC 8859-1 8-bit character range
 	GLuint templatePathObject = ~0; // Non-existant path object
@@ -71,13 +94,10 @@ void GLWidget::initGraphics()
 		Line* line = static_cast<Line*>(page_->child(l));
 		for (int c = 0; c < line->children_size(); c++)
 		{
-			//TODO::break glyph
 			if (line->child(c)->glyph() != nullptr)
 			{
 				const char* svg_str = line->child(c)->glyph()->path()->c_str();
 				paths.push_back(svg_str);
-				//printf(svg_str);
-				//cout << std_str << endl;
 				line_num_.push_back(l);
 				char_num_.push_back(c);
 			}
@@ -85,8 +105,6 @@ void GLWidget::initGraphics()
 			{
 				const char* svg_str = line->child(c)->break_glyph()->path()->c_str();
 				paths.push_back(svg_str);
-				//printf(svg_str);
-				//cout << std_str << endl;
 				line_num_.push_back(l);
 				char_num_.push_back(c);
 			}
@@ -112,19 +130,6 @@ void GLWidget::initGraphics()
 	const char* svg_str = border.c_str();
 	glPathStringNV(path_base_ + i, GL_PATH_FORMAT_SVG_NV, (GLsizei)strlen(svg_str), svg_str);
 	glPathParameterfNV(path_base_ + i, GL_PATH_STROKE_WIDTH_NV, 1);
-
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 0, 0x1F);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
-}
-
-void GLWidget::initModelAndViewMatrices()
-{
-	float tmp[2][3];
-	translate(tmp, settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_));
-	scale(model, 3 / settings::mm_to_point(1), 3 / settings::mm_to_point(1));
-	mul(model, model, tmp);
-	translate(view, 0, 0);
 }
 
 void GLWidget::initializeGL()
@@ -136,6 +141,15 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+
+	glEnable(GL_STENCIL_TEST);
+
+	glClearStencil(0);
+	glClearColor(0.9, 0.9, 0.9, 0);
+	glStencilMask(~0);
+	glStencilFunc(GL_NOTEQUAL, 0, 0x1F);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//nothing to draw
@@ -221,10 +235,28 @@ void GLWidget::paintGL()
 
 			//GLuint stroke_color = 0x000000;
 			//GLfloat stroke_width = 1;
+			Transform3x2 cleartype;
 
+			glColorMask(true, false, false, true);
+			translate(temp, 0.3f, 0);
+			mul(cleartype, temp, result);
+			MatrixLoadToGL(cleartype);
 			glStencilFillPathNV(path_base_ + i, GL_COUNT_UP_NV, 0x1F);
 			glCoverFillPathNV(path_base_ + i, GL_BOUNDING_BOX_NV);
 
+			glColorMask(false, false, true, true);
+			translate(temp, -0.3f, 0);
+			mul(cleartype, temp, result);
+			MatrixLoadToGL(cleartype);
+			glStencilFillPathNV(path_base_ + i, GL_COUNT_UP_NV, 0x3f);
+			glCoverFillPathNV(path_base_ + i, GL_BOUNDING_BOX_NV);
+
+			glColorMask(false, true, false, true);
+			MatrixLoadToGL(result);
+			glStencilFillPathNV(path_base_ + i, GL_COUNT_UP_NV, 0x3f);
+			glCoverFillPathNV(path_base_ + i, GL_BOUNDING_BOX_NV);
+
+			glColorMask(true, true, true, true);
 		}
 
 		//markdowns
@@ -283,14 +315,46 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
+	glViewport(0, 0, w, h);
+	width = w;
+	height = h;
+	initGraphics();
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
+	slide_y = event->y();
+	slide_x = event->x();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+	float m[2][3];
+
+	float x_offset = event->x() - slide_x;
+	float y_offset = event->y() - slide_y;
+	translate(m, x_offset, y_offset);
+	mul(view, m, view);
+	slide_y = event->y();
+	slide_x = event->x();
+	update();
+}
+
+void GLWidget::wheelEvent(QWheelEvent * event)
+{
+	Transform3x2 s;
+	float ratio;
+	if (event->delta() > 0)
+	{
+		ratio = 1.1;
+	}
+	else
+	{
+		ratio = 1 / 1.1;
+	}
+	scale(s, ratio, ratio);
+	mul(view, s, view);
+	update();
 }
 
 void GLWidget::identity(Transform3x2 dst)

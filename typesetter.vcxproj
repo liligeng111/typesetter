@@ -107,7 +107,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>.\lib\libglib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>.\lib\freetype\freetype255d.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Debug\dynamic\glib-2.0.lib;Qt5OpenGLd.lib;Qt5OpenGLExtensionsd.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>.\lib\freetype\freetype255d.lib;qtmaind.lib;qscintilla2.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Debug\dynamic\glib-2.0.lib;Qt5OpenGLd.lib;Qt5OpenGLExtensionsd.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -139,7 +139,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;.\lib\freetype\freetype255.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Release\dynamic\glib-2.0.lib;Qt5OpenGL.lib;Qt5OpenGLExtensions.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;qscintilla2.lib;.\lib\freetype\freetype255.lib;..\packages\glib.2.36.2.11\build\native\lib\v110\x64\Release\dynamic\glib-2.0.lib;Qt5OpenGL.lib;Qt5OpenGLExtensions.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

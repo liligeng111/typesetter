@@ -7,6 +7,7 @@
 #include "settings.h"
 #include "glwidget.h"
 
+#include <Qsci/qsciscintilla.h>
 using namespace std;
 
 class Viewer : public QMainWindow
@@ -19,6 +20,9 @@ public:
 
 
 	static void Message(const string& msg);
+
+protected:
+	void closeEvent(QCloseEvent *event);
 
 private slots:
 	void on_renderButton_clicked();
@@ -40,8 +44,14 @@ private slots:
 	void on_magicSpinBox_valueChanged(double arg1);
 	void on_magicGainSpinBox_valueChanged(double arg1);
 
-
     void on_actionOpen_File_triggered();
+
+
+	void newFile();
+	void open();
+	bool save();
+	bool saveAs();
+	void documentWasModified();
 
 private:
 	Ui::viewerClass ui;
@@ -49,8 +59,34 @@ private:
 	Typesetter typesetter;
 	string content;
 
-	void resize();
 	void update_UI();
+
+	void readSettings();
+	void writeSettings();
+	bool maybeSave();
+	void loadFile(const QString &fileName);
+	bool saveFile(const QString &fileName);
+	void setCurrentFile(const QString &fileName);
+	QString strippedName(const QString &fullFileName);
+
+	QsciScintilla *textEdit;
+	QString curFile;
+
+	QMenu *fileMenu;
+	QMenu *editMenu;
+	QMenu *helpMenu;
+	QToolBar *fileToolBar;
+	QToolBar *editToolBar;
+	QAction *newAct;
+	QAction *openAct;
+	QAction *saveAct;
+	QAction *saveAsAct;
+	QAction *exitAct;
+	QAction *cutAct;
+	QAction *copyAct;
+	QAction *pasteAct;
+	QAction *aboutAct;
+	QAction *aboutQtAct;
 };
 
 #endif // VIEWER_H

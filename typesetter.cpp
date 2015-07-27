@@ -9,12 +9,11 @@
 #include "lib\libhyphenate\Hyphenator.h"
 #include "container.h"
 
+
 using namespace Hyphenate;
 
 Typesetter::Typesetter()
 {
-	//just to be sure
-	file_ = "";
 	LoadFace();
 	sum_stretchability_[settings::item_priority_size_] = {};
 	sum_shrinkability_[settings::item_priority_size_] = {};
@@ -109,18 +108,24 @@ void Typesetter::Progress(string msg)
 	cout << fixed << setprecision(3) << chrono::duration_cast<std::chrono::milliseconds>(chrono::high_resolution_clock::now() - start_time_).count() / 1000.0 << "s--" << msg << "\n";
 }
 
-void Typesetter::Typeset()
+void Typesetter::Typeset(QString& text)
 {
+	cout << "joh" << endl << endl;
 	start_time_ = chrono::high_resolution_clock::now();
 
+	cout << "jodh" << endl << endl;
 	Hyphenator hyphenator = (RFC_3066::Language("en"));
 
+	cout << "jodh" << endl << endl;
 	FT_Error error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
+
+	cout << "joqh" << endl << endl;
 	if (error)
 	{
 		message("Error loading character");
 	}
 
+	cout << "jho" << endl << endl;
 	//load hyphen glyph
 	hyphen_glyph_ = new Glyph(face_->glyph, '-');
 	glyph_cache_['-'] = hyphen_glyph_;
@@ -141,30 +146,28 @@ void Typesetter::Typeset()
 	FT_UInt  last_glyph = 0;
 	FT_UInt glyph_index = 0;
 	wchar_t ch = 0;
-	wchar_t look_ahead[2] = { 0, 0 };
 
-	//TODO::Understand it....
-	std::wifstream fin(file_, std::ios::binary);
-	fin.imbue(std::locale(fin.getloc(),
-		new std::codecvt_utf16<wchar_t, 0x10ffff, std::consume_header>));
 	bool new_paragraph = true;
-
-	for (int i = 0; i < 2; i++)
+	
+	for (int text_index = 0; text_index < text.length(); text_index++)
 	{
-		fin.get(look_ahead[i]);
-	}
+		//TODO::rewrite control
 
-	while (true)
-	{
-		ch = look_ahead[0];
-		look_ahead[0] = look_ahead[1];
-		fin.get(look_ahead[1]);
-		if (fin.eof())
-			look_ahead[1] = 0;
+		ch = text.at(text_index).unicode();
 		int move_forward = 0;
+		if (text_index + 1 < text.length())
+		{
+			//double hyphen
+			if (ch == 45 && text.at(text_index + 1).unicode() == 45)
+			{
+				//TODO::em-dash here
+				ch = 45;
+				text_index++;
+			}
+		}
 		//TODO::check for availbility78
 		/*
-		if (ch == 'f' && look_ahead[0] == 'f')
+		else if (ch == 'f' && look_ahead[0] == 'f')
 		{
 			ch = 64256;
 			move_forward = 1;
@@ -248,7 +251,7 @@ void Typesetter::Typeset()
 			reset_changeability();
 
 			new_paragraph = true;
-			if (fin.eof())
+			if (text_index == text.length() - 1)
 				break;
 			continue;
 		}

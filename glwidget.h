@@ -21,6 +21,8 @@ public:
 
 	void render_page(Page* page, int page_num);
 
+	void resize(int width, int height) { resizeGL(width, height); };
+
 public slots:
 	void cleanup();
 
@@ -33,6 +35,7 @@ protected:
 	void wheelEvent(QWheelEvent * event) Q_DECL_OVERRIDE;
 
 private:
+	QWidget* parent_;
 	GLuint pathObj;
 
 	void initGraphics();

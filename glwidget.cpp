@@ -4,15 +4,16 @@
 #include <QCoreApplication>
 #include <math.h>
 
-GLWidget::GLWidget(QWidget *parent)	: QOpenGLWidget(parent)
+GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
+	parent_ = parent;
 	page_ = nullptr;
 
 	path_base_ = 0;
 	font_base_ = 0;
 	path_count_ = 0;
-	width = 630;
-	height = 891;
+	width = 0;
+	height = 0;
 
 	GLboolean hasDSA;
 
@@ -48,7 +49,7 @@ void GLWidget::initModelAndViewMatrices()
 {
 	float tmp[2][3];
 	translate(tmp, settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_));
-	scale(model, 3 / settings::mm_to_point(1), 3 / settings::mm_to_point(1));
+	scale(model, 3.5 / settings::mm_to_point(1), 3.5 / settings::mm_to_point(1));
 	mul(model, model, tmp);
 	translate(view, 0, 0);
 }
@@ -238,14 +239,14 @@ void GLWidget::paintGL()
 			Transform3x2 cleartype;
 
 			glColorMask(true, false, false, true);
-			translate(temp, 0.3f, 0);
+			translate(temp, 1.0f / 3, 0);
 			mul(cleartype, temp, result);
 			MatrixLoadToGL(cleartype);
 			glStencilFillPathNV(path_base_ + i, GL_COUNT_UP_NV, 0x1F);
 			glCoverFillPathNV(path_base_ + i, GL_BOUNDING_BOX_NV);
 
 			glColorMask(false, false, true, true);
-			translate(temp, -0.3f, 0);
+			translate(temp, -1.0f / 3, 0);
 			mul(cleartype, temp, result);
 			MatrixLoadToGL(cleartype);
 			glStencilFillPathNV(path_base_ + i, GL_COUNT_UP_NV, 0x3f);
@@ -325,6 +326,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 {
 	slide_y = event->y();
 	slide_x = event->x();
+	event->accept();
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -338,10 +340,17 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 	slide_y = event->y();
 	slide_x = event->x();
 	update();
+	event->accept();
 }
 
 void GLWidget::wheelEvent(QWheelEvent * event)
 {
+	if (event->modifiers() != Qt::ControlModifier)
+	{
+		event->ignore();
+		return;
+	}
+
 	Transform3x2 s;
 	float ratio;
 	if (event->delta() > 0)
@@ -355,6 +364,7 @@ void GLWidget::wheelEvent(QWheelEvent * event)
 	scale(s, ratio, ratio);
 	mul(view, s, view);
 	update();
+	event->accept();
 }
 
 void GLWidget::identity(Transform3x2 dst)

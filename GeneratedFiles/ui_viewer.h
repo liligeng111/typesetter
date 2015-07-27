@@ -14,16 +14,14 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
-#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDockWidget>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
-#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
@@ -33,85 +31,104 @@ QT_BEGIN_NAMESPACE
 class Ui_viewerClass
 {
 public:
-    QAction *actionOpen_File;
+    QAction *actionNew;
+    QAction *actionOpen;
+    QAction *actionSave;
+    QAction *actionSave_As;
+    QAction *actionExit;
+    QAction *actionCut;
+    QAction *actionCopy;
+    QAction *actionPaste;
+    QAction *actionAbout;
+    QAction *actionRender;
+    QAction *actionDemerits;
+    QAction *actionR;
     QWidget *centralWidget;
-    QPushButton *renderButton;
     QLabel *label;
-    QCheckBox *spaceBorderButton;
-    QCheckBox *wordBorderButton;
-    QCheckBox *charBorderButton;
-    QCheckBox *pageBorderButton;
-    QCheckBox *lineBorderButton;
     QCheckBox *riverButton;
-    QSpinBox *fontSizeBox;
-    QLabel *label_2;
-    QComboBox *paperBox;
     QDoubleSpinBox *riverThresholdSpinBox;
     QLabel *label_3;
-    QSlider *pageSlider;
-    QComboBox *expansionBox;
-    QDoubleSpinBox *expansionSpinBox;
-    QLabel *label_4;
-    QLabel *label_5;
-    QDoubleSpinBox *magicGainSpinBox;
-    QCheckBox *useMagicBox;
-    QDoubleSpinBox *magicSpinBox;
-    QLabel *label_6;
-    QComboBox *markdownBox;
     QMenuBar *menuBar;
     QMenu *menuFile;
+    QMenu *menuFile_2;
+    QMenu *menuEdit;
+    QMenu *menuCAbout;
+    QMenu *menuView;
+    QMenu *menuMarkdown;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
+    QDockWidget *dockWidget;
+    QWidget *dockWidgetContents;
+    QSlider *pageSlider;
 
     void setupUi(QMainWindow *viewerClass)
     {
         if (viewerClass->objectName().isEmpty())
             viewerClass->setObjectName(QStringLiteral("viewerClass"));
-        viewerClass->resize(831, 750);
-        actionOpen_File = new QAction(viewerClass);
-        actionOpen_File->setObjectName(QStringLiteral("actionOpen_File"));
+        viewerClass->resize(1034, 790);
+        actionNew = new QAction(viewerClass);
+        actionNew->setObjectName(QStringLiteral("actionNew"));
+        QIcon icon;
+        icon.addFile(QStringLiteral(":/viewer/images/TextDocument.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionNew->setIcon(icon);
+        actionOpen = new QAction(viewerClass);
+        actionOpen->setObjectName(QStringLiteral("actionOpen"));
+        QIcon icon1;
+        icon1.addFile(QStringLiteral(":/viewer/images/Opened.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionOpen->setIcon(icon1);
+        actionSave = new QAction(viewerClass);
+        actionSave->setObjectName(QStringLiteral("actionSave"));
+        QIcon icon2;
+        icon2.addFile(QStringLiteral(":/viewer/images/Floppy.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionSave->setIcon(icon2);
+        actionSave_As = new QAction(viewerClass);
+        actionSave_As->setObjectName(QStringLiteral("actionSave_As"));
+        actionSave_As->setIcon(icon2);
+        actionExit = new QAction(viewerClass);
+        actionExit->setObjectName(QStringLiteral("actionExit"));
+        QIcon icon3;
+        icon3.addFile(QStringLiteral(":/viewer/images/Close.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionExit->setIcon(icon3);
+        actionCut = new QAction(viewerClass);
+        actionCut->setObjectName(QStringLiteral("actionCut"));
+        QIcon icon4;
+        icon4.addFile(QStringLiteral(":/viewer/images/CUt.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCut->setIcon(icon4);
+        actionCopy = new QAction(viewerClass);
+        actionCopy->setObjectName(QStringLiteral("actionCopy"));
+        QIcon icon5;
+        icon5.addFile(QStringLiteral(":/viewer/images/Scanner.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCopy->setIcon(icon5);
+        actionPaste = new QAction(viewerClass);
+        actionPaste->setObjectName(QStringLiteral("actionPaste"));
+        QIcon icon6;
+        icon6.addFile(QStringLiteral(":/viewer/images/Printer.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionPaste->setIcon(icon6);
+        actionAbout = new QAction(viewerClass);
+        actionAbout->setObjectName(QStringLiteral("actionAbout"));
+        QIcon icon7;
+        icon7.addFile(QStringLiteral(":/viewer/images/Prorgrams.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionAbout->setIcon(icon7);
+        actionRender = new QAction(viewerClass);
+        actionRender->setObjectName(QStringLiteral("actionRender"));
+        QIcon icon8;
+        icon8.addFile(QStringLiteral(":/viewer/images/Run.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionRender->setIcon(icon8);
+        actionDemerits = new QAction(viewerClass);
+        actionDemerits->setObjectName(QStringLiteral("actionDemerits"));
+        actionDemerits->setCheckable(true);
+        actionDemerits->setChecked(true);
+        actionR = new QAction(viewerClass);
+        actionR->setObjectName(QStringLiteral("actionR"));
+        actionR->setCheckable(true);
         centralWidget = new QWidget(viewerClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        renderButton = new QPushButton(centralWidget);
-        renderButton->setObjectName(QStringLiteral("renderButton"));
-        renderButton->setGeometry(QRect(20, 520, 75, 23));
         label = new QLabel(centralWidget);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(200, 0, 47, 13));
-        spaceBorderButton = new QCheckBox(centralWidget);
-        spaceBorderButton->setObjectName(QStringLiteral("spaceBorderButton"));
-        spaceBorderButton->setGeometry(QRect(30, 10, 82, 17));
-        spaceBorderButton->setChecked(true);
-        wordBorderButton = new QCheckBox(centralWidget);
-        wordBorderButton->setObjectName(QStringLiteral("wordBorderButton"));
-        wordBorderButton->setGeometry(QRect(30, 50, 82, 17));
-        wordBorderButton->setChecked(true);
-        charBorderButton = new QCheckBox(centralWidget);
-        charBorderButton->setObjectName(QStringLiteral("charBorderButton"));
-        charBorderButton->setGeometry(QRect(30, 30, 82, 17));
-        charBorderButton->setChecked(true);
-        pageBorderButton = new QCheckBox(centralWidget);
-        pageBorderButton->setObjectName(QStringLiteral("pageBorderButton"));
-        pageBorderButton->setGeometry(QRect(30, 90, 82, 17));
-        pageBorderButton->setChecked(true);
-        lineBorderButton = new QCheckBox(centralWidget);
-        lineBorderButton->setObjectName(QStringLiteral("lineBorderButton"));
-        lineBorderButton->setGeometry(QRect(30, 70, 82, 17));
-        lineBorderButton->setChecked(true);
         riverButton = new QCheckBox(centralWidget);
         riverButton->setObjectName(QStringLiteral("riverButton"));
         riverButton->setGeometry(QRect(30, 110, 0, 0));
-        fontSizeBox = new QSpinBox(centralWidget);
-        fontSizeBox->setObjectName(QStringLiteral("fontSizeBox"));
-        fontSizeBox->setGeometry(QRect(90, 190, 60, 20));
-        fontSizeBox->setMaximum(1000);
-        fontSizeBox->setValue(12);
-        label_2 = new QLabel(centralWidget);
-        label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setGeometry(QRect(30, 190, 50, 20));
-        paperBox = new QComboBox(centralWidget);
-        paperBox->setObjectName(QStringLiteral("paperBox"));
-        paperBox->setGeometry(QRect(30, 150, 69, 22));
         riverThresholdSpinBox = new QDoubleSpinBox(centralWidget);
         riverThresholdSpinBox->setObjectName(QStringLiteral("riverThresholdSpinBox"));
         riverThresholdSpinBox->setGeometry(QRect(110, 150, 0, 0));
@@ -119,70 +136,78 @@ public:
         label_3 = new QLabel(centralWidget);
         label_3->setObjectName(QStringLiteral("label_3"));
         label_3->setGeometry(QRect(50, 150, 0, 0));
-        pageSlider = new QSlider(centralWidget);
-        pageSlider->setObjectName(QStringLiteral("pageSlider"));
-        pageSlider->setGeometry(QRect(180, 50, 30, 391));
-        pageSlider->setPageStep(10);
-        pageSlider->setValue(0);
-        pageSlider->setOrientation(Qt::Vertical);
-        pageSlider->setInvertedAppearance(true);
-        expansionBox = new QComboBox(centralWidget);
-        expansionBox->setObjectName(QStringLiteral("expansionBox"));
-        expansionBox->setGeometry(QRect(30, 260, 69, 22));
-        expansionSpinBox = new QDoubleSpinBox(centralWidget);
-        expansionSpinBox->setObjectName(QStringLiteral("expansionSpinBox"));
-        expansionSpinBox->setGeometry(QRect(90, 310, 62, 22));
-        label_4 = new QLabel(centralWidget);
-        label_4->setObjectName(QStringLiteral("label_4"));
-        label_4->setGeometry(QRect(30, 290, 100, 16));
-        label_5 = new QLabel(centralWidget);
-        label_5->setObjectName(QStringLiteral("label_5"));
-        label_5->setGeometry(QRect(10, 370, 191, 21));
-        magicGainSpinBox = new QDoubleSpinBox(centralWidget);
-        magicGainSpinBox->setObjectName(QStringLiteral("magicGainSpinBox"));
-        magicGainSpinBox->setGeometry(QRect(90, 400, 62, 22));
-        magicGainSpinBox->setMaximum(10000);
-        magicGainSpinBox->setSingleStep(10);
-        magicGainSpinBox->setValue(0);
-        useMagicBox = new QCheckBox(centralWidget);
-        useMagicBox->setObjectName(QStringLiteral("useMagicBox"));
-        useMagicBox->setGeometry(QRect(20, 490, 70, 17));
-        magicSpinBox = new QDoubleSpinBox(centralWidget);
-        magicSpinBox->setObjectName(QStringLiteral("magicSpinBox"));
-        magicSpinBox->setGeometry(QRect(90, 460, 62, 22));
-        magicSpinBox->setMaximum(20);
-        magicSpinBox->setSingleStep(0.1);
-        magicSpinBox->setValue(0);
-        label_6 = new QLabel(centralWidget);
-        label_6->setObjectName(QStringLiteral("label_6"));
-        label_6->setGeometry(QRect(10, 430, 191, 21));
-        markdownBox = new QComboBox(centralWidget);
-        markdownBox->setObjectName(QStringLiteral("markdownBox"));
-        markdownBox->setGeometry(QRect(30, 110, 69, 22));
         viewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(viewerClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 831, 21));
+        menuBar->setGeometry(QRect(0, 0, 1034, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
+        menuFile_2 = new QMenu(menuBar);
+        menuFile_2->setObjectName(QStringLiteral("menuFile_2"));
+        menuEdit = new QMenu(menuBar);
+        menuEdit->setObjectName(QStringLiteral("menuEdit"));
+        menuCAbout = new QMenu(menuBar);
+        menuCAbout->setObjectName(QStringLiteral("menuCAbout"));
+        menuView = new QMenu(menuBar);
+        menuView->setObjectName(QStringLiteral("menuView"));
+        menuMarkdown = new QMenu(menuView);
+        menuMarkdown->setObjectName(QStringLiteral("menuMarkdown"));
         viewerClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(viewerClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
         viewerClass->addToolBar(Qt::TopToolBarArea, mainToolBar);
-        viewerClass->insertToolBarBreak(mainToolBar);
         statusBar = new QStatusBar(viewerClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         viewerClass->setStatusBar(statusBar);
+        dockWidget = new QDockWidget(viewerClass);
+        dockWidget->setObjectName(QStringLiteral("dockWidget"));
+        dockWidget->setMinimumSize(QSize(50, 38));
+        dockWidgetContents = new QWidget();
+        dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
+        pageSlider = new QSlider(dockWidgetContents);
+        pageSlider->setObjectName(QStringLiteral("pageSlider"));
+        pageSlider->setGeometry(QRect(30, 40, 30, 611));
+        pageSlider->setPageStep(10);
+        pageSlider->setValue(0);
+        pageSlider->setOrientation(Qt::Vertical);
+        pageSlider->setInvertedAppearance(true);
+        dockWidget->setWidget(dockWidgetContents);
+        viewerClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget);
 
+        menuBar->addAction(menuFile_2->menuAction());
+        menuBar->addAction(menuEdit->menuAction());
         menuBar->addAction(menuFile->menuAction());
-        menuFile->addAction(actionOpen_File);
-        mainToolBar->addAction(actionOpen_File);
+        menuBar->addAction(menuView->menuAction());
+        menuBar->addAction(menuCAbout->menuAction());
+        menuFile_2->addAction(actionNew);
+        menuFile_2->addAction(actionOpen);
+        menuFile_2->addAction(actionSave);
+        menuFile_2->addAction(actionSave_As);
+        menuFile_2->addSeparator();
+        menuFile_2->addAction(actionExit);
+        menuEdit->addAction(actionCut);
+        menuEdit->addAction(actionCopy);
+        menuEdit->addAction(actionPaste);
+        menuCAbout->addAction(actionAbout);
+        menuView->addAction(menuMarkdown->menuAction());
+        menuMarkdown->addAction(actionDemerits);
+        menuMarkdown->addAction(actionR);
+        mainToolBar->addAction(actionNew);
+        mainToolBar->addAction(actionOpen);
+        mainToolBar->addAction(actionSave);
+        mainToolBar->addSeparator();
+        mainToolBar->addAction(actionRender);
 
         retranslateUi(viewerClass);
-
-        paperBox->setCurrentIndex(2);
-        expansionBox->setCurrentIndex(0);
-
+        QObject::connect(actionNew, SIGNAL(triggered()), viewerClass, SLOT(newFile()));
+        QObject::connect(actionExit, SIGNAL(triggered()), viewerClass, SLOT(close()));
+        QObject::connect(actionOpen, SIGNAL(triggered()), viewerClass, SLOT(open()));
+        QObject::connect(actionSave, SIGNAL(triggered()), viewerClass, SLOT(save()));
+        QObject::connect(actionSave_As, SIGNAL(triggered()), viewerClass, SLOT(saveAs()));
+        QObject::connect(actionAbout, SIGNAL(triggered()), viewerClass, SLOT(about()));
+        QObject::connect(actionRender, SIGNAL(triggered()), viewerClass, SLOT(render()));
+        QObject::connect(actionR, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownR(bool)));
+        QObject::connect(actionDemerits, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownDemerits(bool)));
 
         QMetaObject::connectSlotsByName(viewerClass);
     } // setupUi
@@ -193,47 +218,65 @@ public:
 #ifndef QT_NO_STATUSTIP
         viewerClass->setStatusTip(QString());
 #endif // QT_NO_STATUSTIP
-        actionOpen_File->setText(QApplication::translate("viewerClass", "Open File", 0));
-        renderButton->setText(QApplication::translate("viewerClass", "Render", 0));
+        actionNew->setText(QApplication::translate("viewerClass", "New", 0));
+#ifndef QT_NO_TOOLTIP
+        actionNew->setToolTip(QApplication::translate("viewerClass", "Create a new file", 0));
+#endif // QT_NO_TOOLTIP
+        actionNew->setShortcut(QApplication::translate("viewerClass", "Ctrl+N", 0));
+        actionOpen->setText(QApplication::translate("viewerClass", "Open", 0));
+#ifndef QT_NO_TOOLTIP
+        actionOpen->setToolTip(QApplication::translate("viewerClass", "Open an existing file", 0));
+#endif // QT_NO_TOOLTIP
+        actionOpen->setShortcut(QApplication::translate("viewerClass", "Ctrl+O", 0));
+        actionSave->setText(QApplication::translate("viewerClass", "Save", 0));
+#ifndef QT_NO_TOOLTIP
+        actionSave->setToolTip(QApplication::translate("viewerClass", "Save the document to disk", 0));
+#endif // QT_NO_TOOLTIP
+        actionSave->setShortcut(QApplication::translate("viewerClass", "Ctrl+S", 0));
+        actionSave_As->setText(QApplication::translate("viewerClass", "Save As", 0));
+#ifndef QT_NO_TOOLTIP
+        actionSave_As->setToolTip(QApplication::translate("viewerClass", "Save the document under a new name", 0));
+#endif // QT_NO_TOOLTIP
+        actionExit->setText(QApplication::translate("viewerClass", "Exit", 0));
+#ifndef QT_NO_TOOLTIP
+        actionExit->setToolTip(QApplication::translate("viewerClass", "Exit the application", 0));
+#endif // QT_NO_TOOLTIP
+        actionExit->setShortcut(QApplication::translate("viewerClass", "Ctrl+Q", 0));
+        actionCut->setText(QApplication::translate("viewerClass", "Cut", 0));
+#ifndef QT_NO_TOOLTIP
+        actionCut->setToolTip(QApplication::translate("viewerClass", "Cut the current selection's contents to the clipboard", 0));
+#endif // QT_NO_TOOLTIP
+        actionCut->setShortcut(QApplication::translate("viewerClass", "Ctrl+X", 0));
+        actionCopy->setText(QApplication::translate("viewerClass", "Copy", 0));
+#ifndef QT_NO_TOOLTIP
+        actionCopy->setToolTip(QApplication::translate("viewerClass", "Copy the current selection's contents to the clipboard", 0));
+#endif // QT_NO_TOOLTIP
+        actionCopy->setShortcut(QApplication::translate("viewerClass", "Ctrl+C", 0));
+        actionPaste->setText(QApplication::translate("viewerClass", "Paste", 0));
+#ifndef QT_NO_TOOLTIP
+        actionPaste->setToolTip(QApplication::translate("viewerClass", "Paste the clipboard's contents into the current selection", 0));
+#endif // QT_NO_TOOLTIP
+        actionPaste->setShortcut(QApplication::translate("viewerClass", "Ctrl+V", 0));
+        actionAbout->setText(QApplication::translate("viewerClass", "About", 0));
+#ifndef QT_NO_TOOLTIP
+        actionAbout->setToolTip(QApplication::translate("viewerClass", "Show the application's About box", 0));
+#endif // QT_NO_TOOLTIP
+        actionRender->setText(QApplication::translate("viewerClass", "Render", 0));
+#ifndef QT_NO_TOOLTIP
+        actionRender->setToolTip(QApplication::translate("viewerClass", "Render text using NVPR.", 0));
+#endif // QT_NO_TOOLTIP
+        actionRender->setShortcut(QApplication::translate("viewerClass", "F5", 0));
+        actionDemerits->setText(QApplication::translate("viewerClass", "Demerits", 0));
+        actionR->setText(QApplication::translate("viewerClass", "r", 0));
         label->setText(QString());
-        spaceBorderButton->setText(QApplication::translate("viewerClass", "Space Border", 0));
-        wordBorderButton->setText(QApplication::translate("viewerClass", "Word Border", 0));
-        charBorderButton->setText(QApplication::translate("viewerClass", "Char Border", 0));
-        pageBorderButton->setText(QApplication::translate("viewerClass", "Page Border", 0));
-        lineBorderButton->setText(QApplication::translate("viewerClass", "Line Border", 0));
         riverButton->setText(QApplication::translate("viewerClass", "Show River", 0));
-        label_2->setText(QApplication::translate("viewerClass", "Font Size:", 0));
-        paperBox->clear();
-        paperBox->insertItems(0, QStringList()
-         << QApplication::translate("viewerClass", "A2", 0)
-         << QApplication::translate("viewerClass", "A3", 0)
-         << QApplication::translate("viewerClass", "A4", 0)
-         << QApplication::translate("viewerClass", "A5", 0)
-         << QApplication::translate("viewerClass", "A6", 0)
-         << QApplication::translate("viewerClass", "A7", 0)
-         << QApplication::translate("viewerClass", "B2", 0)
-         << QApplication::translate("viewerClass", "B3", 0)
-         << QApplication::translate("viewerClass", "B4", 0)
-         << QApplication::translate("viewerClass", "B5", 0)
-         << QApplication::translate("viewerClass", "B6", 0)
-         << QApplication::translate("viewerClass", "B7", 0)
-        );
         label_3->setText(QApplication::translate("viewerClass", "Threshold:", 0));
-        expansionBox->clear();
-        expansionBox->insertItems(0, QStringList()
-         << QApplication::translate("viewerClass", "Font First", 0)
-         << QApplication::translate("viewerClass", "Uniform", 0)
-        );
-        label_4->setText(QApplication::translate("viewerClass", "Max Expansion:", 0));
-        label_5->setText(QApplication::translate("viewerClass", "show Magic Edge with gain >", 0));
-        useMagicBox->setText(QApplication::translate("viewerClass", "Use Magic!", 0));
-        label_6->setText(QApplication::translate("viewerClass", "Max amount magic allowed:", 0));
-        markdownBox->clear();
-        markdownBox->insertItems(0, QStringList()
-         << QApplication::translate("viewerClass", "Demerits", 0)
-         << QApplication::translate("viewerClass", "r", 0)
-        );
-        menuFile->setTitle(QApplication::translate("viewerClass", "File", 0));
+        menuFile->setTitle(QApplication::translate("viewerClass", "Settings", 0));
+        menuFile_2->setTitle(QApplication::translate("viewerClass", "File", 0));
+        menuEdit->setTitle(QApplication::translate("viewerClass", "Edit", 0));
+        menuCAbout->setTitle(QApplication::translate("viewerClass", "About", 0));
+        menuView->setTitle(QApplication::translate("viewerClass", "View", 0));
+        menuMarkdown->setTitle(QApplication::translate("viewerClass", "Markdown", 0));
     } // retranslateUi
 
 };

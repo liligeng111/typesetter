@@ -12,6 +12,7 @@
 #include "breakpoint.h"
 #include "typesetter.h"
 #include "container.h"
+#include <qstring>
 
 using namespace std;
 
@@ -29,21 +30,18 @@ public:
 
 	Typesetter();
 	~Typesetter();
-
-	void set_content(string& content) { file_ = content; }
-
+	
 	void render(RenderTarget target);
 	void render_page(RenderTarget target, int page);
 	Page* page(int i) { return pages_[i]; }
 	int page_count() const { return pages_.size(); }
 	static void message(const string& msg);
-	void Typeset();
+	void Typeset(QString& text);
 
 	void LoadFace();
 
 private:
 
-	string file_;
 	FT_Library  library_;
 	FT_Face face_;
 	map<wchar_t, Glyph*> glyph_cache_;

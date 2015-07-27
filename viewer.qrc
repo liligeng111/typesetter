@@ -1,10 +1,15 @@
 <RCC>
     <qresource prefix="/viewer">
-        <file>images/copy.png</file>
-        <file>images/cut.png</file>
-        <file>images/new.png</file>
-        <file>images/open.png</file>
-        <file>images/paste.png</file>
-        <file>images/save.png</file>
+        <file>images/Administrative_Tools.png</file>
+        <file>images/Close.png</file>
+        <file>images/CUt.png</file>
+        <file>images/Floppy.png</file>
+        <file>images/Opened.png</file>
+        <file>images/Run.png</file>
+        <file>images/Search.png</file>
+        <file>images/TextDocument.png</file>
+        <file>images/Printer.png</file>
+        <file>images/Prorgrams.png</file>
+        <file>images/Scanner.png</file>
     </qresource>
 </RCC>

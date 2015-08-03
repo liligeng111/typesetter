@@ -44,6 +44,7 @@ public:
     QAction *actionDemerits;
     QAction *actionR;
     QAction *actionAuto_Typeset;
+    QAction *actionCommit;
     QWidget *centralWidget;
     QLabel *label;
     QCheckBox *riverButton;
@@ -128,6 +129,11 @@ public:
         actionAuto_Typeset = new QAction(viewerClass);
         actionAuto_Typeset->setObjectName(QStringLiteral("actionAuto_Typeset"));
         actionAuto_Typeset->setCheckable(true);
+        actionCommit = new QAction(viewerClass);
+        actionCommit->setObjectName(QStringLiteral("actionCommit"));
+        QIcon icon9;
+        icon9.addFile(QStringLiteral(":/viewer/images/Up.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCommit->setIcon(icon9);
         centralWidget = new QWidget(viewerClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         label = new QLabel(centralWidget);
@@ -205,6 +211,7 @@ public:
         mainToolBar->addAction(actionSave);
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionTypeset);
+        mainToolBar->addAction(actionCommit);
 
         retranslateUi(viewerClass);
         QObject::connect(actionNew, SIGNAL(triggered()), viewerClass, SLOT(newFile()));
@@ -217,6 +224,7 @@ public:
         QObject::connect(actionR, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownR(bool)));
         QObject::connect(actionDemerits, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownDemerits(bool)));
         QObject::connect(actionAuto_Typeset, SIGNAL(toggled(bool)), viewerClass, SLOT(auto_typeset(bool)));
+        QObject::connect(actionCommit, SIGNAL(triggered()), viewerClass, SLOT(commit()));
 
         QMetaObject::connectSlotsByName(viewerClass);
     } // setupUi
@@ -281,6 +289,7 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionAuto_Typeset->setToolTip(QApplication::translate("viewerClass", "Check to set auto typeset when text is chenged", 0));
 #endif // QT_NO_TOOLTIP
+        actionCommit->setText(QApplication::translate("viewerClass", "Commit", 0));
         label->setText(QString());
         riverButton->setText(QApplication::translate("viewerClass", "Show River", 0));
         label_3->setText(QApplication::translate("viewerClass", "Threshold:", 0));

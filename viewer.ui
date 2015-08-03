@@ -145,6 +145,7 @@
    <addaction name="actionSave"/>
    <addaction name="separator"/>
    <addaction name="actionTypeset"/>
+   <addaction name="actionCommit"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -362,6 +363,15 @@
     <string>Check to set auto typeset when text is chenged</string>
    </property>
   </action>
+  <action name="actionCommit">
+   <property name="icon">
+    <iconset resource="viewer.qrc">
+     <normaloff>:/viewer/images/Up.png</normaloff>:/viewer/images/Up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Commit</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
@@ -528,6 +538,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionCommit</sender>
+   <signal>triggered()</signal>
+   <receiver>viewerClass</receiver>
+   <slot>commit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>newFile()</slot>
@@ -540,5 +566,6 @@
   <slot>setMarkdownR(bool)</slot>
   <slot>setMarkdownDemerits(bool)</slot>
   <slot>auto_typeset(bool)</slot>
+  <slot>commit()</slot>
  </slots>
 </ui>

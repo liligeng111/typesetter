@@ -9,6 +9,7 @@
 #include <QSettings>
 
 #include <Qsci/qsciscintilla.h>
+#include <Qsci/qscicommandset.h>
 using namespace std;
 
 class Viewer : public QMainWindow
@@ -39,6 +40,8 @@ private slots:
 	void auto_typeset(bool checked);
 	void typeset();
 	void jump(int line, int index);
+	void margin_clicked(int margin, int line, Qt::KeyboardModifiers state);
+	void commit();
 
 	void setMarkdownR(bool checked);
 	void setMarkdownDemerits(bool checked);
@@ -59,6 +62,11 @@ private:
 
 	QsciScintilla *textEdit;
 	QString curFile;
+
+	vector<vector<QString>> backups_;
+	vector<int> backups_index_;
+	void clear_backups();
+	int backup_marker_;
 };
 
 #endif // VIEWER_H

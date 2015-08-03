@@ -43,6 +43,13 @@ private:
 	string hyphenated_;
 };
 
+class Page : public Container
+{
+public:
+	Page();
+	~Page();
+};
+
 class Line : public Container
 {
 public:
@@ -54,18 +61,17 @@ public:
 	float space_r() const { return space_r_; }
 	float font_r() const { return font_r_; }
 	float letter_space_r() const { return letter_space_r_; }
-	long line_number() const { return line_number_; }
-	void set_line_number(long number) { line_number_ = number; }
+	int qscintilla_line_number() const { return qscintilla_line_number_; }
+	void set_qscintilla_line_number(int number) { qscintilla_line_number_ = number; }
+	int line_number() const { return line_number_; }
+	void set_line_number(int number) { line_number_ = number; }
+	Page* page() const { return page_; }
+	void set_page(Page* page) { page_ = page; }
 
 private:
 	Breakpoint::Demerits demerits_;
 	float font_r_, space_r_, letter_space_r_;
-	long line_number_;
-};
-
-class Page : public Container
-{
-public:
-	Page();
-	~Page();
+	int line_number_;
+	int qscintilla_line_number_;
+	Page* page_;
 };

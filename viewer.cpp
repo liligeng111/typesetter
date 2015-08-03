@@ -3,7 +3,6 @@
 #include <qpainter>
 #include <QCloseEvent>
 #include <QPoint>
-#include <QSettings>
 #include <QFile>
 #include <QFileInfo>
 #include <QFileDialog>
@@ -15,8 +14,6 @@
 #include <fstream>
 #include <streambuf>
 #include "container.h"
-
-
 
 Viewer::Viewer(QWidget *parent)
 	: QMainWindow(parent)
@@ -30,14 +27,16 @@ Viewer::Viewer(QWidget *parent)
 void Viewer::init()
 {
 	QRect size = centralWidget()->geometry();
+	settings_ = new QSettings("./settings/config.ini", QSettings::IniFormat);
 	glwidget_ = new GLWidget(this);
 	glwidget_->setGeometry(size.x(), size.y(), size.width(), size.height());
 	glwidget_->show();
 
 	textEdit = new QsciScintilla(this);
 	textEdit->setGeometry(250, 50, 630, 891);
+	textEdit->setWrapMode(QsciScintilla::WrapWord);
+	textEdit->setMarginType(0, QsciScintilla::TextMarginRightJustified);
 	textEdit->show();
-	textEdit->SendScintilla(textEdit->SCI_SETHSCROLLBAR, 0);
 	readSettings();
 	connect(textEdit, SIGNAL(textChanged()),
 		this, SLOT(documentWasModified()));
@@ -49,6 +48,8 @@ void Viewer::init()
 	connect(ui.actionCut, SIGNAL(triggered()), textEdit, SLOT(cut()));
 	connect(ui.actionCopy, SIGNAL(triggered()), textEdit, SLOT(copy()));
 	connect(ui.actionPaste, SIGNAL(triggered()), textEdit, SLOT(paste()));
+
+	connect(textEdit, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(jump(int, int)));
 }
 
 Viewer::~Viewer()
@@ -125,21 +126,28 @@ void Viewer::documentWasModified()
 	setWindowModified(textEdit->isModified());
 }
 
+void Viewer::jump(int line, int index)
+{
+	Page* page = typesetter_.get_page_number(line);
+	if (page != nullptr)
+		glwidget_->render_page(page);
+}
+
 void Viewer::readSettings()
 {
-	QSettings settings("./settings/config.ini", QSettings::IniFormat);
-	QPoint pos = settings.value("window/pos", QPoint(200, 200)).toPoint();
-	QSize size = settings.value("window/size", QSize(400, 400)).toSize();
+	QPoint pos = settings_->value("window/pos", QPoint(200, 200)).toPoint();
+	QSize size = settings_->value("window/size", QSize(400, 400)).toSize();
 	resize(size);
 	move(pos);
+
+	//load settings
+	ui.actionAuto_Typeset->setChecked(settings_->value("typesetting/auto_typeset", false).toBool());
 }
 
 void Viewer::writeSettings()
 {
-	QSettings settings("./settings/config.ini", QSettings::IniFormat);
-	settings.setValue("window/pos", pos());
-	settings.setValue("window/size", size());
-	settings.setValue("abc/size", 1.0 / 3);
+	settings_->setValue("window/pos", pos());
+	settings_->setValue("window/size", size());
 }
 
 bool Viewer::maybeSave()
@@ -225,23 +233,33 @@ void Viewer::Message(const string& msg)
 	QMessageBox::critical(nullptr, "Error", QString::fromLocal8Bit(msg.c_str()));
 }
 
-void Viewer::render()
+void Viewer::auto_typeset(bool checked)
 {
-	typesetter_.Typeset(textEdit->text());
+	settings_->setValue("typesetting/auto_typeset", checked);
+	if (checked)
+		connect(textEdit, SIGNAL(textChanged()), this, SLOT(render()));
+	else
+		disconnect(textEdit, SIGNAL(textChanged()), this, SLOT(render()));
+}
+
+void Viewer::typeset()
+{
+	//TODO::why do I have to do this
+	typesetter_.Typeset(textEdit->text().append("\n"));
 	//typesetter.render(Typesetter::SVG);
 
 	cout << "Total Page Count:" << typesetter_.page_count() << endl;
 	ui.pageSlider->setMaximum(typesetter_.page_count() - 1);
 	ui.pageSlider->setValue(0);
 	//on_pageSlider_valueChanged(0);
-	glwidget_->render_page(typesetter_.page(0), 0);
+	glwidget_->render_page(typesetter_.page(0));
 }
 
 void Viewer::on_pageSlider_valueChanged(int value)
 {
 	if (typesetter_.page_count() == 0)
 		return;
-	glwidget_->render_page(typesetter_.page(value), value);
+	glwidget_->render_page(typesetter_.page(value));
 	QString tip = "Page: ";
 	tip.append(QString::number(value, 10));
 	statusBar()->showMessage(tip);

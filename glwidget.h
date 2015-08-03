@@ -19,7 +19,7 @@ public:
 	QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 	QSize sizeHint() const Q_DECL_OVERRIDE;
 
-	void render_page(Page* page, int page_num);
+	void render_page(Page* page);
 
 	void resize(int width, int height) { resizeGL(width, height); };
 

@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Typesetter</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="viewer.qrc">
+    <normaloff>:/viewer/images/Prorgrams.png</normaloff>:/viewer/images/Prorgrams.png</iconset>
+  </property>
   <property name="statusTip">
    <string/>
   </property>
@@ -83,6 +87,7 @@
     <property name="title">
      <string>Settings</string>
     </property>
+    <addaction name="actionAuto_Typeset"/>
    </widget>
    <widget class="QMenu" name="menuFile_2">
     <property name="title">
@@ -139,13 +144,13 @@
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
    <addaction name="separator"/>
-   <addaction name="actionRender"/>
+   <addaction name="actionTypeset"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
    <property name="minimumSize">
     <size>
-     <width>50</width>
+     <width>80</width>
      <height>38</height>
     </size>
    </property>
@@ -306,16 +311,22 @@
     <string>Show the application's About box</string>
    </property>
   </action>
-  <action name="actionRender">
+  <action name="actionTypeset">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="viewer.qrc">
      <normaloff>:/viewer/images/Run.png</normaloff>:/viewer/images/Run.png</iconset>
    </property>
    <property name="text">
-    <string>Render</string>
+    <string>Typeset</string>
    </property>
    <property name="toolTip">
-    <string>Render text using NVPR.</string>
+    <string>Typeset and render text using NVPR.</string>
    </property>
    <property name="shortcut">
     <string>F5</string>
@@ -338,6 +349,17 @@
    </property>
    <property name="text">
     <string>r</string>
+   </property>
+  </action>
+  <action name="actionAuto_Typeset">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Auto Typeset</string>
+   </property>
+   <property name="toolTip">
+    <string>Check to set auto typeset when text is chenged</string>
    </property>
   </action>
  </widget>
@@ -443,10 +465,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionRender</sender>
+   <sender>actionTypeset</sender>
    <signal>triggered()</signal>
    <receiver>viewerClass</receiver>
-   <slot>render()</slot>
+   <slot>typeset()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -490,6 +512,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionAuto_Typeset</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>viewerClass</receiver>
+   <slot>auto_typeset(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>newFile()</slot>
@@ -498,8 +536,9 @@
   <slot>saveAs()</slot>
   <slot>documentWasModified()</slot>
   <slot>about()</slot>
-  <slot>render()</slot>
+  <slot>typeset()</slot>
   <slot>setMarkdownR(bool)</slot>
   <slot>setMarkdownDemerits(bool)</slot>
+  <slot>auto_typeset(bool)</slot>
  </slots>
 </ui>

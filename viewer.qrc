@@ -11,5 +11,7 @@
         <file>images/Printer.png</file>
         <file>images/Prorgrams.png</file>
         <file>images/Scanner.png</file>
+        <file>images/BMP.png</file>
+        <file>images/Control_Panel.png</file>
     </qresource>
 </RCC>

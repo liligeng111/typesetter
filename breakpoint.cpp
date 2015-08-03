@@ -22,6 +22,7 @@ void Breakpoint::init(Item* item, int line, float demerits_sum, Demerits demerit
 	demerits_sum_ = demerits_sum;
 	demerits_ = demerits;
 	prev_ = prev;
+	is_last_ = false;
 }
 
 Breakpoint::~Breakpoint()

@@ -40,6 +40,8 @@ public:
 
 	void LoadFace();
 
+	Page* get_page_number(int qscintilla_line_number);
+
 private:
 
 	FT_Library  library_;

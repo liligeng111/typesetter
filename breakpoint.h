@@ -53,6 +53,8 @@ public:
 	void set_is_magic(bool is_magic) { is_magic_ = is_magic; }
 	int magic_count() const { return magic_count_; }
 	void set_magic_count(int magic_count) { magic_count_ = magic_count; }
+	bool is_last() const { return is_last_; }
+	void set_is_last(bool is_last) { is_last_ = is_last; }
 
 private:
 	Item* item_;
@@ -68,5 +70,7 @@ private:
 	//magic edge
 	bool is_magic_;
 	int magic_count_;
+
+	bool is_last_; //is the last breakpoint of a paragraph
 };
 

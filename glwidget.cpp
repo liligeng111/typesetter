@@ -60,7 +60,7 @@ void GLWidget::cleanup()
 	doneCurrent();
 }
 
-void GLWidget::render_page(Page* page, int page_num)
+void GLWidget::render_page(Page* page)
 {
 	page_ = page;
 	//delete previous page

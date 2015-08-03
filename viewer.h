@@ -6,6 +6,7 @@
 #include "typesetter.h"
 #include "settings.h"
 #include "glwidget.h"
+#include <QSettings>
 
 #include <Qsci/qsciscintilla.h>
 using namespace std;
@@ -35,7 +36,9 @@ private slots:
 	bool saveAs();
 	void documentWasModified();
 	void about();
-	void render();
+	void auto_typeset(bool checked);
+	void typeset();
+	void jump(int line, int index);
 
 	void setMarkdownR(bool checked);
 	void setMarkdownDemerits(bool checked);
@@ -44,6 +47,7 @@ private:
 	Ui::viewerClass ui;
 	GLWidget* glwidget_;
 	Typesetter typesetter_;
+	QSettings* settings_;
 	
 	void readSettings();
 	void writeSettings();

@@ -40,9 +40,10 @@ public:
     QAction *actionCopy;
     QAction *actionPaste;
     QAction *actionAbout;
-    QAction *actionRender;
+    QAction *actionTypeset;
     QAction *actionDemerits;
     QAction *actionR;
+    QAction *actionAuto_Typeset;
     QWidget *centralWidget;
     QLabel *label;
     QCheckBox *riverButton;
@@ -66,54 +67,57 @@ public:
         if (viewerClass->objectName().isEmpty())
             viewerClass->setObjectName(QStringLiteral("viewerClass"));
         viewerClass->resize(1034, 790);
+        QIcon icon;
+        icon.addFile(QStringLiteral(":/viewer/images/Prorgrams.png"), QSize(), QIcon::Normal, QIcon::Off);
+        viewerClass->setWindowIcon(icon);
         actionNew = new QAction(viewerClass);
         actionNew->setObjectName(QStringLiteral("actionNew"));
-        QIcon icon;
-        icon.addFile(QStringLiteral(":/viewer/images/TextDocument.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionNew->setIcon(icon);
+        QIcon icon1;
+        icon1.addFile(QStringLiteral(":/viewer/images/TextDocument.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionNew->setIcon(icon1);
         actionOpen = new QAction(viewerClass);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
-        QIcon icon1;
-        icon1.addFile(QStringLiteral(":/viewer/images/Opened.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionOpen->setIcon(icon1);
+        QIcon icon2;
+        icon2.addFile(QStringLiteral(":/viewer/images/Opened.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionOpen->setIcon(icon2);
         actionSave = new QAction(viewerClass);
         actionSave->setObjectName(QStringLiteral("actionSave"));
-        QIcon icon2;
-        icon2.addFile(QStringLiteral(":/viewer/images/Floppy.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionSave->setIcon(icon2);
+        QIcon icon3;
+        icon3.addFile(QStringLiteral(":/viewer/images/Floppy.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionSave->setIcon(icon3);
         actionSave_As = new QAction(viewerClass);
         actionSave_As->setObjectName(QStringLiteral("actionSave_As"));
-        actionSave_As->setIcon(icon2);
+        actionSave_As->setIcon(icon3);
         actionExit = new QAction(viewerClass);
         actionExit->setObjectName(QStringLiteral("actionExit"));
-        QIcon icon3;
-        icon3.addFile(QStringLiteral(":/viewer/images/Close.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionExit->setIcon(icon3);
+        QIcon icon4;
+        icon4.addFile(QStringLiteral(":/viewer/images/Close.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionExit->setIcon(icon4);
         actionCut = new QAction(viewerClass);
         actionCut->setObjectName(QStringLiteral("actionCut"));
-        QIcon icon4;
-        icon4.addFile(QStringLiteral(":/viewer/images/CUt.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionCut->setIcon(icon4);
+        QIcon icon5;
+        icon5.addFile(QStringLiteral(":/viewer/images/CUt.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCut->setIcon(icon5);
         actionCopy = new QAction(viewerClass);
         actionCopy->setObjectName(QStringLiteral("actionCopy"));
-        QIcon icon5;
-        icon5.addFile(QStringLiteral(":/viewer/images/Scanner.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionCopy->setIcon(icon5);
+        QIcon icon6;
+        icon6.addFile(QStringLiteral(":/viewer/images/Scanner.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCopy->setIcon(icon6);
         actionPaste = new QAction(viewerClass);
         actionPaste->setObjectName(QStringLiteral("actionPaste"));
-        QIcon icon6;
-        icon6.addFile(QStringLiteral(":/viewer/images/Printer.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionPaste->setIcon(icon6);
+        QIcon icon7;
+        icon7.addFile(QStringLiteral(":/viewer/images/Printer.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionPaste->setIcon(icon7);
         actionAbout = new QAction(viewerClass);
         actionAbout->setObjectName(QStringLiteral("actionAbout"));
-        QIcon icon7;
-        icon7.addFile(QStringLiteral(":/viewer/images/Prorgrams.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionAbout->setIcon(icon7);
-        actionRender = new QAction(viewerClass);
-        actionRender->setObjectName(QStringLiteral("actionRender"));
+        actionAbout->setIcon(icon);
+        actionTypeset = new QAction(viewerClass);
+        actionTypeset->setObjectName(QStringLiteral("actionTypeset"));
+        actionTypeset->setCheckable(false);
+        actionTypeset->setChecked(false);
         QIcon icon8;
         icon8.addFile(QStringLiteral(":/viewer/images/Run.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionRender->setIcon(icon8);
+        actionTypeset->setIcon(icon8);
         actionDemerits = new QAction(viewerClass);
         actionDemerits->setObjectName(QStringLiteral("actionDemerits"));
         actionDemerits->setCheckable(true);
@@ -121,6 +125,9 @@ public:
         actionR = new QAction(viewerClass);
         actionR->setObjectName(QStringLiteral("actionR"));
         actionR->setCheckable(true);
+        actionAuto_Typeset = new QAction(viewerClass);
+        actionAuto_Typeset->setObjectName(QStringLiteral("actionAuto_Typeset"));
+        actionAuto_Typeset->setCheckable(true);
         centralWidget = new QWidget(viewerClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         label = new QLabel(centralWidget);
@@ -161,7 +168,7 @@ public:
         viewerClass->setStatusBar(statusBar);
         dockWidget = new QDockWidget(viewerClass);
         dockWidget->setObjectName(QStringLiteral("dockWidget"));
-        dockWidget->setMinimumSize(QSize(50, 38));
+        dockWidget->setMinimumSize(QSize(80, 38));
         dockWidgetContents = new QWidget();
         dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
         pageSlider = new QSlider(dockWidgetContents);
@@ -179,6 +186,7 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuView->menuAction());
         menuBar->addAction(menuCAbout->menuAction());
+        menuFile->addAction(actionAuto_Typeset);
         menuFile_2->addAction(actionNew);
         menuFile_2->addAction(actionOpen);
         menuFile_2->addAction(actionSave);
@@ -196,7 +204,7 @@ public:
         mainToolBar->addAction(actionOpen);
         mainToolBar->addAction(actionSave);
         mainToolBar->addSeparator();
-        mainToolBar->addAction(actionRender);
+        mainToolBar->addAction(actionTypeset);
 
         retranslateUi(viewerClass);
         QObject::connect(actionNew, SIGNAL(triggered()), viewerClass, SLOT(newFile()));
@@ -205,9 +213,10 @@ public:
         QObject::connect(actionSave, SIGNAL(triggered()), viewerClass, SLOT(save()));
         QObject::connect(actionSave_As, SIGNAL(triggered()), viewerClass, SLOT(saveAs()));
         QObject::connect(actionAbout, SIGNAL(triggered()), viewerClass, SLOT(about()));
-        QObject::connect(actionRender, SIGNAL(triggered()), viewerClass, SLOT(render()));
+        QObject::connect(actionTypeset, SIGNAL(triggered()), viewerClass, SLOT(typeset()));
         QObject::connect(actionR, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownR(bool)));
         QObject::connect(actionDemerits, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownDemerits(bool)));
+        QObject::connect(actionAuto_Typeset, SIGNAL(toggled(bool)), viewerClass, SLOT(auto_typeset(bool)));
 
         QMetaObject::connectSlotsByName(viewerClass);
     } // setupUi
@@ -261,13 +270,17 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionAbout->setToolTip(QApplication::translate("viewerClass", "Show the application's About box", 0));
 #endif // QT_NO_TOOLTIP
-        actionRender->setText(QApplication::translate("viewerClass", "Render", 0));
+        actionTypeset->setText(QApplication::translate("viewerClass", "Typeset", 0));
 #ifndef QT_NO_TOOLTIP
-        actionRender->setToolTip(QApplication::translate("viewerClass", "Render text using NVPR.", 0));
+        actionTypeset->setToolTip(QApplication::translate("viewerClass", "Typeset and render text using NVPR.", 0));
 #endif // QT_NO_TOOLTIP
-        actionRender->setShortcut(QApplication::translate("viewerClass", "F5", 0));
+        actionTypeset->setShortcut(QApplication::translate("viewerClass", "F5", 0));
         actionDemerits->setText(QApplication::translate("viewerClass", "Demerits", 0));
         actionR->setText(QApplication::translate("viewerClass", "r", 0));
+        actionAuto_Typeset->setText(QApplication::translate("viewerClass", "Auto Typeset", 0));
+#ifndef QT_NO_TOOLTIP
+        actionAuto_Typeset->setToolTip(QApplication::translate("viewerClass", "Check to set auto typeset when text is chenged", 0));
+#endif // QT_NO_TOOLTIP
         label->setText(QString());
         riverButton->setText(QApplication::translate("viewerClass", "Show River", 0));
         label_3->setText(QApplication::translate("viewerClass", "Threshold:", 0));

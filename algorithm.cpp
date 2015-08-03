@@ -693,7 +693,7 @@ void Typesetter::break_paragraph()
 		bp = active_list_.front();
 	}
 
-
+	bp->set_is_last(true);
 	auto pos = breakpoints.rbegin();
 	while (bp->prev() != nullptr)
 	{

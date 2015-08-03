@@ -103,6 +103,21 @@ void Typesetter::clean()
 	reset_changeability();
 }
 
+Page* Typesetter::get_page_number(int qscintilla_line_number)
+{
+	//TODO::better way?
+	for (Line* line : lines_)
+	{
+		//cout << line->qscintilla_line_number() << "  " << qscintilla_line_number << endl;
+		if (line->qscintilla_line_number() == qscintilla_line_number)
+		{
+			return line->page();
+		}
+	}
+	cout << "Page not found" << endl;
+	return nullptr;
+}
+
 void Typesetter::Progress(string msg)
 {
 	cout << fixed << setprecision(3) << chrono::duration_cast<std::chrono::milliseconds>(chrono::high_resolution_clock::now() - start_time_).count() / 1000.0 << "s--" << msg << "\n";
@@ -443,15 +458,19 @@ void Typesetter::detect_river()
 
 void Typesetter::fill_lines()
 {
+	static int qscintilla_line = 0; //corresponding line num in qsccintillaa
+
 	long x_adjust = 0;
 	//because all chars in lines have negative orientation
 	long y_adjust = settings::em_size_;
-	long line_number = 0;
+	int line_number = 0;
 	Page* current_page = new Page();
 	current_page->set_geometry(settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_), settings::content_width_point(), settings::content_height_point());
 	pages_.push_back(current_page);
 	Line* current_line = new Line();
 	current_line->set_line_number(line_number);
+	current_line->set_qscintilla_line_number(qscintilla_line);
+	current_line->set_page(current_page);
 	line_number++;
 	current_line->set_geometry(0, y_adjust, settings::content_width_point(), settings::line_height_);
 	current_page->add_child(current_line);
@@ -470,7 +489,6 @@ void Typesetter::fill_lines()
 			current_line->add_child(child);
 		if (iter != breakpoints.end() && child == (*iter)->item())
 		{
-
 			child->set_is_break(true);
 			//need newline
 			//new page
@@ -483,6 +501,13 @@ void Typesetter::fill_lines()
 				current_page->set_geometry(settings::mm_to_point(settings::margin_left_), settings::mm_to_point(settings::margin_top_), settings::content_width_point(), settings::content_height_point());
 				pages_.push_back(current_page);
 			}
+
+			//cout << (*iter)->is_last() << endl;
+			if ((*iter)->is_last())
+			{
+				qscintilla_line++; //corresponding line num in qsccintillaa
+			}
+			//cout << (*iter)->is_last()<< "   " << qscintilla_line << endl;
 
 			if (child->type() == Item::PENALITY)
 			{
@@ -497,6 +522,8 @@ void Typesetter::fill_lines()
 			}
 			Line* new_line = new Line();
 			new_line->set_line_number(line_number);
+			new_line->set_qscintilla_line_number(qscintilla_line);
+			new_line->set_page(current_page);
 			line_number++;
 			current_page->add_child(new_line);
 			new_line->set_prev(current_line);

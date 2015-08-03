@@ -82,6 +82,12 @@ void Word::hyphenate(Hyphenate::Hyphenator* hyphenator, Glyph* hyphen)
 
 Line::Line() : Container(Item::LINE)
 {
+	font_r_ = 0;
+	space_r_ = 0;
+	letter_space_r_ = 0;
+	line_number_ = 0;
+	qscintilla_line_number_ = 0;
+	page_ = nullptr;
 }
 
 

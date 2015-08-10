@@ -47,6 +47,10 @@ private slots:
 
 	void setMarkdownR(bool checked);
 	void setMarkdownDemerits(bool checked);
+	void setMarkdownPenalty(bool checked);
+	void setMarkdownSpaceR(bool checked);
+	void setMarkdownFontR(bool checked);
+	void setMarkdownLetterSpaceR(bool checked);
 
 private:
 	Ui::viewerClass ui;

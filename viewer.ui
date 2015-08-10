@@ -124,6 +124,10 @@
      </property>
      <addaction name="actionDemerits"/>
      <addaction name="actionR"/>
+     <addaction name="actionPenalty"/>
+     <addaction name="actionSpaceR"/>
+     <addaction name="actionFontR"/>
+     <addaction name="actionLetterSpaceR"/>
     </widget>
     <addaction name="menuMarkdown"/>
    </widget>
@@ -355,6 +359,38 @@
     <string>r</string>
    </property>
   </action>
+  <action name="actionPenalty">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Penalty</string>
+   </property>
+  </action>
+  <action name="actionSpaceR">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Space r</string>
+   </property>
+  </action>
+  <action name="actionFontR">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Font r</string>
+   </property>
+  </action>
+  <action name="actionLetterSpaceR">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Letter Space r</string>
+   </property>
+  </action>
   <action name="actionAuto_Typeset">
    <property name="checkable">
     <bool>true</bool>
@@ -556,6 +592,70 @@
    </hints>
   </connection>
   <connection>
+   <sender>actionPenalty</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>viewerClass</receiver>
+   <slot>setMarkdownPenalty(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSpaceR</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>viewerClass</receiver>
+   <slot>setMarkdownSpaceR(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionFontR</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>viewerClass</receiver>
+   <slot>setMarkdownFontR(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLetterSpaceR</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>viewerClass</receiver>
+   <slot>setMarkdownLetterSpaceR(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>actionAuto_Typeset</sender>
    <signal>toggled(bool)</signal>
    <receiver>viewerClass</receiver>
@@ -630,6 +730,10 @@
   <slot>typeset()</slot>
   <slot>setMarkdownR(bool)</slot>
   <slot>setMarkdownDemerits(bool)</slot>
+  <slot>setMarkdownPenalty(bool)</slot>
+  <slot>setMarkdownSpaceR(bool)</slot>
+  <slot>setMarkdownFontR(bool)</slot>
+  <slot>setMarkdownLetterSpaceR(bool)</slot>
   <slot>auto_typeset(bool)</slot>
   <slot>commit()</slot>
   <slot>previous()</slot>

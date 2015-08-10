@@ -297,8 +297,18 @@ void GLWidget::paintGL()
 			string right_text;
 			if (settings::markdown_type_ == 0)
 				right_text = to_string(line->demerits().result);
-			else
+			else if (settings::markdown_type_ == 1)
 				right_text = to_string(line->demerits().r);
+			else if (settings::markdown_type_ == 2)
+				right_text = to_string(line->demerits().penalty);
+			else if (settings::markdown_type_ == 3)
+				right_text = to_string(line->space_r());
+			else if (settings::markdown_type_ == 4)
+				right_text = to_string(line->font_r());
+			else if (settings::markdown_type_ == 5)
+				right_text = to_string(line->letter_space_r());
+			else
+				right_text = ("");
 
 			const char * right_str = right_text.c_str();
 			translate(temp, settings::content_width_point() + settings::em_size_ / 2, 0);

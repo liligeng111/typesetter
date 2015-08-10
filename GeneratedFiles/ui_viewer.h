@@ -43,6 +43,10 @@ public:
     QAction *actionTypeset;
     QAction *actionDemerits;
     QAction *actionR;
+    QAction *actionPenalty;
+    QAction *actionSpaceR;
+    QAction *actionFontR;
+    QAction *actionLetterSpaceR;
     QAction *actionAuto_Typeset;
     QAction *actionCommit;
     QAction *actionPrevious;
@@ -128,6 +132,18 @@ public:
         actionR = new QAction(viewerClass);
         actionR->setObjectName(QStringLiteral("actionR"));
         actionR->setCheckable(true);
+        actionPenalty = new QAction(viewerClass);
+        actionPenalty->setObjectName(QStringLiteral("actionPenalty"));
+        actionPenalty->setCheckable(true);
+        actionSpaceR = new QAction(viewerClass);
+        actionSpaceR->setObjectName(QStringLiteral("actionSpaceR"));
+        actionSpaceR->setCheckable(true);
+        actionFontR = new QAction(viewerClass);
+        actionFontR->setObjectName(QStringLiteral("actionFontR"));
+        actionFontR->setCheckable(true);
+        actionLetterSpaceR = new QAction(viewerClass);
+        actionLetterSpaceR->setObjectName(QStringLiteral("actionLetterSpaceR"));
+        actionLetterSpaceR->setCheckable(true);
         actionAuto_Typeset = new QAction(viewerClass);
         actionAuto_Typeset->setObjectName(QStringLiteral("actionAuto_Typeset"));
         actionAuto_Typeset->setCheckable(true);
@@ -218,6 +234,10 @@ public:
         menuView->addAction(menuMarkdown->menuAction());
         menuMarkdown->addAction(actionDemerits);
         menuMarkdown->addAction(actionR);
+        menuMarkdown->addAction(actionPenalty);
+        menuMarkdown->addAction(actionSpaceR);
+        menuMarkdown->addAction(actionFontR);
+        menuMarkdown->addAction(actionLetterSpaceR);
         mainToolBar->addAction(actionNew);
         mainToolBar->addAction(actionOpen);
         mainToolBar->addAction(actionSave);
@@ -238,6 +258,10 @@ public:
         QObject::connect(actionTypeset, SIGNAL(triggered()), viewerClass, SLOT(typeset()));
         QObject::connect(actionR, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownR(bool)));
         QObject::connect(actionDemerits, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownDemerits(bool)));
+        QObject::connect(actionPenalty, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownPenalty(bool)));
+        QObject::connect(actionSpaceR, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownSpaceR(bool)));
+        QObject::connect(actionFontR, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownFontR(bool)));
+        QObject::connect(actionLetterSpaceR, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownLetterSpaceR(bool)));
         QObject::connect(actionAuto_Typeset, SIGNAL(toggled(bool)), viewerClass, SLOT(auto_typeset(bool)));
         QObject::connect(actionCommit, SIGNAL(triggered()), viewerClass, SLOT(commit()));
         QObject::connect(actionPrevious, SIGNAL(triggered()), viewerClass, SLOT(previous()));
@@ -302,6 +326,10 @@ public:
         actionTypeset->setShortcut(QApplication::translate("viewerClass", "F5", 0));
         actionDemerits->setText(QApplication::translate("viewerClass", "Demerits", 0));
         actionR->setText(QApplication::translate("viewerClass", "r", 0));
+        actionPenalty->setText(QApplication::translate("viewerClass", "Penalty", 0));
+        actionSpaceR->setText(QApplication::translate("viewerClass", "Space r", 0));
+        actionFontR->setText(QApplication::translate("viewerClass", "Font r", 0));
+        actionLetterSpaceR->setText(QApplication::translate("viewerClass", "Letter Space r", 0));
         actionAuto_Typeset->setText(QApplication::translate("viewerClass", "Auto Typeset", 0));
 #ifndef QT_NO_TOOLTIP
         actionAuto_Typeset->setToolTip(QApplication::translate("viewerClass", "Check to set auto typeset when text is chenged", 0));

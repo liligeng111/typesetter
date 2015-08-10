@@ -226,6 +226,11 @@ void Viewer::readSettings()
 	settings::margin_left_ = settings_->value("page/margin_left", 19).toFloat();
 	settings::margin_right_ = settings_->value("page/margin_right", 13.2).toFloat();
 	settings::margin_bottom_ = settings_->value("page/margin_bottom", 36.7).toFloat();
+
+
+	settings::letter_space_stretch_ratio_ = settings_->value("typesetting/letter_space_stretch_ratio", 0).toFloat();
+	settings::letter_space_shrink_ratio_ = settings_->value("typesetting/letter_space_shrink_ratio", 0).toFloat();
+	settings::max_expansion_ = settings_->value("typesetting/max_expansion", 0).toFloat();
 }
 
 void Viewer::writeSettings()
@@ -394,17 +399,68 @@ void Viewer::wheelEvent(QWheelEvent * event)
 	event->accept();
 }
 
+void Viewer::setMarkdownDemerits(bool checked)
+{
+	ui.actionR->setChecked(false);
+	ui.actionPenalty->setChecked(false);
+	ui.actionSpaceR->setChecked(false);
+	ui.actionFontR->setChecked(false);
+	ui.actionLetterSpaceR->setChecked(false);
+	settings::markdown_type_ = 0;
+	glwidget_->update();
+}
 
 void  Viewer::setMarkdownR(bool checked)
 {
-	ui.actionDemerits->setChecked(!checked);
+	ui.actionDemerits->setChecked(false);
+	ui.actionPenalty->setChecked(false);
+	ui.actionSpaceR->setChecked(false);
+	ui.actionFontR->setChecked(false);
+	ui.actionLetterSpaceR->setChecked(false);
 	settings::markdown_type_ = 1;
 	glwidget_->update();
 }
 
-void Viewer::setMarkdownDemerits(bool checked)
+void Viewer::setMarkdownPenalty(bool checked)
 {
-	ui.actionR->setChecked(!checked);
-	settings::markdown_type_ = 0;
+	ui.actionDemerits->setChecked(false);
+	ui.actionR->setChecked(false);
+	ui.actionSpaceR->setChecked(false);
+	ui.actionFontR->setChecked(false);
+	ui.actionLetterSpaceR->setChecked(false);
+	settings::markdown_type_ = 2;
+	glwidget_->update();
+}
+
+void Viewer::setMarkdownSpaceR(bool checked)
+{
+	ui.actionDemerits->setChecked(false);
+	ui.actionR->setChecked(false);
+	ui.actionPenalty->setChecked(false);
+	ui.actionFontR->setChecked(false);
+	ui.actionLetterSpaceR->setChecked(false);
+	settings::markdown_type_ = 3;
+	glwidget_->update();
+}
+
+void Viewer::setMarkdownFontR(bool checked)
+{
+	ui.actionDemerits->setChecked(false);
+	ui.actionR->setChecked(false);
+	ui.actionPenalty->setChecked(false);
+	ui.actionSpaceR->setChecked(false);
+	ui.actionLetterSpaceR->setChecked(false);
+	settings::markdown_type_ = 4;
+	glwidget_->update();
+}
+
+void Viewer::setMarkdownLetterSpaceR(bool checked)
+{
+	ui.actionDemerits->setChecked(false);
+	ui.actionR->setChecked(false);
+	ui.actionPenalty->setChecked(false);
+	ui.actionSpaceR->setChecked(false);
+	ui.actionFontR->setChecked(false);
+	settings::markdown_type_ = 5;
 	glwidget_->update();
 }

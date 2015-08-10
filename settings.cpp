@@ -31,8 +31,8 @@ namespace settings
 	float rho_ = 10.0f;
 	float stretch_ratio_ = 1.0f / 3;
 	float shrink_ratio_ = 1.0f / 3;
-	float letter_space_stretch_ratio_ = 0.05;
-	float letter_space_shrink_ratio_ = 0.05;
+	float letter_space_stretch_ratio_ = 0.00;
+	float letter_space_shrink_ratio_ = 0.00;
 	float max_expansion_ = 0.00;
 	int expansion_mode_ = 0;
 

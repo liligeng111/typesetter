@@ -41,6 +41,8 @@ public:
 	void LoadFace();
 
 	Page* get_page_number(int qscintilla_line_number);
+	int get_prev_magic(int line);
+	int get_next_magic(int line);
 
 private:
 
@@ -61,6 +63,7 @@ private:
 	list<Breakpoint*> passive_list_;
 	vector<vector<River*>> rivers_;
 	chrono::high_resolution_clock::time_point start_time_;
+	vector<int> magic_paragraphs_;
 
 	void Progress(string msg);
 	
@@ -100,4 +103,7 @@ private:
 
 	//magic stuff
 	//priority_queue<Item*> magic_queue_;
+
+	int qscintilla_line; //corresponding line num in qsccintilla
+	int magic_line; //previously found magic line
 };

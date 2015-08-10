@@ -146,6 +146,9 @@
    <addaction name="separator"/>
    <addaction name="actionTypeset"/>
    <addaction name="actionCommit"/>
+   <addaction name="separator"/>
+   <addaction name="actionPrevious"/>
+   <addaction name="actionNext"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -372,6 +375,36 @@
     <string>Commit</string>
    </property>
   </action>
+  <action name="actionPrevious">
+   <property name="icon">
+    <iconset resource="viewer.qrc">
+     <normaloff>:/viewer/images/Backward.png</normaloff>:/viewer/images/Backward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Previous</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to previous area</string>
+   </property>
+   <property name="shortcut">
+    <string>Left</string>
+   </property>
+  </action>
+  <action name="actionNext">
+   <property name="icon">
+    <iconset resource="viewer.qrc">
+     <normaloff>:/viewer/images/Forward.png</normaloff>:/viewer/images/Forward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Next</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to next area</string>
+   </property>
+   <property name="shortcut">
+    <string>Right</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
@@ -554,6 +587,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionPrevious</sender>
+   <signal>triggered()</signal>
+   <receiver>viewerClass</receiver>
+   <slot>previous()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNext</sender>
+   <signal>triggered()</signal>
+   <receiver>viewerClass</receiver>
+   <slot>next()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>newFile()</slot>
@@ -567,5 +632,7 @@
   <slot>setMarkdownDemerits(bool)</slot>
   <slot>auto_typeset(bool)</slot>
   <slot>commit()</slot>
+  <slot>previous()</slot>
+  <slot>next()</slot>
  </slots>
 </ui>

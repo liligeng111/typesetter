@@ -42,6 +42,8 @@ private slots:
 	void jump(int line, int index);
 	void margin_clicked(int margin, int line, Qt::KeyboardModifiers state);
 	void commit();
+	void previous();
+	void next();
 
 	void setMarkdownR(bool checked);
 	void setMarkdownDemerits(bool checked);

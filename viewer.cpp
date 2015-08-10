@@ -36,6 +36,8 @@ void Viewer::init()
 	textEdit->setGeometry(250, 50, 630, 891);
 	textEdit->setWrapMode(QsciScintilla::WrapWord);
 	textEdit->setMarginType(0, QsciScintilla::TextMarginRightJustified);
+	textEdit->zoomTo(12);
+	//textEdit->setFont(QFont());
 	textEdit->show();
 	readSettings();
 	connect(textEdit, SIGNAL(textChanged()),
@@ -167,6 +169,32 @@ void Viewer::about()
 	QMessageBox::about(this, tr("About Application"), tr("This is a typesetting editor..."));
 }
 
+void Viewer::previous()
+{
+	int* line = new int(-1);
+	int* index = new int(-1);
+
+	textEdit->getCursorPosition(line, index);
+	textEdit->setCursorPosition(typesetter_.get_prev_magic(*line), 0);
+	textEdit->setFocus();
+
+	delete line;
+	delete index;
+}
+
+void Viewer::next()
+{
+	int* line = new int(-1);
+	int* index = new int(-1);
+
+	textEdit->getCursorPosition(line, index);
+	textEdit->setCursorPosition(typesetter_.get_next_magic(*line), 0);
+	textEdit->setFocus();
+
+	delete line;
+	delete index;
+}
+
 void Viewer::documentWasModified()
 {
 	setWindowModified(textEdit->isModified());
@@ -189,6 +217,15 @@ void Viewer::readSettings()
 	//load settings
 	bool m_auto_typeset = settings_->value("typesetting/auto_typeset", false).toBool();
 	ui.actionAuto_Typeset->setChecked(m_auto_typeset);
+
+	settings::font_size_ = settings_->value("font/font_size", 18).toInt();
+
+	settings::page_width_ = settings_->value("page/width", 210).toFloat();
+	settings::page_height_ = settings_->value("page/height", 297).toFloat();
+	settings::margin_top_ = settings_->value("page/margin_top", 19).toFloat();
+	settings::margin_left_ = settings_->value("page/margin_left", 19).toFloat();
+	settings::margin_right_ = settings_->value("page/margin_right", 13.2).toFloat();
+	settings::margin_bottom_ = settings_->value("page/margin_bottom", 36.7).toFloat();
 }
 
 void Viewer::writeSettings()
@@ -319,7 +356,16 @@ void Viewer::typeset()
 	ui.pageSlider->setMaximum(typesetter_.page_count() - 1);
 	ui.pageSlider->setValue(0);
 	//on_pageSlider_valueChanged(0);
-	glwidget_->render_page(typesetter_.page(0));
+	//glwidget_->render_page(typesetter_.page(0));
+
+	int* line = new int(-1);
+	int* index = new int(-1);
+	textEdit->getCursorPosition(line, index);
+	
+	jump(*line, *index);
+
+	delete line;
+	delete index;
 }
 
 void Viewer::on_pageSlider_valueChanged(int value)

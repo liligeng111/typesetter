@@ -45,6 +45,8 @@ public:
     QAction *actionR;
     QAction *actionAuto_Typeset;
     QAction *actionCommit;
+    QAction *actionPrevious;
+    QAction *actionNext;
     QWidget *centralWidget;
     QLabel *label;
     QCheckBox *riverButton;
@@ -134,6 +136,16 @@ public:
         QIcon icon9;
         icon9.addFile(QStringLiteral(":/viewer/images/Up.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionCommit->setIcon(icon9);
+        actionPrevious = new QAction(viewerClass);
+        actionPrevious->setObjectName(QStringLiteral("actionPrevious"));
+        QIcon icon10;
+        icon10.addFile(QStringLiteral(":/viewer/images/Backward.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionPrevious->setIcon(icon10);
+        actionNext = new QAction(viewerClass);
+        actionNext->setObjectName(QStringLiteral("actionNext"));
+        QIcon icon11;
+        icon11.addFile(QStringLiteral(":/viewer/images/Forward.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionNext->setIcon(icon11);
         centralWidget = new QWidget(viewerClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         label = new QLabel(centralWidget);
@@ -212,6 +224,9 @@ public:
         mainToolBar->addSeparator();
         mainToolBar->addAction(actionTypeset);
         mainToolBar->addAction(actionCommit);
+        mainToolBar->addSeparator();
+        mainToolBar->addAction(actionPrevious);
+        mainToolBar->addAction(actionNext);
 
         retranslateUi(viewerClass);
         QObject::connect(actionNew, SIGNAL(triggered()), viewerClass, SLOT(newFile()));
@@ -225,6 +240,8 @@ public:
         QObject::connect(actionDemerits, SIGNAL(toggled(bool)), viewerClass, SLOT(setMarkdownDemerits(bool)));
         QObject::connect(actionAuto_Typeset, SIGNAL(toggled(bool)), viewerClass, SLOT(auto_typeset(bool)));
         QObject::connect(actionCommit, SIGNAL(triggered()), viewerClass, SLOT(commit()));
+        QObject::connect(actionPrevious, SIGNAL(triggered()), viewerClass, SLOT(previous()));
+        QObject::connect(actionNext, SIGNAL(triggered()), viewerClass, SLOT(next()));
 
         QMetaObject::connectSlotsByName(viewerClass);
     } // setupUi
@@ -290,6 +307,16 @@ public:
         actionAuto_Typeset->setToolTip(QApplication::translate("viewerClass", "Check to set auto typeset when text is chenged", 0));
 #endif // QT_NO_TOOLTIP
         actionCommit->setText(QApplication::translate("viewerClass", "Commit", 0));
+        actionPrevious->setText(QApplication::translate("viewerClass", "Previous", 0));
+#ifndef QT_NO_TOOLTIP
+        actionPrevious->setToolTip(QApplication::translate("viewerClass", "Jump to previous area", 0));
+#endif // QT_NO_TOOLTIP
+        actionPrevious->setShortcut(QApplication::translate("viewerClass", "Left", 0));
+        actionNext->setText(QApplication::translate("viewerClass", "Next", 0));
+#ifndef QT_NO_TOOLTIP
+        actionNext->setToolTip(QApplication::translate("viewerClass", "Jump to next area", 0));
+#endif // QT_NO_TOOLTIP
+        actionNext->setShortcut(QApplication::translate("viewerClass", "Right", 0));
         label->setText(QString());
         riverButton->setText(QApplication::translate("viewerClass", "Show River", 0));
         label_3->setText(QApplication::translate("viewerClass", "Threshold:", 0));

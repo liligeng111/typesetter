@@ -14,5 +14,7 @@
         <file>images/BMP.png</file>
         <file>images/Control_Panel.png</file>
         <file>images/Up.png</file>
+        <file>images/Backward.png</file>
+        <file>images/Forward.png</file>
     </qresource>
 </RCC>

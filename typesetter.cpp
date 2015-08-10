@@ -100,7 +100,11 @@ void Typesetter::clean()
 	breakpoints.clear();
 	active_list_.clear();
 	passive_list_.clear();
+	magic_paragraphs_.clear();
 	reset_changeability();
+
+	qscintilla_line = 0;
+	magic_line = -1;
 }
 
 Page* Typesetter::get_page_number(int qscintilla_line_number)
@@ -125,22 +129,17 @@ void Typesetter::Progress(string msg)
 
 void Typesetter::Typeset(QString& text)
 {
-	cout << "joh" << endl << endl;
 	start_time_ = chrono::high_resolution_clock::now();
 
-	cout << "jodh" << endl << endl;
 	Hyphenator hyphenator = (RFC_3066::Language("en"));
 
-	cout << "jodh" << endl << endl;
 	FT_Error error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
 
-	cout << "joqh" << endl << endl;
 	if (error)
 	{
 		message("Error loading character");
 	}
 
-	cout << "jho" << endl << endl;
 	//load hyphen glyph
 	hyphen_glyph_ = new Glyph(face_->glyph, '-');
 	glyph_cache_['-'] = hyphen_glyph_;
@@ -458,8 +457,6 @@ void Typesetter::detect_river()
 
 void Typesetter::fill_lines()
 {
-	static int qscintilla_line = 0; //corresponding line num in qsccintillaa
-
 	long x_adjust = 0;
 	//because all chars in lines have negative orientation
 	long y_adjust = settings::em_size_;
@@ -506,6 +503,12 @@ void Typesetter::fill_lines()
 			if ((*iter)->is_last())
 			{
 				qscintilla_line++; //corresponding line num in qsccintillaa
+			}
+
+			if (child->is_magic() && magic_line != qscintilla_line)
+			{
+				magic_paragraphs_.push_back(qscintilla_line);
+				magic_line = qscintilla_line;
 			}
 			//cout << (*iter)->is_last()<< "   " << qscintilla_line << endl;
 
@@ -727,4 +730,30 @@ void Typesetter::render(RenderTarget target)
 		}
 	}
 	Progress("Done");
+}
+
+int Typesetter::get_prev_magic(int line)
+{
+	if (magic_paragraphs_.empty())
+		return 0;
+
+	for (int i = magic_paragraphs_.size() - 1; i >= 0; i--)
+	{
+		if (magic_paragraphs_[i] < line)
+			return magic_paragraphs_[i];
+	}
+	return magic_paragraphs_[magic_paragraphs_.size() - 1];
+}
+
+int Typesetter::get_next_magic(int line)
+{
+	if (magic_paragraphs_.empty())
+		return 0;
+
+	for (int i = 0; i < magic_paragraphs_.size(); i++)
+	{
+		if (magic_paragraphs_[i] > line)
+			return magic_paragraphs_[i];
+	}
+	return magic_paragraphs_[0];
 }

@@ -230,7 +230,10 @@ void Viewer::readSettings()
 
 	settings::letter_space_stretch_ratio_ = settings_->value("typesetting/letter_space_stretch_ratio", 0).toFloat();
 	settings::letter_space_shrink_ratio_ = settings_->value("typesetting/letter_space_shrink_ratio", 0).toFloat();
-	settings::max_expansion_ = settings_->value("typesetting/max_expansion", 0).toFloat();
+	settings::font_expansion_ = settings_->value("typesetting/font_expansion", 0).toFloat();
+
+	settings::min_magic_gain_ = settings_->value("magic/min_magic_gain", 10000).toFloat();
+	settings::max_magic_amount_ = settings_->value("magic/max_magic_amount", 1.0).toFloat();
 }
 
 void Viewer::writeSettings()

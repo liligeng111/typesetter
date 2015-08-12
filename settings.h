@@ -44,7 +44,7 @@ namespace settings
 
 	//algorithm related
 	extern float rho_;
-	extern float max_expansion_; //max of font expansion allowed
+	extern float font_expansion_; //max of font expansion allowed
 	extern float letter_space_stretch_ratio_;
 	extern float letter_space_shrink_ratio_;
 	extern float stretch_ratio_;

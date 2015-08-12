@@ -175,7 +175,7 @@ void Typesetter::Typeset(QString& text)
 			if (ch == 45 && text.at(text_index + 1).unicode() == 45)
 			{
 				//TODO::em-dash here
-				ch = 45;
+				ch = 8212;
 				text_index++;
 			}
 		}
@@ -340,7 +340,7 @@ void Typesetter::Typeset(QString& text)
 			}
 
 			Item* item = new Item(Item::BOX);
-			item->init_box(glyph, word, settings::max_expansion_ * glyph->width(), settings::max_expansion_ * glyph->width());
+			item->init_box(glyph, word, settings::font_expansion_ * glyph->width(), settings::font_expansion_ * glyph->width());
 			item->set_geometry(x_cursor + glyph->hori_bearing_x(), item->glyph()->hori_bearing_y(), glyph->width(), -item->glyph()->height());
 			paragraph_.push_back(item);
 			item->set_changeability(sum_stretchability_, sum_shrinkability_);

@@ -51,8 +51,8 @@ void Item::init_box(Glyph* glyph, Word* word, long y, long z)
 	priority_ = settings::box_priority_;
 	stretchability_ = y;
 	shrinkability_ = z;
-	stretch_ratio_ = settings::max_expansion_;
-	shrink_ratio_ = settings::max_expansion_;
+	stretch_ratio_ = settings::font_expansion_;
+	shrink_ratio_ = settings::font_expansion_;
 }
 
 void Item::init_glue(long y, long z, int priority)

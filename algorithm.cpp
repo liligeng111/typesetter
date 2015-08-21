@@ -3,7 +3,7 @@
 #include "settings.h"
 #include <queue>
 
-void Typesetter::optimum_fit_magic_edge()
+void Typesetter::optimum_fit_magic_edge(vector<pair<Item*, Item*>> magic_found)
 {
 	//erase pervious data
 	passive_list_.clear();
@@ -15,12 +15,7 @@ void Typesetter::optimum_fit_magic_edge()
 
 	//line width 
 	long l;
-	Item* item = new Item(Item::GLUE);
-	item->init_glue(0, 0, settings::item_priority_size_ - 1);
-	item->set_geometry(paragraph_.front()->x(), 0, 0, 0);
-	paragraph_.front()->set_prev(item);
-	paragraph_.push_front(item);
-	active_list_.push_back(new Breakpoint(item));
+	active_list_.push_back(new Breakpoint(paragraph_.front()));
 	auto iter = paragraph_.begin();
 	iter++;
 
@@ -166,13 +161,30 @@ void Typesetter::optimum_fit_magic_edge()
 			else if ((*a)->magic_count() == 0 && abs(l - L) < settings::max_magic_amount_ * settings::em_size_ && (!forced_break))
 			{
 				//magic edge
-				Breakpoint::Demerits demerit(r, L, penalty, 0, l);
 
-				Breakpoint* magic_edge = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum(), demerit, (*a));
-				magic_edge->set_is_magic(true);
-				magic_edge->set_magic_count(1);
+				//if this magic if not found before
+				bool new_magic = true;
+				for (auto bp : magic_found)
+				{
+					if ((*a)->item() == bp.first && b == bp.second)
+					{
+						new_magic = false;
+					}
 
-				active_list_.push_back(magic_edge);
+					//Item* aa = (*a)->item();
+					//cout << (*a)->item()->next() << " " << bp.first->next() << endl;
+				}
+
+				if (new_magic)
+				{
+					Breakpoint::Demerits demerit(r, L, penalty, 0, l);
+
+					Breakpoint* magic_edge = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum(), demerit, (*a));
+					magic_edge->set_is_magic(true);
+					magic_edge->set_magic_count(1);
+
+					active_list_.push_back(magic_edge);
+				}
 			}
 
 			if ((r < -settings::max_magic_amount_ || forced_break))
@@ -676,7 +688,14 @@ void Typesetter::break_paragraph()
 	//}
 	//A_star();
 
-	optimum_fit_magic_edge();
+	vector<pair<Item*, Item*>> magic_found;
+
+	Item* item = new Item(Item::GLUE);
+	item->init_glue(0, 0, settings::item_priority_size_ - 1);
+	item->set_geometry(paragraph_.front()->x(), 0, 0, 0);
+	paragraph_.front()->set_prev(item);
+	paragraph_.push_front(item);
+	optimum_fit_magic_edge(magic_found);
 	//insert breakpoints (for knuth original algorithm)
 
 	Breakpoint* bp;
@@ -704,35 +723,52 @@ void Typesetter::break_paragraph()
 	}
 
 	//magic edge
-	if (active_list_.front() != active_list_.back() && active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum() > settings::min_magic_gain_)
+	bool found_magic = true;
+	while (found_magic)
 	{
-		//cout << "magic demerites: " << active_list_.back()->demerits_sum();
-		//cout << " normal demerites: " << active_list_.front()->demerits_sum() << endl;
-		Breakpoint* bp = active_list_.back();
-		while (bp->prev() != nullptr)
+		found_magic = false;
+		if (active_list_.front() != active_list_.back() && active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum() > settings::min_magic_gain_)
 		{
-			if (bp->is_magic())
+			found_magic = true;
+			//cout << "magic demerites: " << active_list_.back()->demerits_sum();
+			//cout << " normal demerites: " << active_list_.front()->demerits_sum() << endl;
+			Breakpoint* bp = active_list_.back();
+			while (bp->prev() != nullptr)
 			{
-				Item* end = bp->prev()->item();
-				Item* current = bp->item();
-				while (current != end)
+				if (bp->is_magic())
 				{
-					current->set_is_magic(true);
-					current = current->prev();
+					magic_found.push_back(make_pair(bp->prev()->item(), bp->item()));
+					Item* end = bp->prev()->item();
+					Item* current = bp->item();
+					while (current != end)
+					{
+						current->set_is_magic(true);
+						current = current->prev();
+
+						if (bp->demerits().r > 0)
+							current->stretch_count_++;
+						else
+							current->shrink_count_++;
+
+					}
+					//cout << "magic r: " << bp->demerits().r << endl;
+					cout << active_list_.front()->item()->before()->word_content() << " improments: " << active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum();
+					cout << " magic em: " << 1.0 * (bp->demerits().length - bp->demerits().l) / settings::em_size_ << endl;
 				}
-				//cout << "magic r: " << bp->demerits().r << endl;
-				cout << active_list_.front()->item()->before()->word_content() << " improments: " << active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum();
-				cout << " magic em: " << 1.0 * (bp->demerits().length - bp->demerits().l) / settings::em_size_ << endl;
+				bp = bp->prev();
 			}
-			bp = bp->prev();
 		}
+
+		while (!active_list_.empty())
+		{
+			passive_list_.push_back(active_list_.front());
+			active_list_.pop_front();
+		}
+
+		if (found_magic)
+			optimum_fit_magic_edge(magic_found);
 	}
 
-	while (!active_list_.empty())
-	{
-		passive_list_.push_back(active_list_.front());
-		active_list_.pop_front();
-	}
 	//merge paragraph
 	items_.splice(items_.end(), paragraph_);
 }

@@ -34,7 +34,8 @@ Word::~Word()
 
 void Word::hyphenate(Hyphenate::Hyphenator* hyphenator, Glyph* hyphen)
 {
-	if (content_ == nullptr)
+	bool warning = false;
+	if (warning && content_ == nullptr)
 	{
 		cout << "Error hyphenating: Empty word" << endl;
 		return;
@@ -53,7 +54,7 @@ void Word::hyphenate(Hyphenate::Hyphenator* hyphenator, Glyph* hyphen)
 			if (i != children_.size() - 1 && cstr[j] == '-')
 			{
 				Item* space = children_[i]->next();
-				if (space->type() != Item::LETTER_SPACE)
+				if (warning && space->type() != Item::LETTER_SPACE)
 				{
 					cout << "Error hyphenating" << *content_ << " " << hyphenated_ << endl;
 				}
@@ -61,7 +62,7 @@ void Word::hyphenate(Hyphenate::Hyphenator* hyphenator, Glyph* hyphen)
 				space->set_breakable(true);
 			}
 		}
-		else if (cstr[j] != '-')
+		else if (warning && cstr[j] != '-')
 		{
 			cout << "Error hyphenating " << *content_ << " " << hyphenated_ << " " << int(children_[i]->glyph()->content()) << " " << int(cstr[j]) << ' ' << i << " " << j << endl;
 		}

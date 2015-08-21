@@ -174,11 +174,21 @@ void Typesetter::Typeset(QString& text)
 			//double hyphen
 			if (ch == 45 && text.at(text_index + 1).unicode() == 45)
 			{
-				//TODO::em-dash here
 				ch = 8212;
 				text_index++;
 			}
 		}
+
+		//quotation
+		if (ch == 96)
+		{
+			ch = 8216;
+		}
+		else if (ch == 39)
+		{
+			ch = 8217;
+		}
+		
 		//TODO::check for availbility78
 		/*
 		else if (ch == 'f' && look_ahead[0] == 'f')

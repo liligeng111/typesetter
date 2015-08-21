@@ -213,26 +213,16 @@ void GLWidget::paintGL()
 
 			if (item->is_magic())
 			{
-				float r = line->demerits().r;
-				if (r < 0)
-				{
-					r /= -7;
-					if (r > 1)
-						r = 1;
-					glColor3f(1, 0.4, 0);
-				}
-				else
-				{
-					r /= 7;
-					if (r > 1)
-						r = 1;
-					glColor3f(1, 0.4, 0);
-				}
+				//int sum = item->shrink_count_ + item->stretch_count_;
+				float r = .25f * item->shrink_count_;
+				float b = .25f * item->stretch_count_;
+				glColor3f(r, 0.5, b);
 			}
 			else
 			{
 				glColor3f(0, 0, 0);
 			}
+
 
 			//GLuint stroke_color = 0x000000;
 			//GLfloat stroke_width = 1;

@@ -92,6 +92,9 @@ public:
 	bool is_magic() const { return is_magic_; }
 	void set_is_magic(bool is_magic) { is_magic_ = is_magic; }
 
+	//TODO::temp
+	int shrink_count_;
+	int stretch_count_;
 protected:
 	const ItemType type_;
 

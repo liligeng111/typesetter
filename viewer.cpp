@@ -356,8 +356,13 @@ void Viewer::auto_typeset(bool checked)
 
 void Viewer::typeset()
 {
+	int* line = new int(-1);
+	int* index = new int(-1);
+
+	textEdit->getCursorPosition(line, index);
 	//TODO::why do I have to do this
-	typesetter_.Typeset(textEdit->text().append("\n"));
+	//typesetter_.Typeset(textEdit->text().append("\n"));
+	typesetter_.Typeset(backups_[*line][backups_index_[*line]]);
 	//typesetter.render(Typesetter::SVG);
 
 	cout << "Total Page Count:" << typesetter_.page_count() << endl;
@@ -366,11 +371,10 @@ void Viewer::typeset()
 	//on_pageSlider_valueChanged(0);
 	//glwidget_->render_page(typesetter_.page(0));
 
-	int* line = new int(-1);
-	int* index = new int(-1);
-	textEdit->getCursorPosition(line, index);
-	
-	jump(*line, *index);
+
+	jump(0, 0);
+	//jump(*line, *index);
+	//typesetter_.Typeset(textEdit->text().append("\n"));
 
 	delete line;
 	delete index;

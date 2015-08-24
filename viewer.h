@@ -38,6 +38,7 @@ private slots:
 	void documentWasModified();
 	void about();
 	void auto_typeset(bool checked);
+	void use_magic(bool checked);
 	void typeset();
 	void jump(int line, int index);
 	void margin_clicked(int margin, int line, Qt::KeyboardModifiers state);

@@ -158,7 +158,8 @@ void Typesetter::optimum_fit_magic_edge(vector<pair<Item*, Item*>> magic_found)
 
 				
 			}
-			else if ((*a)->magic_count() == 0 && abs(l - L) < settings::max_magic_amount_ * settings::em_size_ && (!forced_break))
+
+			if ((*a)->magic_count() == 0 && abs(l - L) < settings::max_magic_amount_ * settings::em_size_ && (!forced_break))
 			{
 				//magic edge
 

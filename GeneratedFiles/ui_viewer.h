@@ -51,6 +51,7 @@ public:
     QAction *actionCommit;
     QAction *actionPrevious;
     QAction *actionNext;
+    QAction *actionUse_Magic;
     QWidget *centralWidget;
     QLabel *label;
     QCheckBox *riverButton;
@@ -162,6 +163,9 @@ public:
         QIcon icon11;
         icon11.addFile(QStringLiteral(":/viewer/images/Forward.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionNext->setIcon(icon11);
+        actionUse_Magic = new QAction(viewerClass);
+        actionUse_Magic->setObjectName(QStringLiteral("actionUse_Magic"));
+        actionUse_Magic->setCheckable(true);
         centralWidget = new QWidget(viewerClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         label = new QLabel(centralWidget);
@@ -221,6 +225,7 @@ public:
         menuBar->addAction(menuView->menuAction());
         menuBar->addAction(menuCAbout->menuAction());
         menuFile->addAction(actionAuto_Typeset);
+        menuFile->addAction(actionUse_Magic);
         menuFile_2->addAction(actionNew);
         menuFile_2->addAction(actionOpen);
         menuFile_2->addAction(actionSave);
@@ -266,6 +271,7 @@ public:
         QObject::connect(actionCommit, SIGNAL(triggered()), viewerClass, SLOT(commit()));
         QObject::connect(actionPrevious, SIGNAL(triggered()), viewerClass, SLOT(previous()));
         QObject::connect(actionNext, SIGNAL(triggered()), viewerClass, SLOT(next()));
+        QObject::connect(actionUse_Magic, SIGNAL(toggled(bool)), viewerClass, SLOT(use_magic(bool)));
 
         QMetaObject::connectSlotsByName(viewerClass);
     } // setupUi
@@ -345,6 +351,7 @@ public:
         actionNext->setToolTip(QApplication::translate("viewerClass", "Jump to next area", 0));
 #endif // QT_NO_TOOLTIP
         actionNext->setShortcut(QApplication::translate("viewerClass", "Right", 0));
+        actionUse_Magic->setText(QApplication::translate("viewerClass", "Use Magic", 0));
         label->setText(QString());
         riverButton->setText(QApplication::translate("viewerClass", "Show River", 0));
         label_3->setText(QApplication::translate("viewerClass", "Threshold:", 0));

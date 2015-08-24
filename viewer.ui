@@ -88,6 +88,7 @@
      <string>Settings</string>
     </property>
     <addaction name="actionAuto_Typeset"/>
+    <addaction name="actionUse_Magic"/>
    </widget>
    <widget class="QMenu" name="menuFile_2">
     <property name="title">
@@ -441,6 +442,14 @@
     <string>Right</string>
    </property>
   </action>
+  <action name="actionUse_Magic">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Use Magic</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
@@ -719,6 +728,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionUse_Magic</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>viewerClass</receiver>
+   <slot>use_magic(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>newFile()</slot>
@@ -738,5 +763,6 @@
   <slot>commit()</slot>
   <slot>previous()</slot>
   <slot>next()</slot>
+  <slot>use_magic(bool)</slot>
  </slots>
 </ui>

@@ -233,7 +233,8 @@ void Viewer::readSettings()
 	settings::font_expansion_ = settings_->value("typesetting/font_expansion", 0).toFloat();
 
 	settings::min_magic_gain_ = settings_->value("magic/min_magic_gain", 10000).toFloat();
-	settings::max_magic_amount_ = settings_->value("magic/max_magic_amount", 1.0).toFloat();
+	settings::max_magic_amount_ = settings_->value("magic/max_magic_amount", 1.0f).toFloat();
+	settings::use_magic_ = settings_->value("magic/use_magic", false).toBool();
 }
 
 void Viewer::writeSettings()
@@ -354,6 +355,12 @@ void Viewer::auto_typeset(bool checked)
 		disconnect(textEdit, SIGNAL(textChanged()), this, SLOT(typeset()));
 }
 
+void Viewer::use_magic(bool checked)
+{
+	settings_->setValue("magic/use_magic", checked);
+	settings::use_magic_ = checked;
+}
+
 void Viewer::typeset()
 {
 	int* line = new int(-1);
@@ -361,8 +368,8 @@ void Viewer::typeset()
 
 	textEdit->getCursorPosition(line, index);
 	//TODO::why do I have to do this
-	//typesetter_.Typeset(textEdit->text().append("\n"));
-	typesetter_.Typeset(backups_[*line][backups_index_[*line]]);
+	typesetter_.Typeset(textEdit->text().append("\n"));
+	//typesetter_.Typeset(backups_[*line][backups_index_[*line]]);
 	//typesetter.render(Typesetter::SVG);
 
 	cout << "Total Page Count:" << typesetter_.page_count() << endl;
@@ -372,9 +379,8 @@ void Viewer::typeset()
 	//glwidget_->render_page(typesetter_.page(0));
 
 
-	jump(0, 0);
-	//jump(*line, *index);
-	//typesetter_.Typeset(textEdit->text().append("\n"));
+	//jump(0, 0);
+	jump(*line, *index);
 
 	delete line;
 	delete index;

@@ -216,7 +216,7 @@ void GLWidget::paintGL()
 				//int sum = item->shrink_count_ + item->stretch_count_;
 				float r = .25f * item->shrink_count_;
 				float b = .25f * item->stretch_count_;
-				glColor3f(r, 0.5, b);
+				glColor3f(r, 0, b);
 			}
 			else
 			{

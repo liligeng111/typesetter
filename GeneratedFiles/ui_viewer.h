@@ -52,6 +52,9 @@ public:
     QAction *actionPrevious;
     QAction *actionNext;
     QAction *actionUse_Magic;
+    QAction *actionPick_Shrink_Collor;
+    QAction *actionPink_Stretch_Color;
+    QAction *actionShow_Only_One_Suggestion;
     QWidget *centralWidget;
     QLabel *label;
     QCheckBox *riverButton;
@@ -166,6 +169,13 @@ public:
         actionUse_Magic = new QAction(viewerClass);
         actionUse_Magic->setObjectName(QStringLiteral("actionUse_Magic"));
         actionUse_Magic->setCheckable(true);
+        actionPick_Shrink_Collor = new QAction(viewerClass);
+        actionPick_Shrink_Collor->setObjectName(QStringLiteral("actionPick_Shrink_Collor"));
+        actionPink_Stretch_Color = new QAction(viewerClass);
+        actionPink_Stretch_Color->setObjectName(QStringLiteral("actionPink_Stretch_Color"));
+        actionShow_Only_One_Suggestion = new QAction(viewerClass);
+        actionShow_Only_One_Suggestion->setObjectName(QStringLiteral("actionShow_Only_One_Suggestion"));
+        actionShow_Only_One_Suggestion->setCheckable(true);
         centralWidget = new QWidget(viewerClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         label = new QLabel(centralWidget);
@@ -226,6 +236,10 @@ public:
         menuBar->addAction(menuCAbout->menuAction());
         menuFile->addAction(actionAuto_Typeset);
         menuFile->addAction(actionUse_Magic);
+        menuFile->addSeparator();
+        menuFile->addAction(actionPick_Shrink_Collor);
+        menuFile->addAction(actionPink_Stretch_Color);
+        menuFile->addAction(actionShow_Only_One_Suggestion);
         menuFile_2->addAction(actionNew);
         menuFile_2->addAction(actionOpen);
         menuFile_2->addAction(actionSave);
@@ -272,6 +286,9 @@ public:
         QObject::connect(actionPrevious, SIGNAL(triggered()), viewerClass, SLOT(previous()));
         QObject::connect(actionNext, SIGNAL(triggered()), viewerClass, SLOT(next()));
         QObject::connect(actionUse_Magic, SIGNAL(toggled(bool)), viewerClass, SLOT(use_magic(bool)));
+        QObject::connect(actionPick_Shrink_Collor, SIGNAL(triggered()), viewerClass, SLOT(pick_shrink_color()));
+        QObject::connect(actionPink_Stretch_Color, SIGNAL(triggered()), viewerClass, SLOT(pick_stretch_color()));
+        QObject::connect(actionShow_Only_One_Suggestion, SIGNAL(toggled(bool)), viewerClass, SLOT(show_only_one_suggestion(bool)));
 
         QMetaObject::connectSlotsByName(viewerClass);
     } // setupUi
@@ -352,6 +369,9 @@ public:
 #endif // QT_NO_TOOLTIP
         actionNext->setShortcut(QApplication::translate("viewerClass", "Right", 0));
         actionUse_Magic->setText(QApplication::translate("viewerClass", "Use Magic", 0));
+        actionPick_Shrink_Collor->setText(QApplication::translate("viewerClass", "Pick Shrink Collor", 0));
+        actionPink_Stretch_Color->setText(QApplication::translate("viewerClass", "Pink Stretch Color", 0));
+        actionShow_Only_One_Suggestion->setText(QApplication::translate("viewerClass", "Show Only One Suggestion", 0));
         label->setText(QString());
         riverButton->setText(QApplication::translate("viewerClass", "Show River", 0));
         label_3->setText(QApplication::translate("viewerClass", "Threshold:", 0));

@@ -38,8 +38,8 @@ Item::Item(ItemType type) : type_(type)
 	prev_ = nullptr;
 	next_ = nullptr;
 
-	shrink_count_ = 0;
-	stretch_count_ = 0;
+	magic_shrink_value_ = 0;
+	magic_stretch_value_ = 0;
 }
 
 void Item::init_box(Glyph* glyph, Word* word, long y, long z)

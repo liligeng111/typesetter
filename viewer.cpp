@@ -5,6 +5,7 @@
 #include <QPoint>
 #include <QFile>
 #include <QFileInfo>
+#include <QColorDialog>
 #include <QFileDialog>
 #include <QSize>
 #include <QStatusBar>
@@ -235,6 +236,12 @@ void Viewer::readSettings()
 	settings::min_magic_gain_ = settings_->value("magic/min_magic_gain", 10000).toFloat();
 	settings::max_magic_amount_ = settings_->value("magic/max_magic_amount", 1.0f).toFloat();
 	settings::use_magic_ = settings_->value("magic/use_magic", false).toBool();
+
+	settings::shrink_color_ = settings_->value("view/shrink_color", QColor(0, 0, 0)).value<QColor>();
+	settings::stretch_color_ = settings_->value("view/stretch_color", QColor(0, 0, 0)).value<QColor>();
+
+	bool m_show_only_one_suggestion = settings_->value("view/show_only_one_suggestion", false).toBool();
+	ui.actionShow_Only_One_Suggestion->setChecked(m_show_only_one_suggestion);
 }
 
 void Viewer::writeSettings()
@@ -368,8 +375,8 @@ void Viewer::typeset()
 
 	textEdit->getCursorPosition(line, index);
 	//TODO::why do I have to do this
-	typesetter_.Typeset(textEdit->text().append("\n"));
-	//typesetter_.Typeset(backups_[*line][backups_index_[*line]]);
+	//typesetter_.Typeset(textEdit->text().append("\n"));
+	typesetter_.Typeset(backups_[*line][backups_index_[*line]]);
 	//typesetter.render(Typesetter::SVG);
 
 	cout << "Total Page Count:" << typesetter_.page_count() << endl;
@@ -379,8 +386,8 @@ void Viewer::typeset()
 	//glwidget_->render_page(typesetter_.page(0));
 
 
-	//jump(0, 0);
-	jump(*line, *index);
+	jump(0, 0);
+	//jump(*line, *index);
 
 	delete line;
 	delete index;
@@ -475,5 +482,28 @@ void Viewer::setMarkdownLetterSpaceR(bool checked)
 	ui.actionSpaceR->setChecked(false);
 	ui.actionFontR->setChecked(false);
 	settings::markdown_type_ = 5;
+	glwidget_->update();
+}
+
+void Viewer::show_only_one_suggestion(bool checked)
+{
+	settings::show_only_one_suggestion_ = checked;
+	settings_->setValue("view/show_only_one_suggestion", checked);
+	glwidget_->update();
+}
+
+void Viewer::pick_shrink_color()
+{
+	QColor color = QColorDialog::getColor(settings::shrink_color_);
+	settings_->setValue("view/shrink_color", color);
+	settings::shrink_color_ = color;
+	glwidget_->update();
+}
+
+void Viewer::pick_stretch_color()
+{
+	QColor color = QColorDialog::getColor(settings::stretch_color_);
+	settings_->setValue("view/stretch_color", color);
+	settings::stretch_color_ = color;
 	glwidget_->update();
 }

@@ -89,6 +89,10 @@
     </property>
     <addaction name="actionAuto_Typeset"/>
     <addaction name="actionUse_Magic"/>
+    <addaction name="separator"/>
+    <addaction name="actionPick_Shrink_Collor"/>
+    <addaction name="actionPink_Stretch_Color"/>
+    <addaction name="actionShow_Only_One_Suggestion"/>
    </widget>
    <widget class="QMenu" name="menuFile_2">
     <property name="title">
@@ -450,6 +454,24 @@
     <string>Use Magic</string>
    </property>
   </action>
+  <action name="actionPick_Shrink_Collor">
+   <property name="text">
+    <string>Pick Shrink Collor</string>
+   </property>
+  </action>
+  <action name="actionPink_Stretch_Color">
+   <property name="text">
+    <string>Pink Stretch Color</string>
+   </property>
+  </action>
+  <action name="actionShow_Only_One_Suggestion">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Only One Suggestion</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
@@ -744,6 +766,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionPick_Shrink_Collor</sender>
+   <signal>triggered()</signal>
+   <receiver>viewerClass</receiver>
+   <slot>pick_shrink_color()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPink_Stretch_Color</sender>
+   <signal>triggered()</signal>
+   <receiver>viewerClass</receiver>
+   <slot>pick_stretch_color()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShow_Only_One_Suggestion</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>viewerClass</receiver>
+   <slot>show_only_one_suggestion(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>516</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>newFile()</slot>
@@ -764,5 +834,8 @@
   <slot>previous()</slot>
   <slot>next()</slot>
   <slot>use_magic(bool)</slot>
+  <slot>pick_shrink_color()</slot>
+  <slot>pick_stretch_color()</slot>
+  <slot>show_only_one_suggestion(bool)</slot>
  </slots>
 </ui>

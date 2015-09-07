@@ -93,8 +93,8 @@ public:
 	void set_is_magic(bool is_magic) { is_magic_ = is_magic; }
 
 	//TODO::temp
-	int shrink_count_;
-	int stretch_count_;
+	float magic_shrink_value_;
+	float magic_stretch_value_;
 protected:
 	const ItemType type_;
 

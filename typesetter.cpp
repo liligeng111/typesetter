@@ -132,7 +132,7 @@ void Typesetter::Typeset(QString& text)
 	start_time_ = chrono::high_resolution_clock::now();
 
 	Hyphenator hyphenator = (RFC_3066::Language("en"));
-
+	
 	FT_Error error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
 
 	if (error)
@@ -176,6 +176,14 @@ void Typesetter::Typeset(QString& text)
 			{
 				ch = 8212;
 				text_index++;
+			}
+
+			//force break
+			//TODO::UTF8....
+			if (ch == '/' && text.at(text_index + 1).unicode() == '/')
+			{
+				ch = 49794;
+				text_index += 2;
 			}
 		}
 
@@ -294,6 +302,24 @@ void Typesetter::Typeset(QString& text)
 			item->set_changeability(sum_stretchability_, sum_shrinkability_);
 			set_changeability(settings::glue_priority_, item->stretchability(), item->shrinkability());
 			item->set_prev(last_item);
+			last_item = item;
+		}
+		//Force break
+		//TODO::temp
+		else if (ch == 49794)
+		{
+			if (word != nullptr)
+			{
+				word->hyphenate(&hyphenator, hyphen_glyph_);
+			}
+			word = nullptr;
+			Item* item = new Item(Item::PENALITY);
+			item->init_penalty(-999);
+			item->set_geometry(x_cursor, 0, 0, 0);
+			paragraph_.push_back(item);
+			item->set_changeability(sum_stretchability_, sum_shrinkability_);
+			item->set_prev(last_item);
+			last_glyph = glyph_index;
 			last_item = item;
 		}
 		//new char

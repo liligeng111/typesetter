@@ -214,9 +214,38 @@ void GLWidget::paintGL()
 			if (item->is_magic())
 			{
 				//int sum = item->shrink_count_ + item->stretch_count_;
-				float r = .25f * item->shrink_count_;
-				float b = .25f * item->stretch_count_;
-				glColor3f(r, 0, b);
+				float shrink_alpha = item->magic_shrink_value_ / (3 * settings::min_magic_gain_) ;
+				float stretch_alpha = item->magic_stretch_value_ / (3 * settings::min_magic_gain_);
+
+				//show only one color
+				if (settings::show_only_one_suggestion_)
+				{
+					if (shrink_alpha > stretch_alpha)
+					{
+						stretch_alpha = 0;
+					}
+					else
+					{
+						shrink_alpha = 0;
+					}
+				}
+
+				float r = (shrink_alpha * settings::shrink_color_.red() + stretch_alpha * settings::stretch_color_.red()) / 255;
+				float g = (shrink_alpha * settings::shrink_color_.green() + stretch_alpha * settings::stretch_color_.green()) / 255;
+				float b = (shrink_alpha * settings::shrink_color_.blue() + stretch_alpha * settings::stretch_color_.blue()) / 255;
+				//cout << r << " " << g << " " << b << endl;
+				float max = 1;
+				if (r > max)
+					max = r;
+				if (g > max)
+					max = g;
+				if (b > max)
+					max = b;
+
+				r /= max;
+				g /= max;
+				b /= max;
+				glColor3f(r, g, b);
 			}
 			else
 			{

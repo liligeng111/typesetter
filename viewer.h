@@ -52,6 +52,9 @@ private slots:
 	void setMarkdownSpaceR(bool checked);
 	void setMarkdownFontR(bool checked);
 	void setMarkdownLetterSpaceR(bool checked);
+	void pick_shrink_color();
+	void pick_stretch_color();
+	void show_only_one_suggestion(bool);
 
 private:
 	Ui::viewerClass ui;

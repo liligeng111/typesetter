@@ -745,16 +745,22 @@ void Typesetter::break_paragraph()
 					{
 						current->set_is_magic(true);
 						current = current->prev();
+						float importance = active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum();
 
-						if (bp->demerits().r > 0)
-							current->stretch_count_++;
-						else
-							current->shrink_count_++;
+						if (bp->demerits().r > 0 && importance > current->magic_stretch_value_)
+						{
+							current->magic_stretch_value_ = importance;
+						}
+
+						if (bp->demerits().r < 0 && importance > current->magic_shrink_value_)
+						{
+							current->magic_shrink_value_ = importance;
+						}
 
 					}
 					//cout << "magic r: " << bp->demerits().r << endl;
-					cout << active_list_.front()->item()->before()->word_content() << " improments: " << active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum();
-					cout << " magic em: " << 1.0 * (bp->demerits().length - bp->demerits().l) / settings::em_size_ << endl;
+					//cout << active_list_.front()->item()->before()->word_content() << " improments: " << active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum();
+					//cout << " magic em: " << 1.0 * (bp->demerits().length - bp->demerits().l) / settings::em_size_ << endl;
 				}
 				bp = bp->prev();
 			}

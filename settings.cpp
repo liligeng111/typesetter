@@ -41,5 +41,8 @@ namespace settings
 	//magic
 	bool use_magic_ = false;
 	float min_magic_gain_ = 10000;
-	float max_magic_amount_= 1;
+	float max_magic_amount_ = 1;
+	QColor shrink_color_ = QColor(0, 0, 0);
+	QColor stretch_color_ = QColor(0, 0, 0);
+	bool show_only_one_suggestion_ = false;
 };

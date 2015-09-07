@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <qcolor.h>
 
 namespace settings
 {
@@ -61,5 +62,8 @@ namespace settings
 	extern bool use_magic_;
 	extern float min_magic_gain_;
 	extern float max_magic_amount_;
+	extern QColor shrink_color_;
+	extern QColor stretch_color_;
+	extern bool show_only_one_suggestion_;
 };
 

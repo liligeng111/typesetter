@@ -40,6 +40,9 @@ Item::Item(ItemType type) : type_(type)
 
 	magic_shrink_value_ = 0;
 	magic_stretch_value_ = 0;
+
+	forward_demerits_ = FLT_MAX;
+	backward_demerits_ = FLT_MAX;
 }
 
 void Item::init_box(Glyph* glyph, Word* word, long y, long z)

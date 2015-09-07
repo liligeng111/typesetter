@@ -586,8 +586,8 @@ void Typesetter::justify()
 	//check eack box
 	for (int i = 0; i < lines_.size(); i++)
 	{
-		//cout << "line: " << i << endl;
 		Line* line = lines_[i];
+		//cout << "line: " << i << ":  " << line->demerits().l << endl;
 
 		const vector<Item*>* children = line->children();
 		//why no children?

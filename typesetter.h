@@ -74,6 +74,7 @@ private:
 	void optimum_fit_magic_edge(vector<pair<Item*, Item*>> magic_found);
 	void optimum_fit();
 	void reverse_optimum_fit();
+	void bidirection_magic();
 	void fill_lines();
 
 	void justify();
@@ -106,4 +107,7 @@ private:
 
 	int qscintilla_line; //corresponding line num in qsccintilla
 	int magic_line; //previously found magic line
+
+	//TEMP!!!!
+	Breakpoint* temp_backward_bp;
 };

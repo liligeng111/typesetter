@@ -3,14 +3,439 @@
 #include "settings.h"
 #include <queue>
 
-void Typesetter::optimum_fit_magic_edge(vector<pair<Item*, Item*>> magic_found)
+void Typesetter::bidirection_magic()
 {
 	//erase pervious data
-	passive_list_.clear();
 	for (auto bp : passive_list_)
 	{
 		delete bp;
 	}
+	passive_list_.clear();
+	local_cost_.clear();
+
+	//line width 
+	Item* item = new Item(Item::GLUE);
+	item->init_glue(0, 0, settings::item_priority_size_ - 1);
+	item->set_geometry(paragraph_.front()->x(), 0, 0, 0);
+	paragraph_.front()->set_prev(item);
+	paragraph_.push_front(item);
+	active_list_.push_back(new Breakpoint(paragraph_.back()));
+	auto iter = paragraph_.rbegin();
+	iter++;
+
+	while (iter != paragraph_.rend())
+	{
+		Item* b = *iter;
+		iter++;
+
+		Breakpoint* breakpoint = nullptr;
+		if (!b->breakable())
+		{
+			continue;
+		}
+		else if (b->type() == Item::PENALITY)
+		{
+			// must not break
+			if (b->penalty() > 999)
+			{
+				continue;
+			}
+		}
+
+		//potential break
+		auto a = active_list_.begin();
+		auto end = active_list_.end();
+
+		//iterare the active list
+		while (a != end)
+		{
+			//calculate r
+			//force break for first one
+			bool forced_break = (iter == paragraph_.rend());
+			Item* after = (*a)->item();
+			Item* before = (*a)->item()->before();
+			//TODO::Is this correct?
+			float r;
+			long L = (*a)->item()->before()->end_at() - b->after()->x();
+
+			long l = settings::content_width_point();
+			//margin kerning
+			if (b->after()->glyph() != nullptr)
+				l += b->after()->glyph()->left_protruding() * b->after()->glyph()->width() / 1000;
+
+			if (after->break_glyph() != nullptr)
+			{
+				l += after->break_glyph()->right_protruding() * after->break_glyph()->width() / 1000;
+			}
+			else if (before->glyph() != nullptr)
+			{
+				l += before->glyph()->right_protruding() * before->glyph()->width() / 1000;
+			}
+
+			if (b->type() == Item::PENALITY)
+			{
+				forced_break = b->penalty() < -999;
+			}
+
+			L += after->break_width();
+
+			int penalty = after->penalty(); //penalty
+			if (L < l)
+			{
+				long Y = -(b->after()->sum_stretchability(0) - after->sum_stretchability(0));
+				if (Y > 0)
+					r = 1.0f * (l - L) / Y;
+				else
+					r = 1000;
+			}
+			else if (L > l)
+			{
+				long Z = -(b->after()->sum_shrinkability(0) - after->sum_shrinkability(0));
+				if (Z > 0)
+					r = 1.0f * (l - L) / Z;
+				else
+					r = 1000;
+			}
+			else
+			{
+				//prefect!
+				r = 0;
+			}
+
+			//rho here
+			if (r >= -1 && r < settings::rho_)
+			{
+				//TODO::cout result seems weird
+				//cout << (*a)->item()->after()->word_content() << " ----> " << b->after()->word_content() << " L: " << L << " r: " << r << endl;
+
+				float d;
+				if (penalty >= 0)
+				{
+					d = 1 + 100 * r * r * abs(r) + penalty;
+					d = d * d;
+				}
+				else if (penalty > -1000)
+				{
+					d = 1 + 100 * r * r * abs(r);
+					d = d * d - penalty * penalty;
+				}
+				else
+				{
+					d = 1 + 100 * r * r * abs(r);
+					d = d * d;
+				}
+				//TODO::f(a) and c
+				//new breakpoint
+				
+				Breakpoint::Demerits demerit(r, L, penalty, d, l);
+
+				if (breakpoint == nullptr)
+				{
+					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+					(*a)->push_next(breakpoint);
+				}
+				//better breakpoint
+				else if ((*a)->demerits_sum() + d < breakpoint->demerits_sum())
+				{
+					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+				}
+				if (b->backward_demerits_ > breakpoint->demerits_sum())
+					b->backward_demerits_ = breakpoint->demerits_sum();
+				local_cost_.insert(make_pair(make_pair((*a)->item(), b), demerit));
+			}
+
+			if (r < -1 || forced_break)
+			{
+				//cout << "deletefrom active list: " << *a << endl;
+				passive_list_.push_front(*a);
+				a = active_list_.erase(a);
+			}
+			else
+			{
+				a++;
+			}
+		}
+		//TODO::what is q?
+		if (breakpoint != nullptr)
+		{
+			active_list_.push_back(breakpoint);
+		}
+
+	}
+	if (active_list_.size() != 1)
+	{
+		cout << "Content:: " << endl;
+		for (Item* item : paragraph_)
+		{
+			cout << item->content() << endl;
+		}
+		cout << endl;
+		message("ERROR: Unable to preform optimum fit");
+		exit(EXIT_FAILURE);
+	}
+
+	temp_backward_bp = active_list_.front();
+	active_list_.clear();
+	//erase pervious data
+	for (auto bp : passive_list_)
+	{
+		delete bp;
+	}
+	passive_list_.clear();
+	local_cost_.clear();
+
+	//line width 
+	long l;
+	item = new Item(Item::GLUE);
+	item->init_glue(0, 0, settings::item_priority_size_ - 1);
+	item->set_geometry(paragraph_.front()->x(), 0, 0, 0);
+	paragraph_.front()->set_prev(item);
+	paragraph_.push_front(item);
+	active_list_.push_back(new Breakpoint(item));
+	auto f_iter = paragraph_.begin();
+	f_iter++;
+
+	while (f_iter != paragraph_.end())
+	{
+		Item* b = *f_iter;
+		//cout << b << " : " << b->content() << endl;
+		f_iter++;
+		//cout << b->content() << "  " << b->x() << " " << b->sum_y_ << " " << b->sum_z_ << endl;
+		Breakpoint* breakpoint = nullptr;
+		int penalty = b->penalty(); //penalty
+		if (!b->breakable())
+		{
+			continue;
+		}
+		else if (b->type() == Item::PENALITY)
+		{
+			// must not break
+			if (b->penalty() > 999)
+			{
+				continue;
+			}
+		}
+
+		//potential break
+		auto a = active_list_.begin();
+		auto end = active_list_.end();
+
+		//iterare the active list
+		while (a != end)
+		{
+			//calculate r
+			bool forced_break = false;
+			Item* after = (*a)->item()->after();
+			Item* before = b->before();
+			float r;
+			//TODO::precision issue?
+			long L = before->end_at() - after->x();
+
+			long l = settings::content_width_point();
+			//margin kerning
+			if (after->glyph() != nullptr)
+				l += after->glyph()->left_protruding() * after->glyph()->width() / 1000;
+
+			if (b->break_glyph() != nullptr)
+			{
+				l += b->break_glyph()->right_protruding() * b->break_glyph()->width() / 1000;
+			}
+			else if (before->glyph() != nullptr)
+			{
+				l += before->glyph()->right_protruding() * before->glyph()->width() / 1000;
+			}
+
+			L += b->break_width();
+			if (b->type() == Item::PENALITY)
+			{
+				forced_break = penalty < -999;
+			}
+			if (L < l)
+			{
+				long Y = b->sum_stretchability(0) - after->sum_stretchability(0);
+				if (Y > 0)
+					r = 1.0f * (l - L) / Y;
+				else
+					r = 1000;
+			}
+			else if (L > l)
+			{
+				long Z = b->sum_shrinkability(0) - after->sum_shrinkability(0);
+				if (Z > 0)
+					r = 1.0f * (l - L) / Z;
+				else
+					r = 1000;
+			}
+			else
+			{
+				//prefect!
+				r = 0;
+			}
+
+			//if (L == 0)
+			//{
+			//	for (Item* item : paragraph_)
+			//	{
+			//		//cout << item << " : " << item->content() << endl;
+			//	}
+			//	cout << after->content() << " ----> " << b->content() << " L: " << L << " r: " << r << " a: " << after->sum_y_ << " b: " << b->sum_y_ << endl;
+			//	cout << (*a)->item()->content() << " ----> " << b->content() << endl << endl;
+			//}
+			//cout << "r " << r << endl;
+			//rho here
+			if (r >= -1 && r < settings::rho_)
+			{
+				//if (r > 5)
+				//	cout << (*a)->item()->content() << " ----> " << b->content() << " L: " << L << " r: " << r << endl;
+				float d;
+				if (penalty >= 0)
+				{
+					d = 1 + 100 * r * r * abs(r) + penalty;
+					d = d * d;
+				}
+				else if (penalty > -1000)
+				{
+					d = 1 + 100 * r * r * abs(r);
+					d = d * d - penalty * penalty;
+				}
+				else
+				{
+					d = 1 + 100 * r * r * abs(r);
+					d = d * d;
+				}
+				//TODO::f(a) and c
+				//new breakpoint
+
+				Breakpoint::Demerits demerit(r, L, penalty, d, l);
+
+				if (breakpoint == nullptr)
+				{
+					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+					(*a)->push_next(breakpoint);
+				}
+				//better breakpoint
+				else if ((*a)->demerits_sum() + d < breakpoint->demerits_sum())
+				{
+					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+				}
+				if (b->forward_demerits_ > breakpoint->demerits_sum())
+					b->forward_demerits_ = breakpoint->demerits_sum();
+				local_cost_.insert(make_pair(make_pair((*a)->item(), b), demerit));
+			}
+
+			if (r < -1 || forced_break)
+			{
+				//cout << "deletefrom active list: " << *a << endl;
+				passive_list_.push_back(*a);
+				a = active_list_.erase(a);
+			}
+			else
+			{
+				a++;
+			}
+		}
+		//TODO::what is q?
+		if (breakpoint != nullptr)
+		{
+			active_list_.push_back(breakpoint);
+		}
+
+	}
+
+	if (active_list_.size() != 1)
+	{
+		cout << "Content:: " << endl;
+		for (Item* item : paragraph_)
+		{
+			cout << item->content() << endl;
+		}
+		cout << endl;
+		cout << "active_list size: " << active_list_.size() << endl;
+		message("ERROR: Unable to preform optimum fit");
+		exit(EXIT_FAILURE);
+	}	
+
+	float normal_demerits = active_list_.front()->demerits_sum();
+	//find magic edges from bp_a to bp_b
+	//temporaryly put the root into passive list, triverse the list and put it back
+	passive_list_.push_back(active_list_.front());
+
+	auto bp_a = passive_list_.begin();
+	while (bp_a != passive_list_.end())
+	{
+		auto bp_b = bp_a;
+		bp_b++;
+		while (bp_b != passive_list_.end())
+		{
+			float importance = normal_demerits - (*bp_a)->item()->forward_demerits_ - (*bp_b)->item()->backward_demerits_;
+			//check if is important
+			if (importance < settings::min_magic_gain_)
+			{
+				bp_b++;
+				continue;
+			}
+
+			//TODO::redunce, write a function to calculate l and L
+			Item* after = (*bp_a)->item()->after();
+			Item* before = (*bp_b)->item()->before();
+			long L = before->end_at() - after->x();
+
+			long l = settings::content_width_point();
+			//margin kerning
+			if (after->glyph() != nullptr)
+				l += after->glyph()->left_protruding() * after->glyph()->width() / 1000;
+
+			if ((*bp_b)->item()->break_glyph() != nullptr)
+			{
+				l += (*bp_b)->item()->break_glyph()->right_protruding() * (*bp_b)->item()->break_glyph()->width() / 1000;
+			}
+			else if (before->glyph() != nullptr)
+			{
+				l += before->glyph()->right_protruding() * before->glyph()->width() / 1000;
+			}
+
+			L += (*bp_b)->item()->break_width();
+			if (abs(l - L) < settings::max_magic_amount_ * settings::em_size_)
+			{
+				//mark all item in between
+				Item* end = (*bp_b)->item();
+				Item* current = (*bp_a)->item();
+				while (current != end)
+				{
+					current->set_is_magic(true);
+					current = current->next();
+					if (L < l && importance > current->magic_stretch_value_)
+					{
+						current->magic_stretch_value_ = importance;
+					}
+
+					if (L >= l && importance > current->magic_shrink_value_)
+					{
+						current->magic_shrink_value_ = importance;
+					}
+				}
+			}
+			else if (L > l)
+			{
+				//already too long, no need to search further
+				break;
+			}
+
+			bp_b++;
+		}
+
+		bp_a++;
+	}
+}
+
+void Typesetter::optimum_fit_magic_edge(vector<pair<Item*, Item*>> magic_found)
+{
+	//erase pervious data
+	for (auto bp : passive_list_)
+	{
+		delete bp;
+	}
+	passive_list_.clear();
 	local_cost_.clear();
 
 	//line width 
@@ -228,11 +653,11 @@ void Typesetter::optimum_fit_magic_edge(vector<pair<Item*, Item*>> magic_found)
 void Typesetter::optimum_fit()
 {
 	//erase pervious data
-	passive_list_.clear();
 	for (auto bp : passive_list_)
 	{
 		delete bp;
 	}
+	passive_list_.clear();
 	local_cost_.clear();
 
 	//line width 
@@ -696,7 +1121,8 @@ void Typesetter::break_paragraph()
 	item->set_geometry(paragraph_.front()->x(), 0, 0, 0);
 	paragraph_.front()->set_prev(item);
 	paragraph_.push_front(item);
-	optimum_fit_magic_edge(magic_found);
+	//optimum_fit_magic_edge(magic_found);
+	bidirection_magic();
 	//insert breakpoints (for knuth original algorithm)
 
 	Breakpoint* bp;
@@ -714,68 +1140,35 @@ void Typesetter::break_paragraph()
 	}
 
 	bp->set_is_last(true);
+
 	auto pos = breakpoints.rbegin();
 	while (bp->prev() != nullptr)
 	{
 		//cout << bp->item()->after()->content() << endl;
+		//cout << "TOTAL: " << bp->demerits_sum() << "  " << bp->item() << "  " << bp->demerits().result << "  " << bp->demerits().l << " " << bp->demerits().length << "  " << bp->demerits().r << endl;
+		//cout << bp->item()->forward_demerits_ << " " << bp->item()->backward_demerits_ << "  " << bp->item()->forward_demerits_ + bp->item()->backward_demerits_ << endl;
 		breakpoints.insert(pos.base(), bp);
 		bp = bp->prev();
 		pos++;
 	}
 
-	//magic edge
-	bool found_magic = true;
-	while (found_magic)
+	//cout << "--------------" << endl;
+	//bp = temp_backward_bp->prev();
+	//while (bp != nullptr)
+	//{
+	//	//cout << bp->item()->after()->content() << endl;
+	//	cout << "TOTAL: " << bp->demerits_sum() << "  " << bp->item() << "  " << bp->demerits().result << "  " << bp->demerits().l << " " << bp->demerits().length << "  " << bp->demerits().r << endl;
+	//	//cout << bp->item()->forward_demerits_ << " " << bp->item()->backward_demerits_ << "  " << bp->item()->forward_demerits_ + bp->item()->backward_demerits_ << endl;
+	//	//breakpoints.push_back(bp);
+	//	bp = bp->prev();
+	//}
+
+
+	while (!active_list_.empty())
 	{
-		found_magic = false;
-		if (active_list_.front() != active_list_.back() && active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum() > settings::min_magic_gain_)
-		{
-			found_magic = true;
-			//cout << "magic demerites: " << active_list_.back()->demerits_sum();
-			//cout << " normal demerites: " << active_list_.front()->demerits_sum() << endl;
-			Breakpoint* bp = active_list_.back();
-			while (bp->prev() != nullptr)
-			{
-				if (bp->is_magic())
-				{
-					magic_found.push_back(make_pair(bp->prev()->item(), bp->item()));
-					Item* end = bp->prev()->item();
-					Item* current = bp->item();
-					while (current != end)
-					{
-						current->set_is_magic(true);
-						current = current->prev();
-						float importance = active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum();
-
-						if (bp->demerits().r > 0 && importance > current->magic_stretch_value_)
-						{
-							current->magic_stretch_value_ = importance;
-						}
-
-						if (bp->demerits().r < 0 && importance > current->magic_shrink_value_)
-						{
-							current->magic_shrink_value_ = importance;
-						}
-
-					}
-					//cout << "magic r: " << bp->demerits().r << endl;
-					//cout << active_list_.front()->item()->before()->word_content() << " improments: " << active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum();
-					//cout << " magic em: " << 1.0 * (bp->demerits().length - bp->demerits().l) / settings::em_size_ << endl;
-				}
-				bp = bp->prev();
-			}
-		}
-
-		while (!active_list_.empty())
-		{
-			passive_list_.push_back(active_list_.front());
-			active_list_.pop_front();
-		}
-
-		if (found_magic)
-			optimum_fit_magic_edge(magic_found);
+		passive_list_.push_back(active_list_.front());
+		active_list_.pop_front();
 	}
-
 	//merge paragraph
 	items_.splice(items_.end(), paragraph_);
 }

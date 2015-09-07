@@ -95,6 +95,9 @@ public:
 	//TODO::temp
 	float magic_shrink_value_;
 	float magic_stretch_value_;
+
+	float forward_demerits_;
+	float backward_demerits_;
 protected:
 	const ItemType type_;
 

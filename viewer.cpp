@@ -382,9 +382,6 @@ void Viewer::typeset()
 	cout << "Total Page Count:" << typesetter_.page_count() << endl;
 	ui.pageSlider->setMaximum(typesetter_.page_count() - 1);
 	ui.pageSlider->setValue(0);
-	//on_pageSlider_valueChanged(0);
-	//glwidget_->render_page(typesetter_.page(0));
-
 
 	jump(0, 0);
 	//jump(*line, *index);

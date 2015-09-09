@@ -13,6 +13,7 @@
 #include "typesetter.h"
 #include "container.h"
 #include <qstring>
+#include "lib\libhyphenate\Hyphenator.h"
 
 using namespace std;
 
@@ -43,7 +44,7 @@ public:
 	Page* get_page_number(int qscintilla_line_number);
 	int get_prev_magic(int line);
 	int get_next_magic(int line);
-
+	
 private:
 
 	FT_Library  library_;
@@ -51,6 +52,8 @@ private:
 	map<wchar_t, Glyph*> glyph_cache_;
 	long hyphen_width_;
 	Glyph* hyphen_glyph_;
+
+	Hyphenate::Hyphenator hyphenator_;
 
 	//input sequence
 	list<Item*> items_;
@@ -108,6 +111,6 @@ private:
 	int qscintilla_line; //corresponding line num in qsccintilla
 	int magic_line; //previously found magic line
 
-	//TEMP!!!!
-	Breakpoint* temp_backward_bp;
+	vector<pair<int, float>> suggestions_;
+
 };

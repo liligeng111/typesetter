@@ -174,7 +174,6 @@ void Typesetter::bidirection_magic()
 		exit(EXIT_FAILURE);
 	}
 
-	temp_backward_bp = active_list_.front();
 	active_list_.clear();
 	//erase pervious data
 	for (auto bp : passive_list_)
@@ -1151,19 +1150,7 @@ void Typesetter::break_paragraph()
 		bp = bp->prev();
 		pos++;
 	}
-
-	//cout << "--------------" << endl;
-	//bp = temp_backward_bp->prev();
-	//while (bp != nullptr)
-	//{
-	//	//cout << bp->item()->after()->content() << endl;
-	//	cout << "TOTAL: " << bp->demerits_sum() << "  " << bp->item() << "  " << bp->demerits().result << "  " << bp->demerits().l << " " << bp->demerits().length << "  " << bp->demerits().r << endl;
-	//	//cout << bp->item()->forward_demerits_ << " " << bp->item()->backward_demerits_ << "  " << bp->item()->forward_demerits_ + bp->item()->backward_demerits_ << endl;
-	//	//breakpoints.push_back(bp);
-	//	bp = bp->prev();
-	//}
-
-
+	
 	while (!active_list_.empty())
 	{
 		passive_list_.push_back(active_list_.front());

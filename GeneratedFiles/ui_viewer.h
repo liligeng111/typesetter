@@ -14,14 +14,12 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
-#include <QtWidgets/QDockWidget>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
@@ -69,9 +67,6 @@ public:
     QMenu *menuMarkdown;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
-    QDockWidget *dockWidget;
-    QWidget *dockWidgetContents;
-    QSlider *pageSlider;
 
     void setupUi(QMainWindow *viewerClass)
     {
@@ -214,20 +209,6 @@ public:
         statusBar = new QStatusBar(viewerClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         viewerClass->setStatusBar(statusBar);
-        dockWidget = new QDockWidget(viewerClass);
-        dockWidget->setObjectName(QStringLiteral("dockWidget"));
-        dockWidget->setMinimumSize(QSize(80, 38));
-        dockWidgetContents = new QWidget();
-        dockWidgetContents->setObjectName(QStringLiteral("dockWidgetContents"));
-        pageSlider = new QSlider(dockWidgetContents);
-        pageSlider->setObjectName(QStringLiteral("pageSlider"));
-        pageSlider->setGeometry(QRect(30, 40, 30, 611));
-        pageSlider->setPageStep(10);
-        pageSlider->setValue(0);
-        pageSlider->setOrientation(Qt::Vertical);
-        pageSlider->setInvertedAppearance(true);
-        dockWidget->setWidget(dockWidgetContents);
-        viewerClass->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget);
 
         menuBar->addAction(menuFile_2->menuAction());
         menuBar->addAction(menuEdit->menuAction());

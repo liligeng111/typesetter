@@ -6,13 +6,9 @@
 #include <iomanip>
 #include "viewer.h"
 #include "settings.h"
-#include "lib\libhyphenate\Hyphenator.h"
 #include "container.h"
 
-
-using namespace Hyphenate;
-
-Typesetter::Typesetter()
+Typesetter::Typesetter() : hyphenator_((RFC_3066::Language("en")))
 {
 	LoadFace();
 	sum_stretchability_[settings::item_priority_size_] = {};
@@ -130,8 +126,6 @@ void Typesetter::Progress(string msg)
 void Typesetter::Typeset(QString& text)
 {
 	start_time_ = chrono::high_resolution_clock::now();
-
-	Hyphenator hyphenator = (RFC_3066::Language("en"));
 	
 	FT_Error error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
 
@@ -257,7 +251,7 @@ void Typesetter::Typeset(QString& text)
 		{
 			if (word != nullptr)
 			{
-				word->hyphenate(&hyphenator, hyphen_glyph_);
+				word->hyphenate(&hyphenator_, hyphen_glyph_);
 			}
 			word = nullptr;
 			//must break
@@ -292,7 +286,7 @@ void Typesetter::Typeset(QString& text)
 		{
 			if (word != nullptr)
 			{
-				word->hyphenate(&hyphenator, hyphen_glyph_);
+				word->hyphenate(&hyphenator_, hyphen_glyph_);
 			}
 			word = nullptr; 
 			Item* item = new Item(Item::GLUE);
@@ -310,7 +304,7 @@ void Typesetter::Typeset(QString& text)
 		{
 			if (word != nullptr)
 			{
-				word->hyphenate(&hyphenator, hyphen_glyph_);
+				word->hyphenate(&hyphenator_, hyphen_glyph_);
 			}
 			word = nullptr;
 			Item* item = new Item(Item::PENALITY);

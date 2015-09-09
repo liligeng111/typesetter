@@ -29,8 +29,6 @@ protected:
 	void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;
 
 private slots:
-	void on_pageSlider_valueChanged(int value);
-
 	void newFile();
 	void open();
 	bool save();

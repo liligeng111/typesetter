@@ -203,7 +203,8 @@ void Viewer::documentWasModified()
 
 void Viewer::jump(int line, int index)
 {
-	Page* page = typesetter_.get_page_number(line);
+	typesetter_.Typeset(textEdit->text(line));
+	Page* page = typesetter_.get_page_number(0);
 	if (page != nullptr)
 		glwidget_->render_page(page);
 }
@@ -376,28 +377,17 @@ void Viewer::typeset()
 	textEdit->getCursorPosition(line, index);
 	//TODO::why do I have to do this
 	//typesetter_.Typeset(textEdit->text().append("\n"));
-	typesetter_.Typeset(backups_[*line][backups_index_[*line]]);
+	//typesetter_.Typeset(backups_[*line][backups_index_[*line]]);
+	typesetter_.Typeset(textEdit->text(*line));
 	//typesetter.render(Typesetter::SVG);
 
 	cout << "Total Page Count:" << typesetter_.page_count() << endl;
-	ui.pageSlider->setMaximum(typesetter_.page_count() - 1);
-	ui.pageSlider->setValue(0);
 
 	jump(0, 0);
 	//jump(*line, *index);
 
 	delete line;
 	delete index;
-}
-
-void Viewer::on_pageSlider_valueChanged(int value)
-{
-	if (typesetter_.page_count() == 0)
-		return;
-	glwidget_->render_page(typesetter_.page(value));
-	QString tip = "Page: ";
-	tip.append(QString::number(value, 10));
-	statusBar()->showMessage(tip);
 }
 
 void Viewer::wheelEvent(QWheelEvent * event)
@@ -412,7 +402,6 @@ void Viewer::wheelEvent(QWheelEvent * event)
 		change = 1;
 	}
 
-	ui.pageSlider->setValue(ui.pageSlider->value() + change);
 	event->accept();
 }
 

@@ -160,41 +160,6 @@
    <addaction name="actionNext"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QDockWidget" name="dockWidget">
-   <property name="minimumSize">
-    <size>
-     <width>80</width>
-     <height>38</height>
-    </size>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents">
-    <widget class="QSlider" name="pageSlider">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>40</y>
-       <width>30</width>
-       <height>611</height>
-      </rect>
-     </property>
-     <property name="pageStep">
-      <number>10</number>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="invertedAppearance">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </widget>
-  </widget>
   <action name="actionNew">
    <property name="icon">
     <iconset resource="viewer.qrc">

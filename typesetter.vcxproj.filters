@@ -107,6 +107,9 @@
     <ClCompile Include="extension_loader.cpp">
       <Filter>NVPR</Filter>
     </ClCompile>
+    <ClCompile Include="logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="viewer.h">
@@ -170,5 +173,10 @@
     <CustomBuild Include="extension_loader.h">
       <Filter>NVPR</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

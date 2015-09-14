@@ -126,6 +126,15 @@ void Viewer::open()
 			loadFile(fileName);
 			clear_backups();
 		}
+
+		suggestions_.clear();
+		suggestions_index_ = -1;
+		typesetter_.Typeset(textEdit->text().append("\n"));
+		suggestions_ = typesetter_.get_suggestions();
+		sort(suggestions_.begin(), suggestions_.end(), [](const pair<int, float> & a, const pair<int, float> & b)
+		{
+			return a.second > b.second;
+		});
 	}
 }
 
@@ -144,6 +153,7 @@ void Viewer::clear_backups()
 		backups_[i].push_back(textEdit->text(i));
 		backups_index_.push_back(0);
 	}
+
 }
 
 bool Viewer::save()
@@ -172,12 +182,19 @@ void Viewer::about()
 
 void Viewer::previous()
 {
+	if (suggestions_.size() == 0)
+		return;
+
 	int* line = new int(-1);
 	int* index = new int(-1);
 
-	textEdit->getCursorPosition(line, index);
-	textEdit->setCursorPosition(typesetter_.get_prev_magic(*line), 0);
+	suggestions_index_--;
+	suggestions_index_ %= suggestions_.size();
+	auto suggestion = suggestions_[suggestions_index_];
+	textEdit->setCursorPosition(suggestion.first, 0);
 	textEdit->setFocus();
+	QString msg = QString("Importance: %1").arg(suggestion.second, 0, 'f', 2);
+	statusBar()->showMessage(msg, 2000);
 
 	delete line;
 	delete index;
@@ -185,12 +202,19 @@ void Viewer::previous()
 
 void Viewer::next()
 {
+	if (suggestions_.size() == 0)
+		return;
+
 	int* line = new int(-1);
 	int* index = new int(-1);
 
-	textEdit->getCursorPosition(line, index);
-	textEdit->setCursorPosition(typesetter_.get_next_magic(*line), 0);
+	suggestions_index_++;
+	suggestions_index_ %= suggestions_.size();
+	auto suggestion = suggestions_[suggestions_index_];
+	textEdit->setCursorPosition(suggestion.first, 0);
 	textEdit->setFocus();
+	QString msg = QString("Importance: %1").arg(suggestion.second, 0, 'f', 2);
+	statusBar()->showMessage(msg, 2000);
 
 	delete line;
 	delete index;

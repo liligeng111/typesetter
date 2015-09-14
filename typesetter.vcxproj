@@ -180,6 +180,7 @@
     <ClCompile Include="lib\libhyphenate\HyphenationTree.cpp" />
     <ClCompile Include="lib\libhyphenate\Hyphenator.cpp" />
     <ClCompile Include="lib\libhyphenate\Language.cpp" />
+    <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="path.cpp" />
     <ClCompile Include="river.cpp" />
@@ -779,6 +780,9 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </AdditionalInputs>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="logger.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

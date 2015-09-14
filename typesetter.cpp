@@ -1,5 +1,4 @@
 #include "typesetter.h"
-#include <iostream>
 #include <fstream>
 #include <locale>
 #include <codecvt>
@@ -7,6 +6,7 @@
 #include "viewer.h"
 #include "settings.h"
 #include "container.h"
+#include "logger.h"
 
 Typesetter::Typesetter() : hyphenator_((RFC_3066::Language("en")))
 {
@@ -101,6 +101,9 @@ void Typesetter::clean()
 
 	qscintilla_line = 0;
 	magic_line = -1;
+
+	paragraph_number_ = 0;
+	suggestions_.clear();
 }
 
 Page* Typesetter::get_page_number(int qscintilla_line_number)
@@ -118,15 +121,10 @@ Page* Typesetter::get_page_number(int qscintilla_line_number)
 	return nullptr;
 }
 
-void Typesetter::Progress(string msg)
-{
-	cout << fixed << setprecision(3) << chrono::duration_cast<std::chrono::milliseconds>(chrono::high_resolution_clock::now() - start_time_).count() / 1000.0 << "s--" << msg << "\n";
-}
-
 void Typesetter::Typeset(QString& text)
-{
-	start_time_ = chrono::high_resolution_clock::now();
-	
+{	
+
+	Logger::set_start_time();
 	FT_Error error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
 
 	if (error)
@@ -140,11 +138,11 @@ void Typesetter::Typeset(QString& text)
 	hyphen_width_ = hyphen_glyph_->advance().x;
 	Glyph* glyph;
 
-	Progress("Cleaning previous data");
+	Logger::progress("Cleaning previous data");
 	//clear previous data
 	clean();
 
-	Progress("Typesetting");
+	Logger::progress("Typesetting");
 	cout << "Page width: " << settings::content_width_point() << endl;
 
 	unsigned long x_cursor = 0;
@@ -394,17 +392,17 @@ void Typesetter::Typeset(QString& text)
 
 
 	//cout << "cache size: " << glyph_cache_.size() << endl;
-	Progress("Breaking paragraphs");
+	Logger::progress("Breaking paragraphs");
 	fill_lines();
-	Progress("Justify lines");
+	Logger::progress("Justify lines");
 	justify();
 
 	if (settings::show_river_)
 	{
-		Progress("Detecting River");
+		Logger::progress("Detecting River");
 		detect_river();
 	}
-	Progress("Typesetting Done");
+	Logger::progress("Typesetting Done");
 }
 
 void Typesetter::detect_river()
@@ -716,7 +714,7 @@ void Typesetter::render_page(RenderTarget target, int page)
 
 void Typesetter::render(RenderTarget target)
 {
-	Progress("Generating optput files");
+	Logger::progress("Generating optput files");
 	if (target == RenderTarget::SVG)
 	{
 		for ( int i = 0; i < pages_.size(); i++)
@@ -759,7 +757,7 @@ void Typesetter::render(RenderTarget target)
 			file.close();
 		}
 	}
-	Progress("Done");
+	Logger::progress("Done");
 }
 
 int Typesetter::get_prev_magic(int line)

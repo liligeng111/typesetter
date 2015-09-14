@@ -6,7 +6,6 @@
 #include <vector>
 #include <list>
 #include <map>
-#include <chrono>
 #include FT_FREETYPE_H
 #include "river.h"
 #include "breakpoint.h"
@@ -44,6 +43,8 @@ public:
 	Page* get_page_number(int qscintilla_line_number);
 	int get_prev_magic(int line);
 	int get_next_magic(int line);
+
+	vector<pair<int, float>> get_suggestions() { return suggestions_; }
 	
 private:
 
@@ -65,11 +66,8 @@ private:
 	list<Breakpoint*> active_list_;
 	list<Breakpoint*> passive_list_;
 	vector<vector<River*>> rivers_;
-	chrono::high_resolution_clock::time_point start_time_;
 	vector<int> magic_paragraphs_;
-
-	void Progress(string msg);
-	
+		
 	void clean();
 
 	void break_paragraph();
@@ -108,9 +106,10 @@ private:
 	//magic stuff
 	//priority_queue<Item*> magic_queue_;
 
+	//TODO::useless
 	int qscintilla_line; //corresponding line num in qsccintilla
 	int magic_line; //previously found magic line
 
 	vector<pair<int, float>> suggestions_;
-
+	int paragraph_number_;
 };

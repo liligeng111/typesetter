@@ -6,9 +6,10 @@
 void Typesetter::bidirection_magic()
 {
 	//erase pervious data
+	//TODO::memory leak???
 	for (auto bp : passive_list_)
 	{
-		delete bp;
+		//delete bp;
 	}
 	passive_list_.clear();
 	local_cost_.clear();
@@ -355,6 +356,7 @@ void Typesetter::bidirection_magic()
 	}	
 
 	float normal_demerits = active_list_.front()->demerits_sum();
+	float max_importance = -1;
 	//find magic edges from bp_a to bp_b
 	//temporaryly put the root into passive list, triverse the list and put it back
 	passive_list_.push_back(active_list_.front());
@@ -374,6 +376,8 @@ void Typesetter::bidirection_magic()
 				continue;
 			}
 
+			if (importance > max_importance)
+				max_importance = importance;
 			//TODO::redunce, write a function to calculate l and L
 			Item* after = (*bp_a)->item()->after();
 			Item* before = (*bp_b)->item()->before();
@@ -425,6 +429,9 @@ void Typesetter::bidirection_magic()
 
 		bp_a++;
 	}
+
+	if (max_importance > 0)
+		suggestions_.push_back(make_pair(paragraph_number_, max_importance));
 }
 
 void Typesetter::optimum_fit_magic_edge(vector<pair<Item*, Item*>> magic_found)
@@ -1113,8 +1120,6 @@ void Typesetter::break_paragraph()
 	//}
 	//A_star();
 
-	vector<pair<Item*, Item*>> magic_found;
-
 	Item* item = new Item(Item::GLUE);
 	item->init_glue(0, 0, settings::item_priority_size_ - 1);
 	item->set_geometry(paragraph_.front()->x(), 0, 0, 0);
@@ -1158,4 +1163,5 @@ void Typesetter::break_paragraph()
 	}
 	//merge paragraph
 	items_.splice(items_.end(), paragraph_);
+	paragraph_number_++;
 }

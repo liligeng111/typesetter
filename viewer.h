@@ -75,6 +75,10 @@ private:
 	vector<int> backups_index_;
 	void clear_backups();
 	int backup_marker_;
+
+	//TODO::init?
+	vector<pair<int, float>> suggestions_;
+	int suggestions_index_;
 };
 
 #endif // VIEWER_H

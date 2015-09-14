@@ -183,6 +183,9 @@ void GLWidget::paintGL()
 
 			Transform3x2 result;
 
+			//TODO::what happened?
+			if (line_num_[i] >= page_->children_size())
+				continue;
 			Line* line = static_cast<Line*>(page_->child(line_num_[i]));
 			Transform3x2 line_trans;
 			translate(line_trans, line->x(), line->y());
@@ -191,6 +194,8 @@ void GLWidget::paintGL()
 			mul(line_trans, line_trans, temp);
 			mul(result, mat, line_trans);
 
+			if (char_num_[i] >= line->children_size())
+				continue;
 			Item* item = line->child(char_num_[i]);
 			Transform3x2 char_trans;
 			translate(char_trans, item->x(), item->y());

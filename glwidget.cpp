@@ -293,6 +293,8 @@ void GLWidget::paintGL()
 
 			Transform3x2 result;
 
+			if (i >= page_->children_size())
+				continue;
 			Line* line = static_cast<Line*>(page_->child(i));
 			Transform3x2 line_trans;
 			translate(line_trans, line->x(), line->y());

@@ -1,4 +1,5 @@
 #include "container.h"
+#include "logger.h"
 
 Container::Container(Item::ItemType type) : Item(type)
 {
@@ -34,8 +35,7 @@ Word::~Word()
 
 void Word::hyphenate(Hyphenate::Hyphenator* hyphenator, Glyph* hyphen)
 {
-	bool warning = false;
-	if (warning && content_ == nullptr)
+	if (content_ == nullptr)
 	{
 		cout << "Error hyphenating: Empty word" << endl;
 		return;
@@ -48,23 +48,25 @@ void Word::hyphenate(Hyphenate::Hyphenator* hyphenator, Glyph* hyphen)
 	int j = 0;
 	for (int i = 0; i < children_.size(); i++)
 	{
-		if (children_[i]->glyph()->content() == cstr[j])
+		if (content_->at(i) == cstr[j])
 		{
 			//allow break after user input hyphen, ignore last one
-			if (i != children_.size() - 1 && cstr[j] == '-')
+			if (i != 0 && i != children_.size() - 1 && cstr[j] == '-')
 			{
 				Item* space = children_[i]->next();
-				if (warning && space->type() != Item::LETTER_SPACE)
+				if (space->type() != Item::LETTER_SPACE)
 				{
-					cout << "Error hyphenating" << *content_ << " " << hyphenated_ << endl;
+					string msg = "Error hyphenating" + *content_ + " " + hyphenated_;
+					Logger::error(100, msg);
 				}
 
 				space->set_breakable(true);
 			}
 		}
-		else if (warning && cstr[j] != '-')
+		else if (cstr[j] != '-')
 		{
-			cout << "Error hyphenating " << *content_ << " " << hyphenated_ << " " << int(children_[i]->glyph()->content()) << " " << int(cstr[j]) << ' ' << i << " " << j << endl;
+			string msg = "Error hyphenating " + *content_ + " " + hyphenated_ + " " + to_string(int(children_[i]->glyph()->content())) + " " + to_string(int(cstr[j])) + ' ' + to_string(i) + " " + to_string(j);
+			Logger::error(101, msg);
 		}
 		else
 		{

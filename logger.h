@@ -13,6 +13,7 @@ public:
 	~Logger();
 
 	static void progress(string msg);
+	static void error(int code, string msg);
 	static void set_start_time();
 private:
 	static chrono::high_resolution_clock::time_point start_time_;

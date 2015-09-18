@@ -143,7 +143,7 @@ void Typesetter::Typeset(QString& text)
 	clean();
 
 	Logger::progress("Typesetting");
-	cout << "Page width: " << settings::content_width_point() << endl;
+	//cout << "Page width: " << settings::content_width_point() << endl;
 
 	unsigned long x_cursor = 0;
 
@@ -151,14 +151,14 @@ void Typesetter::Typeset(QString& text)
 	Word* word = nullptr;
 	FT_UInt  last_glyph = 0;
 	FT_UInt glyph_index = 0;
-	wchar_t ch = 0;
+	unsigned short ch = 0;
 
 	bool new_paragraph = true;
 	
 	for (int text_index = 0; text_index < text.length(); text_index++)
 	{
 		//TODO::rewrite control
-
+		//TODO::U+10000 above may cause error
 		ch = text.at(text_index).unicode();
 		int move_forward = 0;
 		if (text_index + 1 < text.length())
@@ -179,6 +179,7 @@ void Typesetter::Typeset(QString& text)
 			}
 		}
 
+		//TODO::!utf 8 
 		//quotation
 		if (ch == 96)
 		{
@@ -189,6 +190,11 @@ void Typesetter::Typeset(QString& text)
 			ch = 8217;
 		}
 		
+		if (ch == 24)
+		{
+			cout << "hi";
+		}
+
 		//TODO::check for availbility78
 		/*
 		else if (ch == 'f' && look_ahead[0] == 'f')
@@ -306,7 +312,7 @@ void Typesetter::Typeset(QString& text)
 			}
 			word = nullptr;
 			Item* item = new Item(Item::PENALITY);
-			item->init_penalty(-999);
+			item->init_penalty(-1000);
 			item->set_geometry(x_cursor, 0, 0, 0);
 			paragraph_.push_back(item);
 			item->set_changeability(sum_stretchability_, sum_shrinkability_);
@@ -322,7 +328,13 @@ void Typesetter::Typeset(QString& text)
 				word = new Word;
 			}
 			//TODO::ligature && hyphen
-			word->content()->append(1, ch);
+			//if it above 255, not english, use ! to replace
+			//TODO::hyphen with utf8
+			if (ch > 255)
+				word->content()->append(1, 33);
+			else
+				word->content()->append(1, ch);
+
 
 			auto cache_index = glyph_cache_.find(ch);
 			//seach cache
@@ -331,12 +343,14 @@ void Typesetter::Typeset(QString& text)
 				FT_Error error = FT_Load_Glyph(face_, glyph_index, FT_LOAD_NO_SCALE);
 				if (error)
 				{
-					cout << char(ch) << " - " << int(ch) << endl;
 					message("Error loading character");
+					string msg = "Error loading character" + to_string(ch) + " " +  to_string(int(ch));
+					Logger::error(200, msg);
 				}
 				if (glyph_index == 0)
 				{
-					cout << "Unrecognized character:" << ch << endl;
+					string msg = "Unrecognized character:" + to_string(ch) + " " + to_string(int(ch)) + " in: " + *word->content();
+					Logger::error(201, msg);
 				}
 
 				glyph = new Glyph(face_->glyph, ch);

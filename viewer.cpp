@@ -37,6 +37,7 @@ void Viewer::init()
 	textEdit->setGeometry(250, 50, 630, 891);
 	textEdit->setWrapMode(QsciScintilla::WrapWord);
 	textEdit->setMarginType(0, QsciScintilla::TextMarginRightJustified);
+	textEdit->setUtf8(true);
 	textEdit->zoomTo(12);
 	//textEdit->setFont(QFont());
 	textEdit->show();
@@ -189,6 +190,7 @@ void Viewer::previous()
 	int* index = new int(-1);
 
 	suggestions_index_--;
+	suggestions_index_ += suggestions_.size();
 	suggestions_index_ %= suggestions_.size();
 	auto suggestion = suggestions_[suggestions_index_];
 	textEdit->setCursorPosition(suggestion.first, 0);

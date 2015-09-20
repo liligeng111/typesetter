@@ -404,6 +404,7 @@ void Viewer::typeset()
 	//TODO::why do I have to do this
 	//typesetter_.Typeset(textEdit->text().append("\n"));
 	//typesetter_.Typeset(backups_[*line][backups_index_[*line]]);
+	glwidget_->reset();
 	typesetter_.Typeset(textEdit->text(*line));
 	//typesetter.render(Typesetter::SVG);
 

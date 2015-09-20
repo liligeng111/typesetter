@@ -22,6 +22,7 @@ public:
 	void render_page(Page* page);
 
 	void resize(int width, int height) { resizeGL(width, height); };
+	void reset();
 
 public slots:
 	void cleanup();

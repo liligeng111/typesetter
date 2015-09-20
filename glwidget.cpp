@@ -30,6 +30,17 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 	initModelAndViewMatrices();
 }
 
+
+void GLWidget::reset()
+{
+	page_ = nullptr;
+	//delete previous page
+	if (path_count_ != 0)
+		glDeletePathsNV(path_base_, path_count_);
+	path_count_ = 0;
+	path_base_ = 0;
+}
+
 GLWidget::~GLWidget()
 {
 	cleanup();

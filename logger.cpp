@@ -28,6 +28,7 @@ void Logger::error(int code, string msg)
 	/*
 	1xx for hyphenating related error
 	2xx for input related
+	3xx for magic relater
 	*/
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED);
 	cout << "Error " << code << ": " << msg << endl;

@@ -296,6 +296,10 @@ void GLWidget::paintGL()
 		}
 
 		//markdowns
+			//why bother the kernings
+		GLfloat kerning[20];
+		for (int j = 0; j < 20; j++)
+			kerning[j] = 512 * j;
 		for (int i = 0; i < page_->children_size(); i++)
 		{
 
@@ -314,10 +318,6 @@ void GLWidget::paintGL()
 			mul(line_trans, line_trans, temp);
 			mul(mat, mat, line_trans);
 
-			//why bother the kernings
-			GLfloat kerning[20];
-			for (int j = 0; j < 20; j++)
-				kerning[j] = 512 * j;
 
 			//left
 			string left_text = to_string(line->line_number());
@@ -355,7 +355,6 @@ void GLWidget::paintGL()
 			glStencilFillPathInstancedNV(right_text.length(), GL_UNSIGNED_BYTE, right_str, font_base_, GL_PATH_FILL_MODE_NV, 0xFF, GL_TRANSLATE_X_NV, kerning);
 			glCoverFillPathInstancedNV(right_text.length(), GL_UNSIGNED_BYTE, right_str, font_base_, GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV, GL_TRANSLATE_X_NV, kerning);
 		}
-
 	}
 	glMatrixPopEXT(GL_MODELVIEW);
 	context_->swapBuffers(context_->surface());

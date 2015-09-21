@@ -130,7 +130,7 @@ void Viewer::open()
 
 		suggestions_.clear();
 		suggestions_index_ = -1;
-		typesetter_.Typeset(textEdit->text().append("\n"));
+		typesetter_.typeset(textEdit->text().append("\n"), false);
 		suggestions_ = typesetter_.get_suggestions();
 		sort(suggestions_.begin(), suggestions_.end(), [](const pair<int, float> & a, const pair<int, float> & b)
 		{
@@ -229,10 +229,12 @@ void Viewer::documentWasModified()
 
 void Viewer::jump(int line, int index)
 {
-	typesetter_.Typeset(textEdit->text(line));
-	Page* page = typesetter_.get_page_number(0);
-	if (page != nullptr)
-		glwidget_->render_page(page);
+	//typesetter_.typeset(textEdit->text(line), true);
+	//Page* page = typesetter_.get_page_number(0);
+	//if (page != nullptr)
+	//	glwidget_->render_page(page);
+	typesetter_.reset_magic_index();
+	typeset();
 }
 
 void Viewer::readSettings()
@@ -263,6 +265,7 @@ void Viewer::readSettings()
 	settings::min_magic_gain_ = settings_->value("magic/min_magic_gain", 10000).toFloat();
 	settings::max_magic_amount_ = settings_->value("magic/max_magic_amount", 1.0f).toFloat();
 	settings::use_magic_ = settings_->value("magic/use_magic", false).toBool();
+	ui.actionUse_Magic->setChecked(settings::use_magic_);
 
 	settings::shrink_color_ = settings_->value("view/shrink_color", QColor(0, 0, 0)).value<QColor>();
 	settings::stretch_color_ = settings_->value("view/stretch_color", QColor(0, 0, 0)).value<QColor>();
@@ -393,6 +396,7 @@ void Viewer::use_magic(bool checked)
 {
 	settings_->setValue("magic/use_magic", checked);
 	settings::use_magic_ = checked;
+	typeset();
 }
 
 void Viewer::typeset()
@@ -405,12 +409,16 @@ void Viewer::typeset()
 	//typesetter_.Typeset(textEdit->text().append("\n"));
 	//typesetter_.Typeset(backups_[*line][backups_index_[*line]]);
 	glwidget_->reset();
-	typesetter_.Typeset(textEdit->text(*line));
+	typesetter_.typeset(textEdit->text(*line), true);
 	//typesetter.render(Typesetter::SVG);
 
 	cout << "Total Page Count:" << typesetter_.page_count() << endl;
 
-	jump(0, 0);
+	Page* page = typesetter_.get_page_number(0);
+	if (page != nullptr)
+		glwidget_->render_page(page);
+
+	//jump(0, 0);
 	//jump(*line, *index);
 
 	delete line;
@@ -419,17 +427,36 @@ void Viewer::typeset()
 
 void Viewer::wheelEvent(QWheelEvent * event)
 {
-	int change;
 	if (event->delta() > 0)
 	{
-		change = -1;
+		if (settings::use_magic_)
+		{
+			QString result = typesetter_.magic_index_increase();
+			typeset();
+			statusBar()->showMessage(result, 5000);
+		}
+		event->accept();
 	}
 	else
 	{
-		change = 1;
+		if (settings::use_magic_)
+		{
+			QString result = typesetter_.magic_index_decrease();
+			typeset();
+			statusBar()->showMessage(result, 5000);
+		}
+		event->accept();
 	}
+}
 
-	event->accept();
+void Viewer::keyReleaseEvent(QKeyEvent * event)
+{
+	if (event->key() == Qt::Key_J)
+	{
+	}
+	else if (event->key() == Qt::Key_K)
+	{
+	}
 }
 
 void Viewer::setMarkdownDemerits(bool checked)

@@ -36,7 +36,7 @@ public:
 	Page* page(int i) { return pages_[i]; }
 	int page_count() const { return pages_.size(); }
 	static void message(const string& msg);
-	void Typeset(QString& text);
+	void typeset(QString& text, bool single_paragraph);
 
 	void LoadFace();
 
@@ -45,6 +45,11 @@ public:
 	int get_next_magic(int line);
 
 	vector<pair<int, float>> get_suggestions() { return suggestions_; }
+
+	void reset_magic_index() { magic_index_ = 0; }
+	QString magic_index_increase();
+	QString magic_index_decrease();
+
 	
 private:
 
@@ -76,6 +81,7 @@ private:
 	void optimum_fit();
 	void reverse_optimum_fit();
 	void bidirection_magic();
+	void optimum_fit_with_magic();
 	void fill_lines();
 
 	void justify();
@@ -112,4 +118,11 @@ private:
 
 	vector<pair<int, float>> suggestions_;
 	int paragraph_number_;
+
+	//if typesetting a single paragraph or the whole passage
+	bool typesetting_single_paragraph_;
+	vector<pair<Item*, Item*>> magic_edges_;
+	int magic_index_; //index of the megic edge currently using
+	float normal_demerits_;
+
 };

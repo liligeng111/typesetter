@@ -2,6 +2,7 @@
 #include "viewer.h"
 #include "settings.h"
 #include <queue>
+#include "logger.h"
 
 void Typesetter::bidirection_magic()
 {
@@ -23,6 +24,10 @@ void Typesetter::bidirection_magic()
 	active_list_.push_back(new Breakpoint(paragraph_.back()));
 	auto iter = paragraph_.rbegin();
 	iter++;
+
+	//set 0 demerits for begining and end
+	paragraph_.front()->forward_demerits_ = 0;
+	paragraph_.back()->backward_demerits_ = 0;
 
 	while (iter != paragraph_.rend())
 	{
@@ -186,12 +191,7 @@ void Typesetter::bidirection_magic()
 
 	//line width 
 	long l;
-	item = new Item(Item::GLUE);
-	item->init_glue(0, 0, settings::item_priority_size_ - 1);
-	item->set_geometry(paragraph_.front()->x(), 0, 0, 0);
-	paragraph_.front()->set_prev(item);
-	paragraph_.push_front(item);
-	active_list_.push_back(new Breakpoint(item));
+	active_list_.push_back(new Breakpoint(paragraph_.front()));
 	auto f_iter = paragraph_.begin();
 	f_iter++;
 
@@ -355,7 +355,7 @@ void Typesetter::bidirection_magic()
 		exit(EXIT_FAILURE);
 	}	
 
-	float normal_demerits = active_list_.front()->demerits_sum();
+	normal_demerits_ = active_list_.front()->demerits_sum();
 	float max_importance = -1;
 	//find magic edges from bp_a to bp_b
 	//temporaryly put the root into passive list, triverse the list and put it back
@@ -368,7 +368,8 @@ void Typesetter::bidirection_magic()
 		bp_b++;
 		while (bp_b != passive_list_.end())
 		{
-			float importance = normal_demerits - (*bp_a)->item()->forward_demerits_ - (*bp_b)->item()->backward_demerits_;
+			float new_demerits = (*bp_a)->item()->forward_demerits_ + (*bp_b)->item()->backward_demerits_ + 1;
+			float importance = normal_demerits_ - new_demerits;
 			//check if is important
 			if (importance < settings::min_magic_gain_)
 			{
@@ -400,10 +401,12 @@ void Typesetter::bidirection_magic()
 			L += (*bp_b)->item()->break_width();
 			if (abs(l - L) < settings::max_magic_amount_ * settings::em_size_)
 			{
-				//mark all item in between
+				//magic found! mark all item in between
 				Item* end = (*bp_b)->item();
 				Item* current = (*bp_a)->item();
-				while (current != end)
+				if (typesetting_single_paragraph_)
+					magic_edges_.push_back(make_pair(current, end));
+				while (!settings::use_magic_ && current != end)
 				{
 					current->set_is_magic(true);
 					current = current->next();
@@ -430,8 +433,213 @@ void Typesetter::bidirection_magic()
 		bp_a++;
 	}
 
+	sort(magic_edges_.begin(), magic_edges_.end(), [](const pair<Item*, Item*> & a, const pair<Item*, Item*> & b)
+	{
+		return a.first->forward_demerits_ + a.second->backward_demerits_ > b.first->forward_demerits_ + b.second->backward_demerits_;
+	});
+
 	if (max_importance > 0)
 		suggestions_.push_back(make_pair(paragraph_number_, max_importance));
+
+	if (settings::use_magic_ && typesetting_single_paragraph_ && magic_edges_.size() > 0)
+		optimum_fit_with_magic();
+}
+
+
+void Typesetter::optimum_fit_with_magic()
+{
+	active_list_.clear();
+	//erase pervious data
+	for (auto bp : passive_list_)
+	{
+		delete bp;
+	}
+	passive_list_.clear();
+	local_cost_.clear();
+
+	//line width 
+	long l;
+	Item* item;
+	active_list_.push_back(new Breakpoint(paragraph_.front()));
+	auto f_iter = paragraph_.begin();
+	f_iter++;
+	bool found = false;
+
+	while (f_iter != paragraph_.end())
+	{
+		Item* b = *f_iter;
+		//cout << b << " : " << b->content() << endl;
+		f_iter++;
+		//cout << b->content() << "  " << b->x() << " " << b->sum_y_ << " " << b->sum_z_ << endl;
+		Breakpoint* breakpoint = nullptr;
+		int penalty = b->penalty(); //penalty
+		if (!b->breakable())
+		{
+			continue;
+		}
+		else if (b->type() == Item::PENALITY)
+		{
+			// must not break
+			if (b->penalty() > 999)
+			{
+				continue;
+			}
+		}
+
+		//potential break
+		auto a = active_list_.begin();
+		auto end = active_list_.end();
+
+		//iterare the active list
+		while (a != end)
+		{
+			//calculate r
+			bool forced_break = false;
+			Item* after = (*a)->item()->after();
+			Item* before = b->before();
+			float r;
+			//TODO::precision issue?
+			long L = before->end_at() - after->x();
+
+			long l = settings::content_width_point();
+			//margin kerning
+			if (after->glyph() != nullptr)
+				l += after->glyph()->left_protruding() * after->glyph()->width() / 1000;
+
+			if (b->break_glyph() != nullptr)
+			{
+				l += b->break_glyph()->right_protruding() * b->break_glyph()->width() / 1000;
+			}
+			else if (before->glyph() != nullptr)
+			{
+				l += before->glyph()->right_protruding() * before->glyph()->width() / 1000;
+			}
+
+			L += b->break_width();
+			if (b->type() == Item::PENALITY)
+			{
+				forced_break = penalty < -999;
+			}
+			if (L < l)
+			{
+				long Y = b->sum_stretchability(0) - after->sum_stretchability(0);
+				if (Y > 0)
+					r = 1.0f * (l - L) / Y;
+				else
+					r = 1000;
+			}
+			else if (L > l)
+			{
+				long Z = b->sum_shrinkability(0) - after->sum_shrinkability(0);
+				if (Z > 0)
+					r = 1.0f * (l - L) / Z;
+				else
+					r = 1000;
+			}
+			else
+			{
+				//prefect!
+				r = 0;
+			}
+
+			//if (L == 0)
+			//{
+			//	for (Item* item : paragraph_)
+			//	{
+			//		//cout << item << " : " << item->content() << endl;
+			//	}
+			//	cout << after->content() << " ----> " << b->content() << " L: " << L << " r: " << r << " a: " << after->sum_y_ << " b: " << b->sum_y_ << endl;
+			//	cout << (*a)->item()->content() << " ----> " << b->content() << endl << endl;
+			//}
+			//cout << "r " << r << endl;
+			//rho here
+			//the magic edge currently using
+			if (!found && magic_index_ >= 0 && magic_index_ < magic_edges_.size())
+			{
+				auto edge = magic_edges_[magic_index_];
+				if (edge.first == (*a)->item() && edge.second == b)
+				{
+					r = 0;
+					//TODO::should we do this?
+					penalty = 0;
+					found = true;
+				}
+			}
+
+			if (r >= -1 && r < settings::rho_)
+			{
+				//if (r > 5)
+				//	cout << (*a)->item()->content() << " ----> " << b->content() << " L: " << L << " r: " << r << endl;
+				float d;
+				if (penalty >= 0)
+				{
+					d = 1 + 100 * r * r * abs(r) + penalty;
+					d = d * d;
+				}
+				else if (penalty > -1000)
+				{
+					d = 1 + 100 * r * r * abs(r);
+					d = d * d - penalty * penalty;
+				}
+				else
+				{
+					d = 1 + 100 * r * r * abs(r);
+					d = d * d;
+				}
+				//TODO::f(a) and c
+				//new breakpoint
+
+
+				Breakpoint::Demerits demerit(r, L, penalty, d, l);
+
+				if (breakpoint == nullptr)
+				{
+					breakpoint = new Breakpoint(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+					(*a)->push_next(breakpoint);
+				}
+				//better breakpoint
+				else if ((*a)->demerits_sum() + d < breakpoint->demerits_sum())
+				{
+					breakpoint->init(b, (*a)->line() + 1, (*a)->demerits_sum() + d, demerit, (*a));
+				}
+			}
+
+			if (forced_break)
+			{
+				//cout << "deletefrom active list: " << *a << endl;
+				passive_list_.push_back(*a);
+				a = active_list_.erase(a);
+			}
+			else
+			{
+				a++;
+			}
+		}
+		//TODO::what is q?
+		if (breakpoint != nullptr)
+		{
+			active_list_.push_back(breakpoint);
+		}
+
+	}
+
+	if (active_list_.size() != 1)
+	{
+		cout << "Content:: " << endl;
+		for (Item* item : paragraph_)
+		{
+			cout << item->content() << endl;
+		}
+		cout << endl;
+		cout << "active_list size: " << active_list_.size() << endl;
+		message("ERROR: Unable to preform optimum fit");
+		exit(EXIT_FAILURE);
+	}
+
+	if (!found)
+	{
+		Logger::error(300, "Cannot find the magic edge");
+	}
 }
 
 void Typesetter::optimum_fit_magic_edge(vector<pair<Item*, Item*>> magic_found)
@@ -1129,20 +1337,7 @@ void Typesetter::break_paragraph()
 	bidirection_magic();
 	//insert breakpoints (for knuth original algorithm)
 
-	Breakpoint* bp;
-	if (active_list_.front()->demerits_sum() - active_list_.back()->demerits_sum() > settings::min_magic_gain_)
-	{
-		//worth suggesting a magic edge
-		if (settings::use_magic_)
-			bp = active_list_.back();
-		else
-			bp = active_list_.front();
-	}
-	else
-	{
-		bp = active_list_.front();
-	}
-
+	Breakpoint* bp = active_list_.front();
 	bp->set_is_last(true);
 
 	auto pos = breakpoints.rbegin();
@@ -1161,7 +1356,7 @@ void Typesetter::break_paragraph()
 		passive_list_.push_back(active_list_.front());
 		active_list_.pop_front();
 	}
-	//merge paragraph
+
 	items_.splice(items_.end(), paragraph_);
 	paragraph_number_++;
 }

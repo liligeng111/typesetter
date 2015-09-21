@@ -26,7 +26,8 @@ public:
 protected:
 	void wheelEvent(QWheelEvent * event) Q_DECL_OVERRIDE;
 	void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
-	void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;
+	void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE; 
+	void keyReleaseEvent(QKeyEvent * event) Q_DECL_OVERRIDE;
 
 private slots:
 	void newFile();

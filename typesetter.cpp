@@ -62,6 +62,8 @@ void Typesetter::LoadFace()
 	settings::space_width_ = face_->glyph->advance.x;
 	settings::stretchability_ = settings::space_width_ * settings::stretch_ratio_;
 	settings::shrinkability_ = settings::space_width_  * settings::shrink_ratio_;
+
+	typesetting_single_paragraph_ = false;
 }
 
 Typesetter::~Typesetter()
@@ -104,6 +106,9 @@ void Typesetter::clean()
 
 	paragraph_number_ = 0;
 	suggestions_.clear();
+
+	magic_edges_.clear();
+	normal_demerits_ = 0;
 }
 
 Page* Typesetter::get_page_number(int qscintilla_line_number)
@@ -121,8 +126,9 @@ Page* Typesetter::get_page_number(int qscintilla_line_number)
 	return nullptr;
 }
 
-void Typesetter::Typeset(QString& text)
-{	
+void Typesetter::typeset(QString& text, bool single_paragraph)
+{
+	typesetting_single_paragraph_ = single_paragraph;
 
 	Logger::set_start_time();
 	FT_Error error = FT_Load_Char(face_, '-', FT_LOAD_NO_SCALE);
@@ -154,7 +160,7 @@ void Typesetter::Typeset(QString& text)
 	unsigned short ch = 0;
 
 	bool new_paragraph = true;
-	
+
 	for (int text_index = 0; text_index < text.length(); text_index++)
 	{
 		//TODO::rewrite control
@@ -172,7 +178,7 @@ void Typesetter::Typeset(QString& text)
 
 			//force break
 			//TODO::UTF8....
-			if (ch == '/' && text.at(text_index + 1).unicode() == '/')
+			if (ch == '\\' && text.at(text_index + 1).unicode() == '\\')
 			{
 				ch = 49794;
 				text_index += 2;
@@ -189,7 +195,7 @@ void Typesetter::Typeset(QString& text)
 		{
 			ch = 8217;
 		}
-		
+
 		if (ch == 24)
 		{
 			cout << "hi";
@@ -199,32 +205,32 @@ void Typesetter::Typeset(QString& text)
 		/*
 		else if (ch == 'f' && look_ahead[0] == 'f')
 		{
-			ch = 64256;
-			move_forward = 1;
+		ch = 64256;
+		move_forward = 1;
 		}
 		else if (ch == 'f' && look_ahead[0] == 'i')
 		{
-			ch = 64257;
-			move_forward = 1;
+		ch = 64257;
+		move_forward = 1;
 		}
 		else if (ch == 'f' && look_ahead[0] == 'l')
 		{
-			ch = 64258;
-			move_forward = 1;
+		ch = 64258;
+		move_forward = 1;
 		}
 
 		for (int i = 0; i < move_forward; i++)
 		{
-			look_ahead[0] = look_ahead[1];
-			fin.get(look_ahead[1]);
-			if (fin.eof())
-				look_ahead[1] = 0;
+		look_ahead[0] = look_ahead[1];
+		fin.get(look_ahead[1]);
+		if (fin.eof())
+		look_ahead[1] = 0;
 		}*/
 
 		//cout << char(ch) << " - " << int(ch) << endl;
 		//TODO::What is this...
 		if (int(ch) == 13)
-		{			
+		{
 			continue;
 		}
 
@@ -241,7 +247,7 @@ void Typesetter::Typeset(QString& text)
 			item->set_prev(last_item);
 			last_item = item;
 		}
-		
+
 		//kern
 		glyph_index = FT_Get_Char_Index(face_, ch);
 		FT_Vector* kern = new FT_Vector();
@@ -292,7 +298,7 @@ void Typesetter::Typeset(QString& text)
 			{
 				word->hyphenate(&hyphenator_, hyphen_glyph_);
 			}
-			word = nullptr; 
+			word = nullptr;
 			Item* item = new Item(Item::GLUE);
 			item->init_glue(settings::stretchability_, settings::shrinkability_, settings::glue_priority_);
 			item->set_geometry(x_cursor, 0, settings::space_width_, 0);
@@ -344,7 +350,7 @@ void Typesetter::Typeset(QString& text)
 				if (error)
 				{
 					message("Error loading character");
-					string msg = "Error loading character" + to_string(ch) + " " +  to_string(int(ch));
+					string msg = "Error loading character" + to_string(ch) + " " + to_string(int(ch));
 					Logger::error(200, msg);
 				}
 				if (glyph_index == 0)
@@ -798,4 +804,31 @@ int Typesetter::get_next_magic(int line)
 			return magic_paragraphs_[i];
 	}
 	return magic_paragraphs_[0];
+}
+
+QString Typesetter::magic_index_increase()
+{ 
+	if (magic_edges_.size() != 0) 
+	{
+		magic_index_++; 
+		magic_index_ %= magic_edges_.size(); 
+		auto edge = magic_edges_[magic_index_];
+		float gain = normal_demerits_ - edge.first->forward_demerits_ - edge.second->backward_demerits_ - 1;
+		return QString("Magic edge gain: %1").arg(gain);
+	} 
+	return QString("Error finding magic edge");
+}
+
+QString Typesetter::magic_index_decrease()
+{ 
+	if (magic_edges_.size() != 0) 
+	{
+		magic_index_--; 
+		magic_index_ += magic_edges_.size(); 
+		magic_index_ %= magic_edges_.size();
+		auto edge = magic_edges_[magic_index_];
+		float gain = normal_demerits_ - edge.first->forward_demerits_ - edge.second->backward_demerits_ - 1;
+		return QString("Magic edge gain: %1").arg(gain);
+	}
+	return QString("Error finding magic edge");
 }

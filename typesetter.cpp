@@ -196,10 +196,6 @@ void Typesetter::typeset(QString& text, bool single_paragraph)
 			ch = 8217;
 		}
 
-		if (ch == 24)
-		{
-			cout << "hi";
-		}
 
 		//TODO::check for availbility78
 		/*
@@ -388,6 +384,12 @@ void Typesetter::typeset(QString& text, bool single_paragraph)
 			}
 
 			Item* item = new Item(Item::BOX);
+			//em-dash
+			if (ch == 8212)
+			{
+				//TODO::margin kerning
+				item->set_breakable(true);
+			}
 			item->init_box(glyph, word, settings::font_expansion_ * glyph->width(), settings::font_expansion_ * glyph->width());
 			item->set_geometry(x_cursor + glyph->hori_bearing_x(), item->glyph()->hori_bearing_y(), glyph->width(), -item->glyph()->height());
 			paragraph_.push_back(item);
